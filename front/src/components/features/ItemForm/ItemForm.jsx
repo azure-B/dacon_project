@@ -44,7 +44,7 @@ export default function ItemForm() {
         value={description}
         onChange={(e) => setDescription(e.target.value)}
       />
-      <Button type="submit" disabled={submitting || !title.trim()}>
+      <Button type="submit" variant="legacy" disabled={submitting || !title.trim()}>
         {submitting ? '추가 중...' : '추가'}
       </Button>
     </form>

@@ -1,0 +1,432 @@
+<!DOCTYPE html><html lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI 가계부 피드백</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed": "#001c38",
+                      "secondary-container": "#7db6ff",
+                      "tertiary-fixed": "#6ffbbe",
+                      "on-error-container": "#93000a",
+                      "surface-variant": "#d3e4fe",
+                      "on-secondary-container": "#00477f",
+                      "surface-tint": "#455f88",
+                      "surface-bright": "#f8f9ff",
+                      "on-secondary-fixed-variant": "#004881",
+                      "tertiary-container": "#003e28",
+                      "surface": "#f8f9ff",
+                      "on-tertiary": "#ffffff",
+                      "tertiary": "#002617",
+                      "secondary-fixed": "#d3e4ff",
+                      "secondary-fixed-dim": "#a2c9ff",
+                      "primary-fixed-dim": "#adc7f7",
+                      "error-container": "#ffdad6",
+                      "surface-container-high": "#dce9ff",
+                      "inverse-on-surface": "#eaf1ff",
+                      "primary-container": "#1a365d",
+                      "on-secondary": "#ffffff",
+                      "surface-container-low": "#eff4ff",
+                      "error": "#ba1a1a",
+                      "secondary": "#1960a3",
+                      "outline-variant": "#c4c6cf",
+                      "on-primary-container": "#86a0cd",
+                      "tertiary-fixed-dim": "#4edea3",
+                      "on-tertiary-container": "#00b47d",
+                      "on-background": "#0b1c30",
+                      "background": "#f8f9ff",
+                      "primary-fixed": "#d6e3ff",
+                      "on-primary-fixed": "#001b3c",
+                      "on-surface": "#0b1c30",
+                      "primary": "#002045",
+                      "on-tertiary-fixed": "#002113",
+                      "surface-dim": "#cbdbf5",
+                      "surface-container": "#e5eeff",
+                      "on-primary": "#ffffff",
+                      "inverse-primary": "#adc7f7",
+                      "on-surface-variant": "#43474e",
+                      "inverse-surface": "#213145",
+                      "on-primary-fixed-variant": "#2d476f",
+                      "on-tertiary-fixed-variant": "#005236",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-highest": "#d3e4fe",
+                      "outline": "#74777f",
+                      "on-error": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "unit": "4px",
+                      "container-max": "1280px",
+                      "xs": "4px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "margin-desktop": "64px",
+                      "margin-mobile": "16px",
+                      "xl": "48px",
+                      "lg": "24px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Inter", "sans-serif"],
+                      "headline-sm": ["Inter", "sans-serif"],
+                      "body-md": ["Noto Sans KR", "sans-serif"],
+                      "label-md": ["Inter", "sans-serif"],
+                      "body-sm": ["Noto Sans KR", "sans-serif"],
+                      "headline-md": ["Inter", "sans-serif"],
+                      "body-lg": ["Noto Sans KR", "sans-serif"],
+                      "headline-lg-mobile": ["Inter", "sans-serif"],
+                      "headline-lg": ["Inter", "sans-serif"],
+                      "display-lg": ["Inter", "sans-serif"]
+              },
+              "fontSize": {
+                      "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.03em", "fontWeight": "500" }],
+                      "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                      "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                      "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                      "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                      "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                      "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                      "headline-lg-mobile": ["28px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                      "headline-lg": ["32px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                      "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+              }
+            },
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Custom scrollbar for main canvas */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #c4c6cf;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex antialiased">
+<!-- SideNavBar -->
+<nav class="h-screen w-64 fixed left-0 top-16 bg-surface-container-low border-r border-outline-variant flex flex-col py-md gap-sm z-40 hidden md:flex">
+<!-- Tab: Overview (Active based on context fallback) -->
+<a class="bg-secondary-container text-on-secondary-container rounded-lg mx-2 my-1 px-md py-sm flex items-center gap-md scale-95 duration-150 group cursor-default" href="#">
+<span class="material-symbols-outlined icon-fill">analytics</span>
+<span class="text-label-md font-label-md">개요</span>
+</a>
+<!-- Tab: Portfolio Reports -->
+<a class="text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg px-md py-sm flex items-center gap-md hover:text-on-surface transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">description</span>
+<span class="text-label-md font-label-md">포트폴리오 보고서</span>
+</a>
+<!-- Tab: Risk Settings -->
+<a class="text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg px-md py-sm flex items-center gap-md hover:text-on-surface transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">settings_applications</span>
+<span class="text-label-md font-label-md">리스크 설정</span>
+</a>
+<!-- Tab: Audit Log -->
+<a class="text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg px-md py-sm flex items-center gap-md hover:text-on-surface transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">history</span>
+<span class="text-label-md font-label-md">감사 로그</span>
+</a>
+<!-- Tab: Security -->
+<a class="text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg px-md py-sm flex items-center gap-md hover:text-on-surface transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">shield</span>
+<span class="text-label-md font-label-md">보안</span>
+</a>
+<div class="mt-auto px-md pb-md flex flex-col gap-sm">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-label-sm">
+                    UW
+                </div>
+<div>
+<div class="text-label-md font-label-md font-bold text-on-surface">심층 분석</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant">기관 등급</div>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary hover:bg-on-primary-fixed-variant transition-colors py-sm rounded-lg text-label-md font-label-md font-medium mt-sm shadow-sm hover:shadow-md flex justify-center items-center gap-xs">
+                보고서 생성
+            </button>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-64 min-w-0">
+<!-- TopNavBar -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-margin-desktop bg-surface h-16 border-b border-outline-variant shadow-sm">
+<!-- Brand -->
+<div class="flex items-center gap-md">
+<div class="text-headline-md font-headline-md font-bold text-primary tracking-tight">AI 재무 인터렉티브</div>
+</div>
+<!-- Navigation Links (Web) -->
+<nav class="hidden lg:flex items-center gap-lg h-full">
+<a class="text-on-surface-variant hover:text-secondary transition-colors text-label-md font-label-md h-full flex items-center" href="#">대시보드</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors text-label-md font-label-md h-full flex items-center" href="#">부채 분석</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors text-label-md font-label-md h-full flex items-center" href="#">시뮬레이션</a>
+<!-- Active Link -->
+<a class="text-secondary font-bold border-b-2 border-secondary pb-1 h-full flex items-center mt-1 opacity-80 transition-opacity text-label-md font-label-md" href="#">AI 피드백</a>
+</nav>
+<!-- Trailing Icons -->
+<div class="flex items-center gap-sm">
+<button class="w-10 h-10 rounded-full hover:bg-surface-variant flex items-center justify-center text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-10 h-10 rounded-full hover:bg-surface-variant flex items-center justify-center text-on-surface-variant transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-lg overflow-x-hidden">
+<!-- Page Header & Tabs -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-lg gap-md border-b border-outline-variant pb-md">
+<div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface hidden md:block">AI 가계부 분석</h1>
+<h1 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface block md:hidden">AI 가계부 분석</h1>
+<p class="text-body-md font-body-md text-on-surface-variant mt-sm">인공지능 기반 지출 패턴 분석 및 최적화 제안</p>
+</div>
+<div class="flex gap-sm bg-surface-container-low p-1 rounded-lg border border-outline-variant self-start md:self-auto">
+<button class="px-md py-xs rounded-md text-label-md font-label-md text-on-surface-variant hover:bg-surface-variant transition-colors">일간</button>
+<button class="px-md py-xs rounded-md text-label-md font-label-md text-on-surface-variant hover:bg-surface-variant transition-colors">주간</button>
+<button class="px-md py-xs rounded-md text-label-md font-label-md bg-surface shadow-sm text-primary font-medium">월간</button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- AI Feedback Card (Premium/Glassmorphism inspired) -->
+<div class="col-span-1 lg:col-span-4 bg-gradient-to-br from-surface to-surface-container-low border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary-container rounded-full blur-3xl opacity-20 -mr-10 -mt-10 pointer-events-none"></div>
+<div class="flex items-center gap-sm mb-md z-10">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">smart_toy</span>
+</div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface">AI 인사이트</h2>
+</div>
+<div class="flex flex-col gap-sm flex-1 z-10">
+<!-- Insight 1 -->
+<div class="bg-surface-bright rounded-lg p-md border border-outline-variant/50 shadow-sm flex items-start gap-md">
+<span class="material-symbols-outlined text-error mt-xs">trending_up</span>
+<div>
+<p class="text-body-md font-body-md text-on-surface leading-snug">이번 달 <span class="font-bold text-error">식비</span>가 지난달보다 <span class="font-bold">12% 증가</span>했습니다.</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-xs">외식 비중이 30% 증가한 것이 주요 원인입니다.</p>
+</div>
+</div>
+<!-- Insight 2 -->
+<div class="bg-surface-bright rounded-lg p-md border border-outline-variant/50 shadow-sm flex items-start gap-md">
+<span class="material-symbols-outlined text-on-tertiary-container mt-xs">savings</span>
+<div>
+<p class="text-body-md font-body-md text-on-surface leading-snug">사용하지 않는 구독서비스를 정리하면 월 <span class="font-bold text-on-tertiary-container">19,000원을 절약</span>할 수 있습니다.</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-xs">최근 3개월간 미사용: '스트리밍 A', '디지털 매거진'</p>
+</div>
+</div>
+</div>
+<button class="mt-md w-full py-sm bg-surface-container-high text-on-surface hover:bg-surface-variant transition-colors rounded-lg text-label-md font-label-md font-medium border border-outline-variant z-10">
+                        상세 분석 보기
+                    </button>
+</div>
+<!-- Monthly Spending Chart (Bar) -->
+<div class="col-span-1 lg:col-span-8 bg-surface border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col">
+<div class="flex justify-between items-center mb-lg">
+<h2 class="text-headline-sm font-headline-sm text-on-surface">월별 지출 추이</h2>
+<button class="text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Chart Canvas area (Simulated with HTML/CSS for structural demonstration) -->
+<div class="flex-1 flex items-end justify-between gap-sm md:gap-md pt-xl relative min-h-[240px]">
+<!-- Grid lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none pb-8">
+<div class="w-full border-t border-outline-variant/30"></div>
+<div class="w-full border-t border-outline-variant/30"></div>
+<div class="w-full border-t border-outline-variant/30"></div>
+<div class="w-full border-t border-outline-variant/30"></div>
+<div class="w-full border-t border-outline-variant/30"></div>
+</div>
+<!-- Bars -->
+<div class="flex flex-col items-center gap-xs z-10 group w-full">
+<div class="w-full max-w-[40px] bg-secondary-fixed-dim rounded-t-sm h-[40%] group-hover:bg-secondary-container transition-colors"></div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">3월</span>
+</div>
+<div class="flex flex-col items-center gap-xs z-10 group w-full">
+<div class="w-full max-w-[40px] bg-secondary-fixed-dim rounded-t-sm h-[55%] group-hover:bg-secondary-container transition-colors"></div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">4월</span>
+</div>
+<div class="flex flex-col items-center gap-xs z-10 group w-full">
+<div class="w-full max-w-[40px] bg-secondary-fixed-dim rounded-t-sm h-[45%] group-hover:bg-secondary-container transition-colors"></div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">5월</span>
+</div>
+<div class="flex flex-col items-center gap-xs z-10 group w-full">
+<div class="w-full max-w-[40px] bg-secondary-fixed-dim rounded-t-sm h-[60%] group-hover:bg-secondary-container transition-colors"></div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">6월</span>
+</div>
+<div class="flex flex-col items-center gap-xs z-10 group w-full">
+<div class="w-full max-w-[40px] bg-secondary-fixed-dim rounded-t-sm h-[50%] group-hover:bg-secondary-container transition-colors"></div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">7월</span>
+</div>
+<div class="flex flex-col items-center gap-xs z-10 group w-full relative">
+<!-- Current Month Indicator -->
+<div class="absolute -top-8 bg-primary text-on-primary text-[10px] py-1 px-2 rounded font-bold whitespace-nowrap">예상 달성</div>
+<div class="w-full max-w-[40px] bg-primary rounded-t-sm h-[75%] shadow-sm"></div>
+<span class="text-label-sm font-label-sm text-primary font-bold">8월</span>
+</div>
+</div>
+</div>
+<!-- Category Distribution Chart (Donut) -->
+<div class="col-span-1 lg:col-span-5 bg-surface border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col">
+<h2 class="text-headline-sm font-headline-sm text-on-surface mb-md">카테고리별 분포</h2>
+<div class="flex-1 flex flex-col items-center justify-center py-md">
+<!-- Simulated Donut Chart using Conic Gradient -->
+<div class="relative w-48 h-48 rounded-full mb-lg" style="background: conic-gradient(
+                            #1a365d 0% 35%,     /* 식비 35% */
+                            #7db6ff 35% 55%,    /* 주거 20% */
+                            #00b47d 55% 70%,    /* 교통 15% */
+                            #cbdbf5 70% 82%,    /* 쇼핑 12% */
+                            #455f88 82% 90%,    /* 구독 8% */
+                            #c4c6cf 90% 100%    /* 기타 10% */
+                        );">
+<!-- Inner Circle for Donut effect -->
+<div class="absolute inset-4 bg-surface rounded-full flex flex-col items-center justify-center shadow-inner">
+<span class="text-label-sm font-label-sm text-on-surface-variant">총 지출</span>
+<span class="text-headline-sm font-headline-sm font-bold text-on-surface">₩3,450,000</span>
+</div>
+</div>
+<!-- Mini Legend inline for space -->
+<div class="flex flex-wrap justify-center gap-md px-sm">
+<div class="flex items-center gap-xs"><div class="w-3 h-3 rounded-full bg-primary-container"></div><span class="text-label-sm font-label-sm">식비 (35%)</span></div>
+<div class="flex items-center gap-xs"><div class="w-3 h-3 rounded-full bg-secondary-container"></div><span class="text-label-sm font-label-sm">주거 (20%)</span></div>
+<div class="flex items-center gap-xs"><div class="w-3 h-3 rounded-full bg-[#00b47d]"></div><span class="text-label-sm font-label-sm">교통 (15%)</span></div>
+</div>
+</div>
+</div>
+<!-- Categorized Spending List -->
+<div class="col-span-1 lg:col-span-7 bg-surface border border-outline-variant rounded-xl p-0 shadow-sm flex flex-col overflow-hidden">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
+<h2 class="text-headline-sm font-headline-sm text-on-surface">상세 지출 내역</h2>
+<button class="text-label-md font-label-md text-primary hover:underline">전체보기</button>
+</div>
+<div class="flex-1 overflow-y-auto max-h-[400px]">
+<!-- List Items -->
+<div class="flex items-center justify-between p-md border-b border-outline-variant/50 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary-container">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div>
+<div class="text-body-md font-body-md text-on-surface font-medium">식비</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant">외식, 식자재, 커피 등</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-body-md font-body-md text-on-surface font-semibold">₩1,207,500</div>
+<div class="text-label-sm font-label-sm text-error flex items-center justify-end gap-xs">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span> 12%
+                                </div>
+</div>
+</div>
+<div class="flex items-center justify-between p-md border-b border-outline-variant/50 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-secondary-container/20 flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">home</span>
+</div>
+<div>
+<div class="text-body-md font-body-md text-on-surface font-medium">주거/통신</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant">월세, 관리비, 통신비 등</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-body-md font-body-md text-on-surface font-semibold">₩690,000</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant flex items-center justify-end gap-xs">
+<span class="material-symbols-outlined text-[14px]">horizontal_rule</span> 변동없음
+                                </div>
+</div>
+</div>
+<div class="flex items-center justify-between p-md border-b border-outline-variant/50 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-[#00b47d]/10 flex items-center justify-center text-[#00b47d]">
+<span class="material-symbols-outlined">directions_car</span>
+</div>
+<div>
+<div class="text-body-md font-body-md text-on-surface font-medium">교통/차량</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant">대중교통, 주유, 택시</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-body-md font-body-md text-on-surface font-semibold">₩517,500</div>
+<div class="text-label-sm font-label-sm text-[#00b47d] flex items-center justify-end gap-xs">
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span> 5%
+                                </div>
+</div>
+</div>
+<div class="flex items-center justify-between p-md border-b border-outline-variant/50 hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+<div>
+<div class="text-body-md font-body-md text-on-surface font-medium">쇼핑</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant">의류, 잡화, 온라인 쇼핑</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-body-md font-body-md text-on-surface font-semibold">₩414,000</div>
+<div class="text-label-sm font-label-sm text-error flex items-center justify-end gap-xs">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span> 2%
+                                </div>
+</div>
+</div>
+<div class="flex items-center justify-between p-md hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-tint/10 flex items-center justify-center text-surface-tint">
+<span class="material-symbols-outlined">subscriptions</span>
+</div>
+<div>
+<div class="text-body-md font-body-md text-on-surface font-medium">구독</div>
+<div class="text-label-sm font-label-sm text-on-surface-variant">OTT, 소프트웨어, 멤버십</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-body-md font-body-md text-on-surface font-semibold">₩276,000</div>
+<div class="text-label-sm font-label-sm text-error flex items-center justify-end gap-xs font-bold">
+                                    AI 경고 
+                                </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full mt-xl border-t border-outline-variant bg-surface-container-lowest flex flex-col md:flex-row justify-between items-center px-margin-desktop py-lg">
+<div class="text-label-sm font-label-sm font-semibold text-on-surface-variant mb-md md:mb-0">
+                © 2024 기관 인텔리전스. 모든 권리 보유.
+            </div>
+<div class="flex flex-wrap gap-md md:gap-lg justify-center">
+<a class="text-on-surface-variant hover:text-secondary transition-colors text-body-sm font-body-sm" href="#">이용약관</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors text-body-sm font-body-sm" href="#">개인정보처리방침</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors text-body-sm font-body-sm" href="#">고객 지원</a>
+<a class="text-on-surface-variant hover:text-secondary transition-colors text-body-sm font-body-sm" href="#">규제 공시</a>
+</div>
+</footer>
+</div>
+
+
+</body></html>

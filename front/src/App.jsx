@@ -1,12 +1,22 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/layout';
-import { Home } from './pages';
-import './App.css';
+import { Dashboard, DebtAnalysis, Simulation, AiFeedback, AiReport, Login, Signup } from './pages';
 
 function App() {
   return (
-    <Layout>
-      <Home />
-    </Layout>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/debt-analysis" element={<DebtAnalysis />} />
+          <Route path="/simulation" element={<Simulation />} />
+          <Route path="/ai-feedback" element={<AiFeedback />} />
+          <Route path="/ai-report" element={<AiReport />} />
+        </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
