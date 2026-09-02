@@ -3,3 +3,23 @@
   top: 0;
   z-index: 50;
 }
+
+.header__overlay {
+  position: fixed;
+  inset: 0;
+  top: 4rem;
+  z-index: 40;
+  background: rgba(11, 28, 48, 0.35);
+}
+
+.header__drawer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 4rem;
+  z-index: 60;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.08);
+}

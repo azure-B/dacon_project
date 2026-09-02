@@ -44,8 +44,8 @@ export default function Login() {
   };
 
   return (
-    <div className="bg-background min-h-screen flex items-center justify-center p-margin-mobile md:p-margin-desktop antialiased">
-      <Card className="w-full max-w-[440px] bg-surface p-lg md:p-xl flex flex-col gap-lg">
+    <div className="bg-background min-h-screen flex items-center justify-center p-3 sm:p-margin-mobile md:p-margin-desktop antialiased page-shell">
+      <Card className="w-full max-w-[440px] bg-surface p-md sm:p-lg md:p-xl flex flex-col gap-md sm:gap-lg">
         <div className="flex flex-col items-center text-center gap-sm">
           <div className="w-12 h-12 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center mb-sm shadow-level-1">
             <MaterialIcon name="account_balance" className="text-[28px]" />
@@ -98,12 +98,12 @@ export default function Login() {
         </form>
 
         <div className="flex flex-col gap-md pt-sm border-t border-outline-variant/30">
-          <div className="flex justify-center items-center gap-md">
-            <a className="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">
+          <div className="flex flex-wrap justify-center items-center gap-sm sm:gap-md">
+            <a className="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors min-h-[44px] flex items-center px-sm" href="#">
               아이디 찾기
             </a>
-            <span className="w-[1px] h-3 bg-outline-variant/50" />
-            <a className="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">
+            <span className="w-[1px] h-3 bg-outline-variant/50 hidden sm:block" />
+            <a className="text-label-md font-label-md text-on-surface-variant hover:text-primary transition-colors min-h-[44px] flex items-center px-sm" href="#">
               비밀번호 찾기
             </a>
           </div>

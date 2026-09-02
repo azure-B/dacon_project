@@ -1,3 +1,8 @@
 .layout {
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.layout__main {
+  overflow-x: hidden;
 }

@@ -71,7 +71,7 @@ export default function AiReport() {
   const [sideTab, setSideTab] = useState('portfolio');
 
   return (
-    <div className="flex min-h-full antialiased">
+    <div className="flex min-h-full antialiased page-shell min-w-0">
       <aside className="hidden md:flex flex-col h-[calc(100vh-4rem)] w-64 sticky top-16 bg-surface-container-low border-r border-outline-variant py-md gap-sm z-40 shrink-0">
         <div className="px-md mb-md">
           <div className="flex items-center gap-sm mb-xs">
@@ -112,43 +112,63 @@ export default function AiReport() {
         </div>
       </aside>
 
-      <main className="flex-1 md:ml-0 w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-lg md:py-xl min-w-0">
-        <div className="mb-xl flex flex-col md:flex-row justify-between items-start md:items-end gap-md">
+      <main className="flex-1 md:ml-0 w-full max-w-container-max mx-auto px-3 sm:px-margin-mobile md:px-margin-desktop py-md md:py-xl min-w-0 overflow-x-hidden">
+        <nav className="md:hidden flex gap-sm overflow-x-auto hide-scrollbar pb-sm mb-md border-b border-outline-variant -mx-1 px-1">
+          {SIDE_ITEMS.map((item) => {
+            const active = sideTab === item.id;
+            return (
+              <button
+                key={`mobile-${item.id}`}
+                type="button"
+                onClick={() => setSideTab(item.id)}
+                className={`shrink-0 px-md py-2 rounded-full text-label-sm font-label-md min-h-[44px] ${
+                  active
+                    ? 'bg-secondary-container text-on-secondary-container font-bold'
+                    : 'bg-surface-container-low text-on-surface-variant border border-outline-variant'
+                }`}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="mb-lg md:mb-xl flex flex-col md:flex-row justify-between items-start md:items-end gap-md">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-high rounded-full mb-4">
               <span className="w-2 h-2 rounded-full bg-secondary" />
               <span className="text-label-sm font-label-sm text-on-surface-variant tracking-wider uppercase">AI 생성 분석</span>
             </div>
-            <h1 className="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-primary mb-2">
+            <h1 className="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-primary mb-2 break-keep">
               AI 심층 재무 보고서
             </h1>
-            <p className="text-body-lg font-body-lg text-on-surface-variant">
+            <p className="text-body-sm md:text-body-lg font-body-lg text-on-surface-variant break-keep">
               기준일: 2024년 5월 24일 · 분석 대상: 통합 포트폴리오 Alpha
             </p>
           </div>
-          <div className="flex flex-wrap gap-sm">
-            <Button variant="outline" className="px-4 py-2 h-auto">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-sm w-full md:w-auto">
+            <Button variant="outline" className="px-4 py-2 h-12 sm:h-auto w-full sm:w-auto">
               <MaterialIcon name="download" className="text-[18px]" />
               PDF 다운로드
             </Button>
-            <Button variant="secondary" className="px-4 py-2 h-auto">
+            <Button variant="secondary" className="px-4 py-2 h-12 sm:h-auto w-full sm:w-auto">
               <MaterialIcon name="share" className="text-[18px]" />
               보고서 공유
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-lg">
-          <div className="col-span-1 md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-lg mb-4">
-            <Card className="p-lg flex flex-col justify-center relative overflow-hidden group hover:shadow-level-2 transition-shadow border-0">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-md md:gap-lg min-w-0">
+          <div className="col-span-1 md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-md md:gap-lg mb-4">
+            <Card className="p-md md:p-lg flex flex-col justify-center relative overflow-hidden group hover:shadow-level-2 transition-shadow border-0 min-w-0">
               <div className="absolute -right-12 -top-12 w-48 h-48 bg-secondary-container rounded-full opacity-10 group-hover:scale-110 transition-transform duration-500" />
               <div className="flex items-center gap-sm mb-md text-secondary">
                 <MaterialIcon name="savings" />
                 <h3 className="text-headline-sm font-headline-sm">예상 절감액 (월간)</h3>
               </div>
-              <div className="flex items-end gap-sm">
-                <span className="text-display-lg font-display-lg text-primary tracking-tight">₩1,250,000</span>
-                <span className="text-body-md font-body-md text-on-surface-variant mb-2">/ 월</span>
+              <div className="flex flex-wrap items-end gap-sm">
+                <span className="text-headline-lg-mobile md:text-display-lg font-display-lg text-primary tracking-tight financial-value break-words">₩1,250,000</span>
+                <span className="text-body-md font-body-md text-on-surface-variant mb-1 sm:mb-2">/ 월</span>
               </div>
               <div className="mt-sm flex items-center gap-2 text-on-tertiary-container">
                 <MaterialIcon name="trending_up" className="text-[16px]" />
@@ -156,44 +176,45 @@ export default function AiReport() {
               </div>
             </Card>
 
-            <Card className="p-lg flex flex-col justify-center relative overflow-hidden group hover:shadow-level-2 transition-shadow border-0">
+            <Card className="p-md md:p-lg flex flex-col justify-center relative overflow-hidden group hover:shadow-level-2 transition-shadow border-0 min-w-0">
               <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-tertiary-container rounded-full opacity-5 group-hover:scale-110 transition-transform duration-500" />
               <div className="flex items-center gap-sm mb-md text-tertiary-container">
                 <MaterialIcon name="flag" />
                 <h3 className="text-headline-sm font-headline-sm">목표 달성 예상 기간</h3>
               </div>
               <div className="flex items-end gap-sm">
-                <span className="text-display-lg font-display-lg text-primary tracking-tight">14개월 단축</span>
+                <span className="text-headline-lg-mobile md:text-display-lg font-display-lg text-primary tracking-tight break-words">14개월 단축</span>
               </div>
               <div className="mt-sm">
                 <div className="w-full bg-surface-variant rounded-full h-2.5 mb-2">
                   <div className="bg-tertiary-fixed-dim h-2.5 rounded-full" style={{ width: '75%' }} />
                 </div>
-                <div className="flex justify-between text-label-sm font-label-sm text-on-surface-variant">
-                  <span>기존 예상: 60개월</span>
-                  <span className="text-primary font-bold">AI 최적화 후: 46개월</span>
+                <div className="flex flex-col sm:flex-row justify-between gap-1 sm:gap-2 text-label-sm font-label-sm text-on-surface-variant">
+                  <span className="break-keep">기존 예상: 60개월</span>
+                  <span className="text-primary font-bold break-keep">AI 최적화 후: 46개월</span>
                 </div>
               </div>
             </Card>
           </div>
 
-          <Card className="col-span-1 md:col-span-8 flex flex-col hover:shadow-level-2 transition-shadow border-0 overflow-hidden">
-            <div className="p-lg border-b border-outline-variant flex flex-col sm:flex-row justify-between items-start sm:items-center gap-sm">
+          <Card className="col-span-1 md:col-span-8 flex flex-col hover:shadow-level-2 transition-shadow border-0 overflow-hidden min-w-0">
+            <div className="p-md md:p-lg border-b border-outline-variant flex flex-col sm:flex-row justify-between items-start sm:items-center gap-sm">
               <div className="flex items-center gap-sm">
                 <MaterialIcon name="query_stats" className="text-secondary" />
                 <h3 className="text-headline-sm font-headline-sm text-primary">주요 분석: 현금 흐름 및 지출 패턴</h3>
               </div>
               <span className="px-2 py-1 bg-surface-variant text-on-surface-variant text-label-sm font-label-sm rounded">6개월</span>
             </div>
-            <div className="p-lg flex-1 flex flex-col">
-              <p className="text-body-sm font-body-sm text-on-surface-variant mb-xl">
+            <div className="p-md md:p-lg flex-1 flex flex-col min-w-0">
+              <p className="text-body-sm font-body-sm text-on-surface-variant mb-lg md:mb-xl break-keep">
                 지난 6개월간의 데이터를 분석한 결과, 고정비 지출이 권장 수준(수입의 40%)을 초과하여 52%에 달하고 있습니다. 특히 이자
                 비용과 구독 서비스 항목에서 비효율성이 두드러집니다.
               </p>
-              <div className="flex-1 min-h-[250px] flex items-end justify-between gap-2 px-md mt-auto overflow-x-auto">
+              <div className="w-full min-w-0 mt-auto overflow-x-auto">
+                <div className="flex items-end justify-between gap-1 sm:gap-2 px-1 sm:px-md min-w-[300px] min-h-[200px] sm:min-h-[250px]">
                 {CHART_MONTHS.map((month) => (
-                  <div key={month.label} className="flex flex-col items-center gap-2 w-full min-w-[48px] group">
-                    <div className="w-full relative flex items-end justify-center h-48 bg-surface-container rounded-t-sm overflow-hidden">
+                  <div key={month.label} className="flex flex-col items-center gap-2 w-full min-w-[40px] sm:min-w-[48px] group shrink-0">
+                    <div className="w-full relative flex items-end justify-center h-36 sm:h-48 bg-surface-container rounded-t-sm overflow-hidden">
                       <div
                         className={`absolute bottom-0 w-3/4 bg-primary-container rounded-t-sm ${
                           month.segments[0].highlight ? 'group-hover:bg-primary' : 'group-hover:bg-primary'
@@ -216,6 +237,7 @@ export default function AiReport() {
                     </span>
                   </div>
                 ))}
+                </div>
               </div>
               <div className="flex flex-wrap justify-center gap-md mt-md pt-md border-t border-surface-variant">
                 <div className="flex items-center gap-xs">
@@ -234,8 +256,8 @@ export default function AiReport() {
             </div>
           </Card>
 
-          <div className="col-span-1 md:col-span-4 flex flex-col gap-md">
-            <Card className="p-lg h-full hover:shadow-level-2 transition-shadow border-0">
+          <div className="col-span-1 md:col-span-4 flex flex-col gap-md min-w-0">
+            <Card className="p-md md:p-lg h-full hover:shadow-level-2 transition-shadow border-0 min-w-0">
               <div className="flex items-center gap-sm mb-lg">
                 <MaterialIcon name="warning" className="text-error" />
                 <h3 className="text-headline-sm font-headline-sm text-primary">현재 문제점</h3>
@@ -267,14 +289,14 @@ export default function AiReport() {
             </Card>
           </div>
 
-          <Card className="col-span-1 md:col-span-7 hover:shadow-level-2 transition-shadow border-0 overflow-hidden">
-            <div className="p-lg border-b border-outline-variant">
+          <Card className="col-span-1 md:col-span-7 hover:shadow-level-2 transition-shadow border-0 overflow-hidden min-w-0">
+            <div className="p-md md:p-lg border-b border-outline-variant">
               <div className="flex items-center gap-sm">
                 <MaterialIcon name="tune" className="text-tertiary-fixed-dim" />
                 <h3 className="text-headline-sm font-headline-sm text-primary">절감 가능한 항목 세부내역</h3>
               </div>
             </div>
-            <div className="overflow-x-auto">
+            <div className="table-scroll">
               <table className="w-full text-left border-collapse min-w-[640px]">
                 <thead>
                   <tr className="bg-surface-container-low text-label-sm font-label-sm text-on-surface-variant border-b border-outline-variant">
@@ -305,7 +327,7 @@ export default function AiReport() {
             </div>
           </Card>
 
-          <Card className="col-span-1 md:col-span-5 p-lg hover:shadow-level-2 transition-shadow border-0 flex flex-col">
+          <Card className="col-span-1 md:col-span-5 p-md md:p-lg hover:shadow-level-2 transition-shadow border-0 flex flex-col min-w-0">
             <div className="flex items-center gap-sm mb-lg">
               <MaterialIcon name="assistant_direction" className="text-secondary" />
               <h3 className="text-headline-sm font-headline-sm text-primary">추천 행동</h3>
@@ -322,7 +344,7 @@ export default function AiReport() {
                   </p>
                 </div>
                 <Link to="/">
-                  <Button variant="secondary" fullWidth className="py-2">
+                  <Button variant="secondary" fullWidth className="py-2 min-h-[44px]">
                     대시보드 이동
                   </Button>
                 </Link>
@@ -337,7 +359,7 @@ export default function AiReport() {
                     현재 보유중인 고금리 부채를 대체할 수 있는, 승인 확률이 가장 높은 저금리 상품을 비교합니다.
                   </p>
                 </div>
-                <Button variant="outline" fullWidth className="py-2 border-secondary text-secondary hover:bg-surface-variant">
+                <Button variant="outline" fullWidth className="py-2 border-secondary text-secondary hover:bg-surface-variant min-h-[44px]">
                   상품 비교하기
                 </Button>
               </div>

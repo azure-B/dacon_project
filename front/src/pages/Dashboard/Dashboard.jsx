@@ -38,42 +38,42 @@ const SUMMARY_CARDS = [
 
 export default function Dashboard() {
   return (
-    <div className="flex flex-1 relative max-w-container-max mx-auto w-full">
-      <div className="flex-1 px-margin-mobile md:px-margin-desktop py-xl w-full max-w-[1200px] mx-auto">
-        <header className="mb-xl">
-          <h1 className="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-primary mb-xs">재무 대시보드</h1>
-          <p className="text-body-md font-body-md text-on-surface-variant">현재 재무 상태와 목표 진행률을 확인하세요.</p>
+    <div className="flex flex-1 relative max-w-container-max mx-auto w-full page-shell min-w-0">
+      <div className="flex-1 px-3 sm:px-margin-mobile md:px-margin-desktop py-lg md:py-xl w-full max-w-[1200px] mx-auto min-w-0">
+        <header className="mb-lg md:mb-xl">
+          <h1 className="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-primary mb-xs break-keep">재무 대시보드</h1>
+          <p className="text-body-sm md:text-body-md font-body-md text-on-surface-variant">현재 재무 상태와 목표 진행률을 확인하세요.</p>
         </header>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md mb-xl">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-sm sm:gap-md mb-lg md:mb-xl">
           {SUMMARY_CARDS.map((card) => (
             <div
               key={card.title}
-              className="glass-card rounded-xl p-md flex flex-col justify-between h-32 hover:shadow-lg transition-shadow duration-300"
+              className="glass-card rounded-xl p-md flex flex-col justify-between min-h-[7.5rem] sm:h-32 hover:shadow-lg transition-shadow duration-300"
             >
-              <div className="flex justify-between items-center mb-sm">
-                <h3 className="text-label-md font-label-md text-on-surface-variant">{card.title}</h3>
-                <MaterialIcon name={card.icon} className={`${card.iconClass} text-xl`} />
+              <div className="flex justify-between items-center mb-sm gap-sm min-w-0">
+                <h3 className="text-label-md font-label-md text-on-surface-variant truncate">{card.title}</h3>
+                <MaterialIcon name={card.icon} className={`${card.iconClass} text-xl shrink-0`} />
               </div>
-              <div>
-                <p className="text-headline-md font-headline-md text-primary">{card.value}</p>
+              <div className="min-w-0">
+                <p className="text-headline-sm sm:text-headline-md font-headline-md text-primary financial-value">{card.value}</p>
                 <p className={`text-label-sm font-label-sm mt-xs ${card.hintClass}`}>{card.hint}</p>
               </div>
             </div>
           ))}
         </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-xl mb-xl">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-lg md:gap-xl mb-lg md:mb-xl">
           <div className="lg:col-span-1 flex flex-col gap-md">
-            <div className="glass-card rounded-xl p-lg flex flex-col">
+            <div className="glass-card rounded-xl p-md md:p-lg flex flex-col">
               <h2 className="text-headline-sm font-headline-sm text-primary mb-md">현금 흐름 분석</h2>
-              <div className="flex justify-between items-center py-sm border-b border-outline-variant">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-xs py-sm border-b border-outline-variant">
                 <span className="text-body-sm font-body-sm text-on-surface-variant">월 고정지출</span>
-                <span className="text-body-md font-body-md text-primary font-medium">₩ 1,500,000</span>
+                <span className="text-body-md font-body-md text-primary font-medium financial-value">₩ 1,500,000</span>
               </div>
-              <div className="flex justify-between items-center py-sm pt-md">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-xs py-sm pt-md">
                 <span className="text-body-sm font-body-sm text-on-surface-variant">월 잉여 자금</span>
-                <span className="text-body-md font-body-md text-tertiary-fixed-dim font-bold">₩ 1,400,000</span>
+                <span className="text-body-md font-body-md text-tertiary-fixed-dim font-bold financial-value">₩ 1,400,000</span>
               </div>
               <div className="mt-lg pt-lg border-t border-outline-variant">
                 <p className="text-label-sm font-label-sm text-on-surface-variant mb-sm flex items-center gap-xs">
@@ -86,7 +86,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <Card className="lg:col-span-2 glass-card p-lg relative overflow-hidden border-0">
+          <Card className="lg:col-span-2 glass-card p-md md:p-lg relative overflow-hidden border-0 min-w-0">
             <div
               className="absolute inset-0 opacity-[0.03] pointer-events-none"
               style={{ backgroundImage: 'radial-gradient(#002045 1px, transparent 1px)', backgroundSize: '20px 20px' }}
@@ -96,7 +96,7 @@ export default function Dashboard() {
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-sm gap-sm sm:gap-0">
                 <div>
                   <p className="text-label-sm font-label-sm text-on-surface-variant mb-xs">단기 목표: 비상금 확보</p>
-                  <p className="text-headline-md font-headline-md text-primary">
+                  <p className="text-headline-sm sm:text-headline-md font-headline-md text-primary financial-value break-words">
                     ₩ 3,000,000 <span className="text-body-sm font-body-sm text-on-surface-variant font-normal">/ ₩ 10,000,000</span>
                   </p>
                 </div>

@@ -32,7 +32,7 @@ export default function AiFeedback() {
   const [sideTab, setSideTab] = useState('overview');
 
   return (
-    <div className="flex min-h-full antialiased">
+    <div className="flex min-h-full antialiased page-shell min-w-0">
       <nav className="h-[calc(100vh-4rem)] w-64 sticky top-16 bg-surface-container-low border-r border-outline-variant flex-col py-md gap-sm z-40 hidden md:flex shrink-0">
         {SIDE_ITEMS.map((item) => {
           const active = sideTab === item.id;
@@ -69,13 +69,33 @@ export default function AiFeedback() {
       </nav>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex-1 w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-lg overflow-x-hidden">
+        <div className="flex-1 w-full max-w-container-max mx-auto px-3 sm:px-margin-mobile md:px-margin-desktop py-md md:py-lg overflow-x-hidden min-w-0">
+          <nav className="md:hidden flex gap-sm overflow-x-auto hide-scrollbar pb-sm mb-md border-b border-outline-variant -mx-1 px-1">
+            {SIDE_ITEMS.map((item) => {
+              const active = sideTab === item.id;
+              return (
+                <button
+                  key={`mobile-${item.id}`}
+                  type="button"
+                  onClick={() => setSideTab(item.id)}
+                  className={`shrink-0 px-md py-2 rounded-full text-label-sm font-label-md min-h-[44px] ${
+                    active
+                      ? 'bg-secondary-container text-on-secondary-container font-bold'
+                      : 'bg-surface-container-low text-on-surface-variant border border-outline-variant'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </nav>
+
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-lg gap-md border-b border-outline-variant pb-md">
             <div>
               <h1 className="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-surface">AI 가계부 분석</h1>
               <p className="text-body-md font-body-md text-on-surface-variant mt-sm">인공지능 기반 지출 패턴 분석 및 최적화 제안</p>
             </div>
-            <div className="flex gap-sm bg-surface-container-low p-1 rounded-lg border border-outline-variant self-start md:self-auto">
+            <div className="flex gap-sm bg-surface-container-low p-1 rounded-lg border border-outline-variant self-stretch sm:self-start md:self-auto overflow-x-auto hide-scrollbar">
               {[
                 { id: 'day', label: '일간' },
                 { id: 'week', label: '주간' },
@@ -85,7 +105,7 @@ export default function AiFeedback() {
                   key={item.id}
                   type="button"
                   onClick={() => setPeriod(item.id)}
-                  className={`px-md py-xs rounded-md text-label-md font-label-md ${
+                  className={`px-md py-xs rounded-md text-label-md font-label-md min-h-[44px] shrink-0 ${
                     period === item.id
                       ? 'bg-surface shadow-sm text-primary font-medium'
                       : 'text-on-surface-variant hover:bg-surface-variant transition-colors'
@@ -97,8 +117,8 @@ export default function AiFeedback() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-            <Card className="col-span-1 lg:col-span-4 bg-gradient-to-br from-surface to-surface-container-low p-lg flex flex-col relative overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-md md:gap-gutter min-w-0">
+            <Card className="col-span-1 lg:col-span-4 bg-gradient-to-br from-surface to-surface-container-low p-md md:p-lg flex flex-col relative overflow-hidden min-w-0">
               <div className="absolute top-0 right-0 w-32 h-32 bg-secondary-container rounded-full blur-3xl opacity-20 -mr-10 -mt-10 pointer-events-none" />
               <div className="flex items-center gap-sm mb-md z-10">
                 <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
@@ -128,19 +148,19 @@ export default function AiFeedback() {
                   </div>
                 </div>
               </div>
-              <Button variant="outline" fullWidth className="mt-md py-sm z-10 bg-surface-container-high hover:bg-surface-variant">
+              <Button variant="outline" fullWidth className="mt-md py-sm z-10 bg-surface-container-high hover:bg-surface-variant min-h-[44px]">
                 상세 분석 보기
               </Button>
             </Card>
 
-            <Card className="col-span-1 lg:col-span-8 p-lg flex flex-col">
-              <div className="flex justify-between items-center mb-lg">
+            <Card className="col-span-1 lg:col-span-8 p-md md:p-lg flex flex-col min-w-0">
+              <div className="flex justify-between items-center mb-md md:mb-lg gap-sm">
                 <h2 className="text-headline-sm font-headline-sm text-on-surface">월별 지출 추이</h2>
-                <button type="button" className="text-on-surface-variant hover:text-primary" aria-label="더보기">
+                <button type="button" className="text-on-surface-variant hover:text-primary min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0" aria-label="더보기">
                   <MaterialIcon name="more_vert" />
                 </button>
               </div>
-              <div className="flex-1 flex items-end justify-between gap-sm md:gap-md pt-xl relative min-h-[240px]">
+              <div className="flex-1 flex items-end justify-between gap-1 sm:gap-sm md:gap-md pt-10 sm:pt-xl relative min-h-[200px] sm:min-h-[240px] chart-responsive chart-responsive--clip">
                 <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-8">
                   <div className="w-full border-t border-outline-variant/30" />
                   <div className="w-full border-t border-outline-variant/30" />
@@ -151,12 +171,12 @@ export default function AiFeedback() {
                 {MONTHS.map((month) => (
                   <div key={month.label} className="flex flex-col items-center gap-xs z-10 group w-full relative">
                     {month.current ? (
-                      <div className="absolute -top-8 bg-primary text-on-primary text-[10px] py-1 px-2 rounded font-bold whitespace-nowrap">
+                      <div className="absolute -top-7 sm:-top-8 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[10px] py-1 px-2 rounded font-bold whitespace-nowrap z-20">
                         예상 달성
                       </div>
                     ) : null}
                     <div
-                      className={`w-full max-w-[40px] rounded-t-sm ${
+                      className={`w-full max-w-[32px] sm:max-w-[40px] rounded-t-sm ${
                         month.current
                           ? 'bg-primary shadow-sm'
                           : 'bg-secondary-fixed-dim group-hover:bg-secondary-container transition-colors'
@@ -171,19 +191,19 @@ export default function AiFeedback() {
               </div>
             </Card>
 
-            <Card className="col-span-1 lg:col-span-5 p-lg flex flex-col">
+            <Card className="col-span-1 lg:col-span-5 p-md md:p-lg flex flex-col min-w-0">
               <h2 className="text-headline-sm font-headline-sm text-on-surface mb-md">카테고리별 분포</h2>
               <div className="flex-1 flex flex-col items-center justify-center py-md">
                 <div
-                  className="relative w-48 h-48 rounded-full mb-lg"
+                  className="relative w-36 h-36 sm:w-48 sm:h-48 rounded-full mb-lg chart-responsive chart-responsive--clip"
                   style={{
                     background:
                       'conic-gradient(#1a365d 0% 35%, #7db6ff 35% 55%, #00b47d 55% 70%, #cbdbf5 70% 82%, #455f88 82% 90%, #c4c6cf 90% 100%)',
                   }}
                 >
-                  <div className="absolute inset-4 bg-surface rounded-full flex flex-col items-center justify-center shadow-inner">
+                  <div className="absolute inset-3 sm:inset-4 bg-surface rounded-full flex flex-col items-center justify-center shadow-inner px-2 text-center">
                     <span className="text-label-sm font-label-sm text-on-surface-variant">총 지출</span>
-                    <span className="text-headline-sm font-headline-sm font-bold text-on-surface">₩3,450,000</span>
+                    <span className="text-headline-sm font-headline-sm font-bold text-on-surface financial-value break-words">₩3,450,000</span>
                   </div>
                 </div>
                 <div className="flex flex-wrap justify-center gap-md px-sm">
@@ -203,10 +223,10 @@ export default function AiFeedback() {
               </div>
             </Card>
 
-            <Card className="col-span-1 lg:col-span-7 p-0 flex flex-col overflow-hidden">
-              <div className="p-lg border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
+            <Card className="col-span-1 lg:col-span-7 p-0 flex flex-col overflow-hidden min-w-0">
+              <div className="p-md md:p-lg border-b border-outline-variant flex justify-between items-center gap-sm bg-surface-container-lowest">
                 <h2 className="text-headline-sm font-headline-sm text-on-surface">상세 지출 내역</h2>
-                <button type="button" className="text-label-md font-label-md text-primary hover:underline">
+                <button type="button" className="text-label-md font-label-md text-primary hover:underline min-h-[44px] flex items-center shrink-0">
                   전체보기
                 </button>
               </div>
@@ -214,21 +234,21 @@ export default function AiFeedback() {
                 {SPENDING.map((item, index) => (
                   <div
                     key={item.name}
-                    className={`flex items-center justify-between p-md hover:bg-surface-container-low transition-colors ${
+                    className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-sm p-md hover:bg-surface-container-low transition-colors min-w-0 ${
                       index === SPENDING.length - 1 ? '' : 'border-b border-outline-variant/50'
                     }`}
                   >
-                    <div className="flex items-center gap-md">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${item.iconWrap}`}>
+                    <div className="flex items-center gap-md min-w-0">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${item.iconWrap}`}>
                         <MaterialIcon name={item.icon} />
                       </div>
-                      <div>
-                        <div className="text-body-md font-body-md text-on-surface font-medium">{item.name}</div>
-                        <div className="text-label-sm font-label-sm text-on-surface-variant">{item.desc}</div>
+                      <div className="min-w-0">
+                        <div className="text-body-md font-body-md text-on-surface font-medium truncate">{item.name}</div>
+                        <div className="text-label-sm font-label-sm text-on-surface-variant truncate">{item.desc}</div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-body-md font-body-md text-on-surface font-semibold">{item.amount}</div>
+                    <div className="text-left sm:text-right shrink-0 pl-[52px] sm:pl-0">
+                      <div className="text-body-md font-body-md text-on-surface font-semibold financial-value">{item.amount}</div>
                       <ChangeHint change={item.change} text={item.changeText} />
                     </div>
                   </div>

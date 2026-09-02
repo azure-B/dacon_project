@@ -9,16 +9,16 @@ const FOOTER_LINKS = [
 
 export default function Footer() {
   return (
-    <footer className="mt-auto flex flex-col md:flex-row justify-between items-center px-margin-mobile md:px-margin-desktop py-lg w-full bg-surface-container-lowest border-t border-outline-variant text-center md:text-left gap-md md:gap-0">
-      <div className="text-label-sm font-label-sm font-semibold text-on-surface-variant">
+    <footer className="mt-auto flex flex-col items-center md:flex-row md:justify-between px-3 sm:px-margin-mobile md:px-margin-desktop py-md md:py-lg w-full min-w-0 bg-surface-container-lowest border-t border-outline-variant text-center md:text-left gap-sm md:gap-md">
+      <div className="text-label-sm font-label-sm font-semibold text-on-surface-variant break-keep">
         © 2026 AI 재무 인터렉티브. 모든 권리 보유.
       </div>
-      <div className="flex flex-wrap justify-center gap-md">
+      <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-sm sm:gap-md w-full md:w-auto">
         {FOOTER_LINKS.map((link) => (
           <a
             key={link.label}
             href={link.href}
-            className="text-on-surface-variant hover:text-secondary transition-colors text-label-sm font-label-sm"
+            className="text-on-surface-variant hover:text-secondary transition-colors text-label-sm font-label-sm py-1 min-h-[44px] flex items-center justify-center sm:min-h-0"
           >
             {link.label}
           </a>

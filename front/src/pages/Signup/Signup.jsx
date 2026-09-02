@@ -15,9 +15,9 @@ export default function Signup() {
   };
 
   return (
-    <div className="bg-surface-container-lowest text-on-surface min-h-screen flex items-center justify-center p-margin-mobile md:p-margin-desktop">
-      <main className="w-full max-w-[480px]">
-        <Card className="p-md md:p-xl">
+    <div className="bg-surface-container-lowest text-on-surface min-h-screen flex items-center justify-center p-3 sm:p-margin-mobile md:p-margin-desktop page-shell">
+      <main className="w-full max-w-[480px] min-w-0">
+        <Card className="p-md sm:p-lg md:p-xl">
           <div className="text-center mb-xl">
             <h1 className="text-headline-lg font-headline-lg text-primary mb-sm font-inter">AI 재무 인터렉티브</h1>
             <p className="text-body-md font-body-md text-on-surface-variant">
@@ -69,10 +69,10 @@ export default function Signup() {
               value={passwordConfirm}
               onChange={(e) => setPasswordConfirm(e.target.value)}
             />
-            <div className="flex items-start mt-md">
-              <div className="flex items-center h-5">
+            <div className="flex items-start mt-md gap-sm">
+              <div className="flex items-center shrink-0 min-h-[44px]">
                 <input
-                  className="h-4 w-4 text-primary focus:ring-primary border-outline-variant rounded bg-surface-container-lowest cursor-pointer"
+                  className="h-5 w-5 text-primary focus:ring-primary border-outline-variant rounded bg-surface-container-lowest cursor-pointer"
                   id="terms"
                   name="terms"
                   required
@@ -81,8 +81,8 @@ export default function Signup() {
                   onChange={(e) => setTerms(e.target.checked)}
                 />
               </div>
-              <div className="ml-sm text-body-sm font-body-sm">
-                <label className="text-on-surface-variant cursor-pointer" htmlFor="terms">
+              <div className="text-body-sm font-body-sm min-w-0">
+                <label className="text-on-surface-variant cursor-pointer break-keep" htmlFor="terms">
                   <a className="text-secondary hover:underline font-medium" href="#">
                     서비스 이용약관
                   </a>{' '}
@@ -95,7 +95,7 @@ export default function Signup() {
               </div>
             </div>
             <div className="pt-md">
-              <Button type="submit" variant="secondary" fullWidth className="py-[14px] md:py-[10px] px-md">
+              <Button type="submit" variant="secondary" fullWidth className="h-[48px] py-[14px] md:py-[10px] px-md">
                 회원가입 완료
               </Button>
             </div>

@@ -65,9 +65,14 @@
   animation: spin 1.5s linear infinite;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   min-width: 320px;
+  overflow-x: hidden;
   background-color: #f8f9ff;
   color: #0b1c30;
   font-family: 'Noto Sans KR', Inter, sans-serif;
@@ -76,4 +81,44 @@ body {
 #root {
   width: 100%;
   min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Mobile responsive utilities ── */
+.page-shell {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.financial-value {
+  word-break: break-word;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-responsive {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.chart-responsive--clip {
+  overflow: hidden;
+}
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 767px) {
+  .mobile-page-padding {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .mobile-section-gap {
+    gap: 12px;
+  }
 }
