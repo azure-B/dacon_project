@@ -1,16 +1,28 @@
 {
-  "name": "server",
+  "name": "back",
   "version": "1.0.0",
   "private": true,
+  "description": "Express API server",
   "main": "app.js",
   "engines": {
     "node": "20.x"
   },
   "scripts": {
     "start": "node app.js",
-    "dev": "node --watch app.js"
+    "dev": "node --watch app.js",
+    "start:src": "node server.js",
+    "dev:src": "nodemon server.js"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
   "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }

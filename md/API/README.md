@@ -1,11 +1,13 @@
-# REST API 명세서
+# API 명세서
 
-- Base URL: `/api`
+> back 작업 시 엔드포인트 변경마다 이 문서를 갱신한다.
+
+- Base URL: `/api` (로컬 Express 기본 `http://localhost:3000`, `server.js` 엔트리는 `http://localhost:5000`)
 - Content-Type: `application/json`
 - 성공/실패 본문은 JSON
 - 비밀번호, `passwordHash`는 응답에 포함하지 않음
 
-인증 전체 설계(회원가입, 찾기 등)는 `md/auth-api.md`를 참고합니다. 이 문서는 **현재 서버에 구현된 엔드포인트**를 기준으로 합니다.
+인증 전체 설계(회원가입, 찾기 등)는 `md/auth-api.md`를 참고합니다. 아래 **구현된 REST API**는 `back/app.js` 기준입니다. `back/server.js` + `back/src/` 스캐폴드 엔드포인트는 문서 하단에 별도로 적습니다.
 
 ---
 
@@ -30,7 +32,7 @@
 
 ---
 
-## 엔드포인트 목록
+## 엔드포인트 목록 (`back/app.js`)
 
 | 기능 | Method | Path | 구현 |
 | --- | --- | --- | --- |
@@ -217,9 +219,46 @@ curl -X POST http://localhost:3000/api/auth/login \
 
 ---
 
-## 구현 위치
+## 구현 위치 (`back/app.js`)
 
 - 라우트 등록: `back/routes/index.js` (`/auth`, `/items`, `/health`)
 - 로그인 라우트: `back/routes/auth.routes.js`
 - 로그인 컨트롤러: `back/controller/auth.controller.js`
 - 사용자/토큰/실패 횟수: `back/models/user.model.js`
+
+REST API Playground UI는 `front/playground.html` (`front/styles.css`, `front/app.js`)입니다. Vite React 앱 엔트리는 `front/index.html`입니다.
+
+---
+
+## 스캐폴드 엔드포인트 (`back/server.js`)
+
+Base URL: `http://localhost:5000` (`npm run start:src`)
+
+### GET /health
+
+- 설명: 서버 상태 확인
+- 요청: 없음
+- 응답: `{ "status": "ok" }`
+- 관련 파일: `back/src/app.js`
+
+### GET /api/examples
+
+- 설명: 예시 목록 조회
+- 요청: 없음
+- 응답: `{ "success": true, "data": [{ "id": number, "title": string, "description": string }] }`
+- 관련 파일: `back/src/routes/example.routes.js`, `back/src/controllers/example.controller.js`, `back/src/models/example.model.js`
+
+### GET /api/examples/:id
+
+- 설명: 예시 단건 조회
+- 요청: URL 파라미터 `id` (number)
+- 응답: `{ "success": true, "data": { "id": number, "title": string, "description": string } }`
+- 에러: 404 `{ "success": false, "message": "Item not found" }`
+- 관련 파일: `back/src/routes/example.routes.js`, `back/src/controllers/example.controller.js`, `back/src/models/example.model.js`
+
+### POST /api/examples
+
+- 설명: 예시 생성
+- 요청 body: `{ "title": string, "description"?: string }`
+- 응답: `{ "success": true, "data": { "id": number, "title": string, "description": string } }` (201)
+- 관련 파일: `back/src/routes/example.routes.js`, `back/src/controllers/example.controller.js`, `back/src/models/example.model.js`

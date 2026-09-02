@@ -1,0 +1,503 @@
+<!DOCTYPE html><html class="light" lang="ko"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI 심층 재무 보고서 - 인스티튜셔널 인텔리전스</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#001c38",
+                        "secondary-container": "#7db6ff",
+                        "tertiary-fixed": "#6ffbbe",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#d3e4fe",
+                        "on-secondary-container": "#00477f",
+                        "surface-tint": "#455f88",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#004881",
+                        "tertiary-container": "#003e28",
+                        "surface": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "tertiary": "#002617",
+                        "secondary-fixed": "#d3e4ff",
+                        "secondary-fixed-dim": "#a2c9ff",
+                        "primary-fixed-dim": "#adc7f7",
+                        "error-container": "#ffdad6",
+                        "surface-container-high": "#dce9ff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary-container": "#1a365d",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "error": "#ba1a1a",
+                        "secondary": "#1960a3",
+                        "outline-variant": "#c4c6cf",
+                        "on-primary-container": "#86a0cd",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "on-tertiary-container": "#00b47d",
+                        "on-background": "#0b1c30",
+                        "background": "#f8f9ff",
+                        "primary-fixed": "#d6e3ff",
+                        "on-primary-fixed": "#001b3c",
+                        "on-surface": "#0b1c30",
+                        "primary": "#002045",
+                        "on-tertiary-fixed": "#002113",
+                        "surface-dim": "#cbdbf5",
+                        "surface-container": "#e5eeff",
+                        "on-primary": "#ffffff",
+                        "inverse-primary": "#adc7f7",
+                        "on-surface-variant": "#43474e",
+                        "inverse-surface": "#213145",
+                        "on-primary-fixed-variant": "#2d476f",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#d3e4fe",
+                        "outline": "#74777f",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "unit": "4px",
+                        "container-max": "1280px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "16px",
+                        "xl": "48px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["inter", "Noto Sans KR", "sans-serif"],
+                        "headline-sm": ["inter", "Noto Sans KR", "sans-serif"],
+                        "body-md": ["notoSans", "Noto Sans KR", "sans-serif"],
+                        "label-md": ["inter", "Noto Sans KR", "sans-serif"],
+                        "body-sm": ["notoSans", "Noto Sans KR", "sans-serif"],
+                        "headline-md": ["inter", "Noto Sans KR", "sans-serif"],
+                        "body-lg": ["notoSans", "Noto Sans KR", "sans-serif"],
+                        "headline-lg-mobile": ["inter", "Noto Sans KR", "sans-serif"],
+                        "headline-lg": ["inter", "Noto Sans KR", "sans-serif"],
+                        "display-lg": ["inter", "Noto Sans KR", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.03em", "fontWeight": "500" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8f9ff; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c4c6cf; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #74777f; 
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen overflow-x-hidden flex flex-col">
+<!-- TopNavBar -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop bg-surface h-16 border-b border-outline-variant shadow-sm">
+<div class="flex items-center gap-lg">
+<div class="text-headline-md font-headline-md font-bold text-primary flex items-center gap-sm"><span class="material-symbols-outlined fill text-secondary">analytics</span>
+                AI 재무 인터렉티브
+            </div>
+<nav class="hidden md:flex items-center gap-md ml-lg">
+<a class="text-label-md font-label-md text-on-surface-variant hover:text-secondary transition-colors px-2 py-4" href="#">대시보드</a>
+<a class="text-label-md font-label-md text-on-surface-variant hover:text-secondary transition-colors px-2 py-4" href="#">부채 분석</a>
+<a class="text-label-md font-label-md text-on-surface-variant hover:text-secondary transition-colors px-2 py-4" href="#">시뮬레이션</a>
+<a class="text-label-md font-label-md text-secondary font-bold border-b-2 border-secondary pb-[14px] opacity-80 transition-opacity px-2 py-4 mt-1" href="#">AI 피드백</a>
+</nav>
+</div>
+<div class="flex items-center gap-sm">
+<button aria-label="알림" class="p-2 rounded-full text-on-surface-variant hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button aria-label="사용자 프로필" class="p-2 rounded-full text-on-surface-variant hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<div class="flex flex-1">
+<!-- SideNavBar (Desktop Only) -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-64px)] w-64 fixed left-0 top-16 bg-surface-container-low border-r border-outline-variant py-md gap-sm z-40 overflow-y-auto">
+<div class="px-md mb-md">
+<div class="flex items-center gap-sm mb-xs">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-[20px]">corporate_fare</span>
+</div>
+<div>
+<h2 class="text-label-md font-label-md font-bold text-on-surface">심층 분석</h2>
+<p class="text-label-sm font-label-sm text-on-surface-variant">기관 등급</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1 px-sm">
+<a class="flex items-center gap-md px-md py-3 text-label-md font-label-md text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">overview</span>
+                    개요
+                </a>
+<a class="flex items-center gap-md px-md py-3 text-label-md font-label-md bg-secondary-container text-on-secondary-container rounded-lg mx-2 my-1 scale-95 duration-150" href="#">
+<span class="material-symbols-outlined fill">description</span>
+                    포트폴리오 보고서
+                </a>
+<a class="flex items-center gap-md px-md py-3 text-label-md font-label-md text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">settings_applications</span>
+                    리스크 설정
+                </a>
+<a class="flex items-center gap-md px-md py-3 text-label-md font-label-md text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">history</span>
+                    감사 로그
+                </a>
+<a class="flex items-center gap-md px-md py-3 text-label-md font-label-md text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">shield</span>
+                    보안
+                </a>
+</nav>
+<div class="px-md mt-auto">
+<button class="w-full py-2 px-4 bg-primary text-on-primary text-label-md font-label-md rounded-lg shadow-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">add_chart</span>
+                    보고서 생성
+                </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 p-margin-mobile md:p-xl w-full max-w-container-max mx-auto">
+<!-- Report Header -->
+<div class="mb-xl flex flex-col md:flex-row justify-between items-start md:items-end gap-md">
+<div>
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-high rounded-full mb-4">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="text-label-sm font-label-sm text-on-surface-variant tracking-wider uppercase">AI 생성 분석</span>
+</div>
+<h1 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-primary mb-2">
+                        AI 심층 재무 보고서
+                    </h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant">
+                        기준일: 2024년 5월 24일 · 분석 대상: 통합 포트폴리오 Alpha
+                    </p>
+</div>
+<div class="flex gap-sm">
+<button class="px-4 py-2 border border-outline-variant text-on-surface rounded-lg text-label-md font-label-md hover:bg-surface-variant transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                        PDF 다운로드
+                    </button>
+<button class="px-4 py-2 bg-secondary text-on-secondary rounded-lg text-label-md font-label-md shadow-sm hover:opacity-90 transition-opacity flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">share</span>
+                        보고서 공유
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Highlights: Expected Savings & Timeline -->
+<div class="col-span-1 md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-lg mb-4">
+<!-- Expected Savings -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col justify-center relative overflow-hidden group hover:shadow-[0_10px_15px_rgba(0,0,0,0.08)] transition-shadow">
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-secondary-container rounded-full opacity-10 group-hover:scale-110 transition-transform duration-500"></div>
+<div class="flex items-center gap-sm mb-md text-secondary">
+<span class="material-symbols-outlined">savings</span>
+<h3 class="text-headline-sm font-headline-sm">예상 절감액 (월간)</h3>
+</div>
+<div class="flex items-end gap-sm">
+<span class="text-display-lg font-display-lg text-primary tracking-tight">₩1,250,000</span>
+<span class="text-body-md font-body-md text-on-surface-variant mb-2">/ 월</span>
+</div>
+<div class="mt-sm flex items-center gap-2 text-on-tertiary-container">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span class="text-label-md font-label-md">전월 대비 15% 추가 절감 가능</span>
+</div>
+</div>
+<!-- Goal Timeline -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col justify-center relative overflow-hidden group hover:shadow-[0_10px_15px_rgba(0,0,0,0.08)] transition-shadow">
+<div class="absolute -right-12 -bottom-12 w-48 h-48 bg-tertiary-container rounded-full opacity-5 group-hover:scale-110 transition-transform duration-500"></div>
+<div class="flex items-center gap-sm mb-md text-tertiary-container">
+<span class="material-symbols-outlined">flag</span>
+<h3 class="text-headline-sm font-headline-sm">목표 달성 예상 기간</h3>
+</div>
+<div class="flex items-end gap-sm">
+<span class="text-display-lg font-display-lg text-primary tracking-tight">14개월 단축</span>
+</div>
+<div class="mt-sm">
+<div class="w-full bg-surface-variant rounded-full h-2.5 mb-2">
+<div class="bg-tertiary-fixed-dim h-2.5 rounded-full" style="width: 75%"></div>
+</div>
+<div class="flex justify-between text-label-sm font-label-sm text-on-surface-variant">
+<span class="">기존 예상: 60개월</span>
+<span class="text-primary font-bold">AI 최적화 후: 46개월</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Key Analysis (Main Chart) -->
+<div class="col-span-1 md:col-span-8 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm hover:shadow-[0_10px_15px_rgba(0,0,0,0.08)] transition-shadow flex flex-col">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">query_stats</span>
+<h3 class="text-headline-sm font-headline-sm text-primary">주요 분석: 현금 흐름 및 지출 패턴</h3>
+</div>
+<div class="flex gap-2">
+<span class="px-2 py-1 bg-surface-variant text-on-surface-variant text-label-sm font-label-sm rounded">6개월</span>
+</div>
+</div>
+<div class="p-lg flex-1 flex flex-col">
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-xl">
+                            지난 6개월간의 데이터를 분석한 결과, 고정비 지출이 권장 수준(수입의 40%)을 초과하여 52%에 달하고 있습니다. 특히 이자 비용과 구독 서비스 항목에서 비효율성이 두드러집니다.
+                        </p>
+<!-- CSS Mock Bar Chart -->
+<div class="flex-1 min-h-[250px] flex items-end justify-between gap-2 px-md mt-auto">
+<!-- Chart Columns (Jan to Jun mock data) -->
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full relative flex items-end justify-center h-48 bg-surface-container rounded-t-sm overflow-hidden">
+<div class="absolute bottom-0 w-3/4 bg-primary-container h-[40%] rounded-t-sm group-hover:bg-primary transition-colors"></div>
+<div class="absolute bottom-[40%] w-3/4 bg-secondary-container h-[30%] rounded-t-sm opacity-80"></div>
+<div class="absolute bottom-[70%] w-3/4 bg-error-container h-[10%] rounded-t-sm opacity-60"></div>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">1월</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full relative flex items-end justify-center h-48 bg-surface-container rounded-t-sm overflow-hidden">
+<div class="absolute bottom-0 w-3/4 bg-primary-container h-[42%] rounded-t-sm group-hover:bg-primary transition-colors"></div>
+<div class="absolute bottom-[42%] w-3/4 bg-secondary-container h-[28%] rounded-t-sm opacity-80"></div>
+<div class="absolute bottom-[70%] w-3/4 bg-error-container h-[15%] rounded-t-sm opacity-60"></div>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">2월</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full relative flex items-end justify-center h-48 bg-surface-container rounded-t-sm overflow-hidden">
+<div class="absolute bottom-0 w-3/4 bg-primary-container h-[45%] rounded-t-sm group-hover:bg-primary transition-colors"></div>
+<div class="absolute bottom-[45%] w-3/4 bg-secondary-container h-[32%] rounded-t-sm opacity-80"></div>
+<div class="absolute bottom-[77%] w-3/4 bg-error-container h-[18%] rounded-t-sm opacity-60"></div>
+</div>
+<span class="text-label-sm font-label-sm text-primary font-bold">3월</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full relative flex items-end justify-center h-48 bg-surface-container rounded-t-sm overflow-hidden">
+<div class="absolute bottom-0 w-3/4 bg-primary-container h-[41%] rounded-t-sm group-hover:bg-primary transition-colors"></div>
+<div class="absolute bottom-[41%] w-3/4 bg-secondary-container h-[30%] rounded-t-sm opacity-80"></div>
+<div class="absolute bottom-[71%] w-3/4 bg-error-container h-[12%] rounded-t-sm opacity-60"></div>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">4월</span>
+</div>
+<div class="flex flex-col items-center gap-2 w-full group">
+<div class="w-full relative flex items-end justify-center h-48 bg-surface-container rounded-t-sm overflow-hidden">
+<div class="absolute bottom-0 w-3/4 bg-primary-container h-[40%] rounded-t-sm group-hover:bg-primary transition-colors"></div>
+<div class="absolute bottom-[40%] w-3/4 bg-secondary-container h-[25%] rounded-t-sm opacity-80"></div>
+<div class="absolute bottom-[65%] w-3/4 bg-error-container h-[10%] rounded-t-sm opacity-60"></div>
+</div>
+<span class="text-label-sm font-label-sm text-on-surface-variant">5월</span>
+</div>
+</div>
+<!-- Chart Legend -->
+<div class="flex justify-center gap-md mt-md pt-md border-t border-surface-variant">
+<div class="flex items-center gap-xs">
+<span class="w-3 h-3 rounded-full bg-primary-container"></span>
+<span class="text-label-sm font-label-sm text-on-surface-variant">필수 생활비</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="w-3 h-3 rounded-full bg-secondary-container"></span>
+<span class="text-label-sm font-label-sm text-on-surface-variant">고정 부채/구독</span>
+</div>
+<div class="flex items-center gap-xs">
+<span class="w-3 h-3 rounded-full bg-error-container"></span>
+<span class="text-label-sm font-label-sm text-on-surface-variant">비효율 지출</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Current Problems List -->
+<div class="col-span-1 md:col-span-4 flex flex-col gap-md">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-lg h-full hover:shadow-[0_10px_15px_rgba(0,0,0,0.08)] transition-shadow">
+<div class="flex items-center gap-sm mb-lg">
+<span class="material-symbols-outlined text-error">warning</span>
+<h3 class="text-headline-sm font-headline-sm text-primary">현재 문제점</h3>
+</div>
+<div class="flex flex-col gap-md">
+<!-- Problem 1 -->
+<div class="flex gap-md items-start p-md bg-error-container/30 rounded-lg border border-error-container/50">
+<div class="w-8 h-8 rounded-full bg-error flex justify-center items-center text-on-error shrink-0">
+<span class="text-label-md font-label-md font-bold">1</span>
+</div>
+<div>
+<h4 class="text-label-md font-label-md font-bold text-on-background mb-1">고정비 비중 과다</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant">전체 수입의 52%가 고정비로 지출되어 유동성 확보가 어렵습니다.</p>
+</div>
+</div>
+<!-- Problem 2 -->
+<div class="flex gap-md items-start p-md bg-surface-container rounded-lg border border-outline-variant">
+<div class="w-8 h-8 rounded-full bg-surface-tint flex justify-center items-center text-on-primary shrink-0">
+<span class="text-label-md font-label-md font-bold">2</span>
+</div>
+<div>
+<h4 class="text-label-md font-label-md font-bold text-on-background mb-1">구독 서비스 중복</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant">유사한 카테고리(엔터테인먼트, 소프트웨어)의 구독이 3건 중복됩니다.</p>
+</div>
+</div>
+<!-- Problem 3 -->
+<div class="flex gap-md items-start p-md bg-surface-container rounded-lg border border-outline-variant">
+<div class="w-8 h-8 rounded-full bg-surface-tint flex justify-center items-center text-on-primary shrink-0">
+<span class="text-label-md font-label-md font-bold">3</span>
+</div>
+<div>
+<h4 class="text-label-md font-label-md font-bold text-on-background mb-1">단기 부채 이자율 상승</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant">최근 3개월간 변동금리 기반 단기 부채의 실효 이자율이 1.2%p 상승했습니다.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Savings Potential Items -->
+<div class="col-span-1 md:col-span-7 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm hover:shadow-[0_10px_15px_rgba(0,0,0,0.08)] transition-shadow">
+<div class="p-lg border-b border-outline-variant">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary-fixed-dim">tune</span>
+<h3 class="text-headline-sm font-headline-sm text-primary">절감 가능한 항목 세부내역</h3>
+</div>
+</div>
+<div class="p-0">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-label-sm font-label-sm text-on-surface-variant border-b border-outline-variant">
+<th class="py-3 px-md font-medium">카테고리</th>
+<th class="py-3 px-md font-medium">상세 내용</th>
+<th class="py-3 px-md font-medium text-right">예상 절감액 (월)</th>
+<th class="py-3 px-md font-medium text-center">실행 난이도</th>
+</tr>
+</thead>
+<tbody class="text-body-sm font-body-sm text-on-background">
+<tr class="border-b border-surface-variant hover:bg-surface transition-colors">
+<td class="py-4 px-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">account_balance</span>
+                                            대출 대환
+                                        </div>
+</td>
+<td class="py-4 px-md text-on-surface-variant">고금리 신용대출 -&gt; 담보부 저금리 대환</td>
+<td class="py-4 px-md text-right font-bold text-primary">₩150,000</td>
+<td class="py-4 px-md text-center">
+<span class="inline-block px-2 py-1 bg-surface-variant text-on-surface-variant text-xs rounded">보통</span>
+</td>
+</tr>
+<tr class="border-b border-surface-variant hover:bg-surface transition-colors">
+<td class="py-4 px-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">phonelink_ring</span>
+                                            통신비 최적화
+                                        </div>
+</td>
+<td class="py-4 px-md text-on-surface-variant">데이터 사용량 기반 맞춤형 요금제 변경</td>
+<td class="py-4 px-md text-right font-bold text-primary">₩45,000</td>
+<td class="py-4 px-md text-center">
+<span class="inline-block px-2 py-1 bg-tertiary-fixed-dim/20 text-on-tertiary-container text-xs rounded">쉬움</span>
+</td>
+</tr>
+<tr class="hover:bg-surface transition-colors">
+<td class="py-4 px-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">subscriptions</span>
+                                            미사용 구독 취소
+                                        </div>
+</td>
+<td class="py-4 px-md text-on-surface-variant">최근 3개월 미접속 스트리밍 서비스 2건</td>
+<td class="py-4 px-md text-right font-bold text-primary">₩32,000</td>
+<td class="py-4 px-md text-center">
+<span class="inline-block px-2 py-1 bg-tertiary-fixed-dim/20 text-on-tertiary-container text-xs rounded">매우 쉬움</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Recommended Next Actions -->
+<div class="col-span-1 md:col-span-5 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-lg hover:shadow-[0_10px_15px_rgba(0,0,0,0.08)] transition-shadow flex flex-col">
+<div class="flex items-center gap-sm mb-lg">
+<span class="material-symbols-outlined text-secondary">assistant_direction</span>
+<h3 class="text-headline-sm font-headline-sm text-primary">추천 행동</h3>
+</div>
+<div class="flex flex-col gap-md flex-1">
+<!-- Action Card 1 -->
+<div class="border border-outline-variant rounded-lg p-md hover:border-secondary transition-colors cursor-pointer group flex flex-col justify-between h-full bg-surface">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h4 class="text-label-md font-label-md font-bold text-on-background">구독 서비스 일괄 관리</h4>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors">arrow_forward</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-4">
+                                    중복되거나 사용하지 않는 구독 서비스를 한 번에 확인하고 취소하여 즉각적인 현금 흐름을 개선하세요.
+                                </p>
+</div>
+<button class="w-full py-2 bg-secondary text-on-secondary rounded text-label-md font-label-md hover:opacity-90 transition-opacity">
+                                대시보드 이동
+                            </button>
+</div>
+<!-- Action Card 2 -->
+<div class="border border-outline-variant rounded-lg p-md hover:border-secondary transition-colors cursor-pointer group flex flex-col justify-between h-full bg-surface">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h4 class="text-label-md font-label-md font-bold text-on-background">AI 맞춤형 대환 대출 탐색</h4>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary transition-colors">arrow_forward</span>
+</div>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-4">
+                                    현재 보유중인 고금리 부채를 대체할 수 있는, 승인 확률이 가장 높은 저금리 상품을 비교합니다.
+                                </p>
+</div>
+<button class="w-full py-2 border border-secondary text-secondary bg-surface-container-lowest rounded text-label-md font-label-md hover:bg-surface-variant transition-colors">
+                                상품 비교하기
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="w-full mt-xl bg-surface-container-lowest border-t border-outline-variant flex flex-col md:flex-row justify-between items-center px-margin-desktop py-lg z-50 relative">
+<div class="mb-4 md:mb-0">
+<span class="text-label-sm font-label-sm font-semibold text-on-surface-variant">© 2024 인스티튜셔널 인텔리전스. 모든 권리 보유.</span>
+</div>
+<nav class="flex gap-md">
+<a class="text-body-sm font-body-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">서비스 약관</a>
+<a class="text-body-sm font-body-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">개인정보 처리방침</a>
+<a class="text-body-sm font-body-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">고객 지원</a>
+<a class="text-body-sm font-body-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">규제 정보</a>
+</nav>
+</footer>
+
+
+</body></html>

@@ -1,0 +1,31 @@
+.item-detail {
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.item-detail--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 200px;
+  opacity: 0.5;
+}
+
+.item-detail__title {
+  margin: 0 0 0.5rem;
+}
+
+.item-detail__desc {
+  margin: 0 0 1rem;
+  opacity: 0.8;
+}
+
+.item-detail__id {
+  margin: 0 0 1rem;
+  font-size: 0.75rem;
+  opacity: 0.4;
+}

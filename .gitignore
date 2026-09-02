@@ -1,4 +1,34 @@
+# Dependencies
 node_modules/
 server/node_modules/
+
+# Build output
+dist/
+dist-ssr/
+build/
+
+# Environment
 .env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editor / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
 .DS_Store
+Thumbs.db
+
+# Vite cache
+.vite/

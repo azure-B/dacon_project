@@ -1,0 +1,13 @@
+---
+description: 프로젝트 공통 — 폴더 역할과 문서 SSOT
+alwaysApply: true
+---
+
+# 프로젝트 개요
+
+- `back/` Express MVC | `front/` React | `python/` Python | `md/` 문서
+- API 명세: `md/API/README.md` | 폴더 구조: `md/folder.md`
+- 작업 내역: `md/jobs/back/`, `md/jobs/front/`
+
+폴더·파일 구조가 실제로 바뀌면 `md/folder.md`를 갱신한다.
+상세 규율은 작업 영역 규칙(`back-workflow`, `front-workflow`, `md-documentation`)을 따른다.
