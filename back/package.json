@@ -9,9 +9,7 @@
   },
   "scripts": {
     "start": "node app.js",
-    "dev": "node --watch app.js",
-    "start:src": "node server.js",
-    "dev:src": "nodemon server.js"
+    "dev": "node --watch app.js"
   },
   "keywords": [],
   "author": "",
@@ -25,4 +23,4 @@
   "devDependencies": {
     "nodemon": "^3.1.9"
   }
-}
+} 

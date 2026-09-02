@@ -9,12 +9,9 @@ alwaysApply: false
 ## 코드 구조
 
 ```
-components/common/   — 공통 UI
+components/common/   — 공통 UI (Button, Input, Card 등)
 components/layout/   — Header, Footer, Layout
-components/features/ — 기능별 컴포넌트 (폴더당 .jsx + .css)
-pages/               — 페이지 조합
-context/             — 컴포넌트 간 상태 공유
-hooks/               — 커스텀 훅
+pages/               — 페이지 (Dashboard, Login 등)
 services/            — API 호출 (api.js)
 publish/             — 퍼블리시 HTML
 ```
@@ -48,13 +45,12 @@ API 명세는 `md/API/README.md`를 참고한다. front 작업 시 API md는 수
 (1~3줄)
 
 ## 변경 파일
-- front/src/components/features/...
+- front/src/components/common/...
 - front/src/pages/...
 - front/src/services/api.js
 
 ## 사용 API
-- GET /api/examples — ItemList 데이터 조회
-- POST /api/examples — ItemForm 생성 요청
+- POST /api/auth/login — 로그인 요청
 ```
 
 ### 일별 로그 항목 형식

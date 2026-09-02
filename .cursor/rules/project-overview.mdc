@@ -11,3 +11,8 @@ alwaysApply: true
 
 폴더·파일 구조가 실제로 바뀌면 `md/folder.md`를 갱신한다.
 상세 규율은 작업 영역 규칙(`back-workflow`, `front-workflow`, `md-documentation`)을 따른다.
+
+## 작업 시작 전
+
+코드·문서 수정 전, 이번 대화에서 pull하지 않았으면 `git pull origin main`을 먼저 실행한다.
+사용자가 pull 완료를 밝혔거나 pull 생략을 요청한 경우만 건너뛴다. 실패 시 작업 중단 후 안내.

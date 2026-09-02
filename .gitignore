@@ -31,4 +31,4 @@ venv/
 Thumbs.db
 
 # Vite cache
-.vite/
+.vite/ 
