@@ -21,12 +21,15 @@ dacon/
 │       │   └── layout/       # Header, Footer, Layout
 │       ├── pages/            # 페이지 (Dashboard, Login 등)
 │       └── services/         # API 호출
-├── python/                   # Python 스크립트
+├── python/                   # Python 스크립트·데이터
+│   └── api/
+│       └── product.json      # 웹 검색 기반 금융 상품 데이터
 └── md/
     ├── folder.md             # 이 문서
     ├── auth-api.md           # 인증 API 설계 (전체)
     ├── API/
-    │   └── README.md         # 구현된 API 명세서
+    │   ├── README.md         # 구현된 API 명세서
+    │   └── product-data.md   # product.json 연동 가이드 (back)
     └── jobs/
         ├── back/             # back 작업 내역
         └── front/            # front 작업 내역

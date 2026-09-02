@@ -7,7 +7,9 @@
 - 성공/실패 본문은 JSON
 - 비밀번호, `passwordHash`는 응답에 포함하지 않음
 
-인증 전체 설계(회원가입, 찾기 등)는 `md/auth-api.md`를 참고합니다. 아래 **구현된 REST API**는 `back/app.js` 기준입니다.
+인증 전체 설계(회원가입, 찾기 등)는 `md/auth-api.md`를 참고합니다.  
+금융 상품 정적 데이터(`python/api/product.json`) 연동은 **`md/API/product-data.md`** 를 참고합니다.  
+아래 **구현된 REST API**는 `back/app.js` 기준입니다.
 
 ---
 
@@ -39,6 +41,10 @@
 | 회원가입 | `POST` | `/api/auth/signup` | N |
 | 로그아웃 | `POST` | `/api/auth/logout` | N |
 | 내 정보 | `GET` | `/api/auth/me` | N |
+| 상품 목록 | `GET` | `/api/products` | N |
+| 상품 단건 | `GET` | `/api/products/:id` | N |
+
+> 상품 API 상세·데이터 스키마·고지 문구: [`product-data.md`](./product-data.md)
 
 ---
 
