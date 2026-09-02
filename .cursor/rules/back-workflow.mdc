@@ -23,6 +23,12 @@ routes/ → controller/ → models/
 2. **`md/jobs/back/`** — 작업 내역 기록
 3. **폴더 구조 변경 시** `md/folder.md` 갱신
 
+## 금융 상품 API (`product.json`)
+
+- 데이터: `python/api/product.json` (읽기 전용)
+- 연동 가이드: **`md/API/product-data.md`** — 스키마, disclaimer, 필터, REST 설계
+- 상품 API 구현·수정 시 위 문서와 `md/API/README.md` 함께 갱신
+
 ## jobs 기록 규칙
 
 | 규모 | 방식 | 파일명 |
