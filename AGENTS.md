@@ -43,6 +43,7 @@ git pull origin main
 | 규칙 파일 | 적용 범위 |
 |-----------|-----------|
 | `project-overview.mdc` | 전역 (최소 공통 사항) |
+| `git-workflow.mdc` | 전역 (Git 커밋·pull 규칙) |
 | `back-workflow.mdc` | `back/**` |
 | `front-workflow.mdc` | `front/**` |
 | `md-documentation.mdc` | `md/**` |
@@ -71,3 +72,32 @@ git pull origin main
 - 작업 내역: `md/jobs/back/`, `md/jobs/front/`
 
 작업을 종료하기 전 위 문서 갱신 여부를 반드시 확인하세요.
+
+## Git — Cursor 사용 시
+
+상세 규칙: `.cursor/rules/git-workflow.mdc`
+
+### 커밋 메시지 (필수)
+
+```
+[YYYY.MM.DD] - 작업내역
+```
+
+| 항목 | 규칙 |
+|------|------|
+| 날짜 | `[2026.09.02]` — 점(`.`) 구분 |
+| 요약 | `-` 뒤 한국어 한 줄 (변경 내용) |
+| 금지 | `feat:`, `fix:`, `Merge origin/main` 등 |
+
+**예시**
+
+```
+[2026.09.02] - Merge 내역 일부 수정 및 pull 강제 로직 추가
+[2026.09.01] - Stitch 디자인 JSX 변환 및 프론트 화면 적용
+```
+
+### pull · commit
+
+- **pull**: 작업 시작 전 `git pull origin main` (위 「작업 시작 전」 참고)
+- **commit**: 사용자가 요청했을 때만 실행. 메시지는 반드시 위 형식
+
