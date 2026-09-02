@@ -1,11 +1,11 @@
 /** 회원가입 폼 — Supabase 연동 전 더미 데이터 구조 */
 
-export const ASSET_TYPES = [
-  { value: 'deposit', label: '예금' },
-  { value: 'savings', label: '적금' },
-  { value: 'cash', label: '현금' },
-  { value: 'investment', label: '투자자산' },
-  { value: 'other', label: '기타' },
+import { getProductById } from './productCatalog';
+
+export const MANUAL_ASSET_TYPES = [
+  { value: '현금', label: '현금' },
+  { value: '투자자산', label: '투자자산' },
+  { value: '기타', label: '기타' },
 ];
 
 export const GOAL_PERIOD_OPTIONS = [
@@ -25,20 +25,96 @@ function nextId(prefix) {
 
 export function createEmptyAsset() {
   return {
-    id: nextId('asset'),
-    type: 'deposit',
-    name: '',
+    id: nextId('holding-asset'),
+    productId: '',
+    isManual: false,
+    manualType: '현금',
+    manualName: '',
     amount: '',
+    금융권_구분: '',
+    은행명: '',
+    상품명: '',
+    상품_유형: '',
+    이자율_최저: null,
+    이자율_최고: null,
+    만기: '',
+    최소_금액: '',
   };
 }
 
 export function createEmptyLoan() {
   return {
-    id: nextId('loan'),
-    name: '',
+    id: nextId('holding-loan'),
+    productId: '',
     balance: '',
-    interestRate: '',
     monthlyPayment: '',
+    금융권_구분: '',
+    은행명: '',
+    상품명: '',
+    상품_유형: '',
+    이자율_최저: null,
+    이자율_최고: null,
+    한도: '',
+    대출_기간: '',
+  };
+}
+
+export function applyProductToLoan(loan, productId) {
+  const product = getProductById(productId);
+  if (!product) {
+    return { ...loan, productId: '' };
+  }
+  return {
+    ...loan,
+    productId: product.id,
+    금융권_구분: product.금융권_구분,
+    은행명: product.은행명,
+    상품명: product.상품명,
+    상품_유형: product.상품_유형,
+    이자율_최저: product.이자율_최저,
+    이자율_최고: product.이자율_최고,
+    한도: product.한도 ?? '',
+    대출_기간: product.대출_기간 ?? '',
+  };
+}
+
+export function applyProductToAsset(asset, productId) {
+  const product = getProductById(productId);
+  if (!product) {
+    return { ...asset, productId: '' };
+  }
+  return {
+    ...asset,
+    productId: product.id,
+    isManual: false,
+    manualName: '',
+    금융권_구분: product.금융권_구분,
+    은행명: product.은행명,
+    상품명: product.상품명,
+    상품_유형: product.상품_유형,
+    이자율_최저: product.이자율_최저,
+    이자율_최고: product.이자율_최고,
+    만기: product.만기 ?? '',
+    최소_금액: product.최소_금액 ?? '',
+  };
+}
+
+export function setAssetManualMode(asset, isManual) {
+  if (!isManual) {
+    return {
+      ...createEmptyAsset(),
+      id: asset.id,
+      amount: asset.amount,
+      isManual: false,
+    };
+  }
+  return {
+    ...createEmptyAsset(),
+    id: asset.id,
+    amount: asset.amount,
+    isManual: true,
+    manualType: '현금',
+    manualName: '',
   };
 }
 
@@ -67,9 +143,14 @@ function parseNumber(value) {
   return Number.isFinite(num) ? num : null;
 }
 
-/**
- * 폼 state → Supabase 저장용 payload (비밀번호는 profile에만 포함, 로그 출력 시 제외 가능)
- */
+function isAssetFilled(item) {
+  return item.amount !== '' || item.productId !== '' || item.manualName.trim();
+}
+
+function isLoanFilled(item) {
+  return item.balance !== '' || item.productId !== '';
+}
+
 export function buildSignupPayload(form) {
   return {
     profile: {
@@ -78,23 +159,50 @@ export function buildSignupPayload(form) {
     },
     financial: {
       monthlySalary: parseNumber(form.financial.monthlySalary),
-      assets: form.financial.assets
-        .filter((item) => item.name.trim() || item.amount !== '')
-        .map((item) => ({
+      assets: form.financial.assets.filter(isAssetFilled).map((item) => {
+        const base = {
           id: item.id,
-          type: item.type,
-          name: item.name.trim(),
+          productId: item.isManual ? null : item.productId === '' ? null : Number(item.productId),
+          isManual: item.isManual,
           amount: parseNumber(item.amount) ?? 0,
-        })),
-      loans: form.financial.loans
-        .filter((item) => item.name.trim() || item.balance !== '')
-        .map((item) => ({
-          id: item.id,
-          name: item.name.trim(),
-          balance: parseNumber(item.balance) ?? 0,
-          interestRate: parseNumber(item.interestRate) ?? 0,
-          monthlyPayment: parseNumber(item.monthlyPayment) ?? 0,
-        })),
+        };
+
+        if (item.isManual) {
+          return {
+            ...base,
+            상품_유형: item.manualType,
+            상품명: item.manualName.trim(),
+            은행명: null,
+            금융권_구분: null,
+          };
+        }
+
+        return {
+          ...base,
+          금융권_구분: item.금융권_구분 || null,
+          은행명: item.은행명 || null,
+          상품명: item.상품명 || null,
+          상품_유형: item.상품_유형 || null,
+          이자율_최저: item.이자율_최저,
+          이자율_최고: item.이자율_최고,
+          만기: item.만기 || null,
+          최소_금액: item.최소_금액 || null,
+        };
+      }),
+      loans: form.financial.loans.filter(isLoanFilled).map((item) => ({
+        id: item.id,
+        productId: item.productId === '' ? null : Number(item.productId),
+        balance: parseNumber(item.balance) ?? 0,
+        monthlyPayment: parseNumber(item.monthlyPayment) ?? 0,
+        금융권_구분: item.금융권_구분 || null,
+        은행명: item.은행명 || null,
+        상품명: item.상품명 || null,
+        상품_유형: item.상품_유형 || null,
+        이자율_최저: item.이자율_최저,
+        이자율_최고: item.이자율_최고,
+        한도: item.한도 || null,
+        대출_기간: item.대출_기간 || null,
+      })),
     },
     goal: {
       targetAmount: parseNumber(form.goal.targetAmount) ?? 0,
@@ -116,17 +224,43 @@ export const SIGNUP_DUMMY_EXAMPLE = {
   financial: {
     monthlySalary: 4200000,
     assets: [
-      { id: 'asset-1', type: 'deposit', name: 'KB 정기예금', amount: 1500000 },
-      { id: 'asset-2', type: 'cash', name: '비상금 통장', amount: 500000 },
-      { id: 'asset-3', type: 'investment', name: '국내 주식', amount: 1000000 },
+      {
+        id: 'holding-asset-1',
+        productId: 12,
+        isManual: false,
+        상품_유형: '정기예금',
+        은행명: 'KB국민은행',
+        상품명: 'KB특별정기예금',
+        amount: 1500000,
+        이자율_최저: 3.0,
+        이자율_최고: 3.2,
+        만기: '12개월',
+        최소_금액: '100만원',
+      },
+      {
+        id: 'holding-asset-2',
+        productId: null,
+        isManual: true,
+        상품_유형: '현금',
+        상품명: '비상금 통장',
+        은행명: null,
+        amount: 500000,
+      },
     ],
     loans: [
       {
-        id: 'loan-1',
-        name: '신한 직장인 신용대출',
+        id: 'holding-loan-1',
+        productId: 0,
+        상품_유형: '신용대출',
+        은행명: 'KB국민은행',
+        상품명: 'KB직장인대출',
+        금융권_구분: '1금융권',
         balance: 65000000,
-        interestRate: 5.8,
         monthlyPayment: 1245000,
+        이자율_최저: 4.78,
+        이자율_최고: 5.98,
+        한도: '최대 3.5억원',
+        대출_기간: '1년~5년',
       },
     ],
   },

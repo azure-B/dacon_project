@@ -2,13 +2,23 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Input, Card, MaterialIcon } from '../../components/common';
 import {
-  ASSET_TYPES,
   GOAL_PERIOD_OPTIONS,
   INITIAL_SIGNUP_FORM,
+  MANUAL_ASSET_TYPES,
   buildSignupPayload,
   createEmptyAsset,
   createEmptyLoan,
+  applyProductToAsset,
+  applyProductToLoan,
+  setAssetManualMode,
 } from '../../data/signupFormData';
+import {
+  PRODUCT_DISCLAIMER,
+  formatProductOption,
+  formatRateRange,
+  getDepositProducts,
+  getLoanProducts,
+} from '../../data/productCatalog';
 import './Signup.css';
 
 const STEPS = [
@@ -63,6 +73,57 @@ function FieldLabel({ htmlFor, children }) {
     <label className="text-label-md font-label-md text-on-surface" htmlFor={htmlFor}>
       {children}
     </label>
+  );
+}
+
+const LOAN_PRODUCTS = getLoanProducts();
+const DEPOSIT_PRODUCTS = getDepositProducts();
+
+function ProductDisclaimer() {
+  return (
+    <div className="rounded-lg bg-surface-container-low border border-outline-variant p-md space-y-xs">
+      <p className="text-label-sm font-label-sm text-on-surface-variant m-0 flex items-start gap-xs">
+        <MaterialIcon name="info" className="text-[16px] shrink-0 mt-0.5" />
+        {PRODUCT_DISCLAIMER.partialResults}
+      </p>
+      <p className="text-label-sm font-label-sm text-on-surface-variant m-0 pl-[22px]">
+        {PRODUCT_DISCLAIMER.variableConditions}
+      </p>
+    </div>
+  );
+}
+
+function LoanProductSummary({ loan }) {
+  if (!loan.productId && loan.productId !== 0) return null;
+  return (
+    <div className="rounded-lg bg-surface-container-low p-sm text-body-sm font-body-sm text-on-surface-variant space-y-xs">
+      <p className="m-0">
+        <span className="text-on-surface font-medium">{loan.은행명}</span> · {loan.상품명}
+      </p>
+      <p className="m-0">
+        {loan.금융권_구분} / {loan.상품_유형}
+      </p>
+      <p className="m-0">금리(참고): {loan.이자율_최저}% ~ {loan.이자율_최고}%</p>
+      <p className="m-0">한도: {loan.한도 || '-'} · 기간: {loan.대출_기간 || '-'}</p>
+    </div>
+  );
+}
+
+function DepositProductSummary({ asset }) {
+  if (asset.isManual || (asset.productId === '' && asset.productId !== 0)) return null;
+  return (
+    <div className="rounded-lg bg-surface-container-low p-sm text-body-sm font-body-sm text-on-surface-variant space-y-xs">
+      <p className="m-0">
+        <span className="text-on-surface font-medium">{asset.은행명}</span> · {asset.상품명}
+      </p>
+      <p className="m-0">
+        {asset.금융권_구분} / {asset.상품_유형}
+      </p>
+      <p className="m-0">금리(참고): {formatRateRange(asset)}</p>
+      <p className="m-0">
+        만기: {asset.만기 || '-'} · 최소 금액: {asset.최소_금액 || '-'}
+      </p>
+    </div>
   );
 }
 
@@ -136,6 +197,42 @@ export default function Signup() {
     }));
   };
 
+  const selectLoanProduct = (id, productId) => {
+    setForm((prev) => ({
+      ...prev,
+      financial: {
+        ...prev.financial,
+        loans: prev.financial.loans.map((item) =>
+          item.id === id ? applyProductToLoan(item, productId) : item
+        ),
+      },
+    }));
+  };
+
+  const selectAssetProduct = (id, productId) => {
+    setForm((prev) => ({
+      ...prev,
+      financial: {
+        ...prev.financial,
+        assets: prev.financial.assets.map((item) =>
+          item.id === id ? applyProductToAsset(item, productId) : item
+        ),
+      },
+    }));
+  };
+
+  const toggleAssetManual = (id, isManual) => {
+    setForm((prev) => ({
+      ...prev,
+      financial: {
+        ...prev.financial,
+        assets: prev.financial.assets.map((item) =>
+          item.id === id ? setAssetManualMode(item, isManual) : item
+        ),
+      },
+    }));
+  };
+
   const addLoan = () => {
     setForm((prev) => ({
       ...prev,
@@ -172,6 +269,25 @@ export default function Signup() {
     if (!form.financial.monthlySalary || !Number.isFinite(salary) || salary <= 0) {
       return '월급을 올바르게 입력해주세요.';
     }
+
+    for (const loan of form.financial.loans) {
+      if (loan.balance !== '' || loan.monthlyPayment !== '') {
+        if (loan.productId === '' && loan.productId !== 0) {
+          return '대출 상품을 선택해주세요.';
+        }
+      }
+    }
+
+    for (const asset of form.financial.assets) {
+      if (asset.amount !== '') {
+        if (asset.isManual) {
+          if (!asset.manualName.trim()) return '수동 입력 자산의 이름을 입력해주세요.';
+        } else if (asset.productId === '' && asset.productId !== 0) {
+          return '예·적금 자산 상품을 선택해주세요.';
+        }
+      }
+    }
+
     return '';
   };
 
@@ -358,6 +474,8 @@ export default function Signup() {
 
             {step === 2 ? (
               <div className="space-y-lg">
+                <ProductDisclaimer />
+
                 <Input
                   id="signup-salary"
                   name="monthlySalary"
@@ -398,33 +516,82 @@ export default function Signup() {
                             </button>
                           ) : null}
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
-                          <div className="flex flex-col gap-xs">
-                            <FieldLabel htmlFor={`asset-type-${asset.id}`}>유형</FieldLabel>
-                            <select
-                              id={`asset-type-${asset.id}`}
-                              className={SELECT_CLASS}
-                              value={asset.type}
-                              onChange={(e) => updateAsset(asset.id, 'type', e.target.value)}
-                            >
-                              {ASSET_TYPES.map((type) => (
-                                <option key={type.value} value={type.value}>
-                                  {type.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <Input
-                            id={`asset-name-${asset.id}`}
-                            label="자산명"
-                            placeholder="KB 정기예금"
-                            value={asset.name}
-                            onChange={(e) => updateAsset(asset.id, 'name', e.target.value)}
-                          />
+
+                        <div className="flex flex-col sm:flex-row gap-sm">
+                          <button
+                            type="button"
+                            className={`flex-1 min-h-[44px] rounded-lg text-label-sm font-label-md border ${
+                              !asset.isManual
+                                ? 'bg-secondary-container text-on-secondary-container border-secondary'
+                                : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant'
+                            }`}
+                            onClick={() => toggleAssetManual(asset.id, false)}
+                          >
+                            금융상품 선택
+                          </button>
+                          <button
+                            type="button"
+                            className={`flex-1 min-h-[44px] rounded-lg text-label-sm font-label-md border ${
+                              asset.isManual
+                                ? 'bg-secondary-container text-on-secondary-container border-secondary'
+                                : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant'
+                            }`}
+                            onClick={() => toggleAssetManual(asset.id, true)}
+                          >
+                            직접 입력
+                          </button>
                         </div>
+
+                        {asset.isManual ? (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                            <div className="flex flex-col gap-xs">
+                              <FieldLabel htmlFor={`asset-manual-type-${asset.id}`}>유형</FieldLabel>
+                              <select
+                                id={`asset-manual-type-${asset.id}`}
+                                className={SELECT_CLASS}
+                                value={asset.manualType}
+                                onChange={(e) => updateAsset(asset.id, 'manualType', e.target.value)}
+                              >
+                                {MANUAL_ASSET_TYPES.map((type) => (
+                                  <option key={type.value} value={type.value}>
+                                    {type.label}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            <Input
+                              id={`asset-manual-name-${asset.id}`}
+                              label="자산명"
+                              placeholder="비상금 통장"
+                              value={asset.manualName}
+                              onChange={(e) => updateAsset(asset.id, 'manualName', e.target.value)}
+                            />
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex flex-col gap-xs">
+                              <FieldLabel htmlFor={`asset-product-${asset.id}`}>예·적금 상품 선택</FieldLabel>
+                              <select
+                                id={`asset-product-${asset.id}`}
+                                className={SELECT_CLASS}
+                                value={asset.productId === '' ? '' : String(asset.productId)}
+                                onChange={(e) => selectAssetProduct(asset.id, e.target.value)}
+                              >
+                                <option value="">상품을 선택하세요</option>
+                                {DEPOSIT_PRODUCTS.map((product) => (
+                                  <option key={product.id} value={product.id}>
+                                    {formatProductOption(product)}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+                            <DepositProductSummary asset={asset} />
+                          </>
+                        )}
+
                         <Input
                           id={`asset-amount-${asset.id}`}
-                          label="금액 (원)"
+                          label="보유 금액 (원)"
                           type="number"
                           min="0"
                           placeholder="1000000"
@@ -463,33 +630,35 @@ export default function Signup() {
                             </button>
                           ) : null}
                         </div>
-                        <Input
-                          id={`loan-name-${loan.id}`}
-                          label="대출명"
-                          placeholder="신한 직장인 신용대출"
-                          icon="account_balance"
-                          value={loan.name}
-                          onChange={(e) => updateLoan(loan.id, 'name', e.target.value)}
-                        />
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-sm">
+
+                        <div className="flex flex-col gap-xs">
+                          <FieldLabel htmlFor={`loan-product-${loan.id}`}>대출 상품 선택</FieldLabel>
+                          <select
+                            id={`loan-product-${loan.id}`}
+                            className={SELECT_CLASS}
+                            value={loan.productId === '' ? '' : String(loan.productId)}
+                            onChange={(e) => selectLoanProduct(loan.id, e.target.value)}
+                          >
+                            <option value="">상품을 선택하세요</option>
+                            {LOAN_PRODUCTS.map((product) => (
+                              <option key={product.id} value={product.id}>
+                                {formatProductOption(product)}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <LoanProductSummary loan={loan} />
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
                           <Input
                             id={`loan-balance-${loan.id}`}
-                            label="잔액 (원)"
+                            label="대출 잔액 (원)"
                             type="number"
                             min="0"
                             placeholder="65000000"
                             value={loan.balance}
                             onChange={(e) => updateLoan(loan.id, 'balance', e.target.value)}
-                          />
-                          <Input
-                            id={`loan-rate-${loan.id}`}
-                            label="금리 (%)"
-                            type="number"
-                            min="0"
-                            step="0.1"
-                            placeholder="5.8"
-                            value={loan.interestRate}
-                            onChange={(e) => updateLoan(loan.id, 'interestRate', e.target.value)}
                           />
                           <Input
                             id={`loan-monthly-${loan.id}`}
@@ -546,8 +715,8 @@ export default function Signup() {
                   <p className="text-label-md font-label-md text-primary mb-xs">입력 요약</p>
                   <ul className="text-body-sm font-body-sm text-on-surface-variant space-y-xs m-0 pl-md">
                     <li>월급: {form.financial.monthlySalary ? `₩${Number(form.financial.monthlySalary).toLocaleString()}` : '-'}</li>
-                    <li>자산: {form.financial.assets.filter((a) => a.name || a.amount).length}건</li>
-                    <li>대출: {form.financial.loans.filter((l) => l.name || l.balance).length}건</li>
+                    <li>자산: {form.financial.assets.filter((a) => a.amount || a.productId !== '' || a.manualName).length}건</li>
+                    <li>대출: {form.financial.loans.filter((l) => l.balance || l.productId !== '').length}건</li>
                   </ul>
                 </div>
               </div>
