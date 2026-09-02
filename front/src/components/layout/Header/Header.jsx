@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { MaterialIcon } from '../../common';
+import { getAccessToken, getStoredUser } from '../../../services/authStorage';
 import './Header.css';
 
 export const NAV_ITEMS = [
@@ -17,8 +18,18 @@ function navClassName({ isActive }) {
     : 'text-on-surface-variant hover:text-secondary transition-colors text-label-md font-label-md';
 }
 
+function getAuthDisplay() {
+  const accessToken = getAccessToken();
+  const user = getStoredUser();
+  const isLoggedIn = Boolean(accessToken && user);
+  const displayName = user?.name || user?.loginId || '로그인됨';
+
+  return { isLoggedIn, displayName };
+}
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isLoggedIn, displayName } = getAuthDisplay();
 
   return (
     <header className="header">
@@ -54,13 +65,24 @@ export default function Header() {
           >
             <MaterialIcon name="notifications" />
           </button>
-          <Link
-            to="/login"
-            className="hover:text-secondary transition-colors p-sm rounded-full hover:bg-surface-variant hidden lg:block"
-            aria-label="계정"
-          >
-            <MaterialIcon name="account_circle" />
-          </Link>
+          {isLoggedIn ? (
+            <div className="hidden lg:flex items-center gap-xs shrink-0">
+              <span className="text-label-md font-label-md text-on-surface-variant max-w-[120px] truncate">
+                {displayName}
+              </span>
+              <span className="p-sm rounded-full text-primary cursor-default" aria-label="계정">
+                <MaterialIcon name="account_circle" />
+              </span>
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="hover:text-secondary transition-colors p-sm rounded-full hover:bg-surface-variant hidden lg:block"
+              aria-label="계정"
+            >
+              <MaterialIcon name="account_circle" />
+            </Link>
+          )}
         </div>
       </nav>
 
@@ -85,9 +107,13 @@ export default function Header() {
               {item.label}
             </NavLink>
           ))}
-          <Link to="/login" className="text-label-md font-label-md text-secondary py-sm" onClick={() => setMenuOpen(false)}>
-            로그인
-          </Link>
+          {isLoggedIn ? (
+            <p className="text-label-md font-label-md text-on-surface-variant py-sm">{displayName}</p>
+          ) : (
+            <Link to="/login" className="text-label-md font-label-md text-secondary py-sm" onClick={() => setMenuOpen(false)}>
+              로그인
+            </Link>
+          )}
         </div>
       ) : null}
     </header>

@@ -1,14 +1,46 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Input, Card, MaterialIcon } from '../../components/common';
+import { api } from '../../services/api';
+import { saveAuthSession } from '../../services/authStorage';
 import './Login.css';
 
-export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const LOGIN_ERROR_MESSAGES = {
+  'loginId is required': '아이디를 입력해주세요.',
+  'password is required': '비밀번호를 입력해주세요.',
+  'invalid credentials': '아이디 또는 비밀번호가 올바르지 않습니다.',
+  'too many login attempts': '로그인 시도 횟수를 초과했습니다. 15분 후 다시 시도해주세요.',
+};
 
-  const handleSubmit = (event) => {
+function getLoginErrorMessage(error) {
+  const message = error?.message || '';
+  return LOGIN_ERROR_MESSAGES[message] || '로그인에 실패했습니다. 잠시 후 다시 시도해주세요.';
+}
+
+export default function Login() {
+  const navigate = useNavigate();
+  const [loginId, setLoginId] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    setErrorMessage('');
+    setIsLoading(true);
+
+    try {
+      const data = await api.login({
+        loginId: loginId.trim(),
+        password,
+      });
+      saveAuthSession(data);
+      navigate('/');
+    } catch (error) {
+      setErrorMessage(getLoginErrorMessage(error));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -26,16 +58,25 @@ export default function Login() {
         </div>
 
         <form className="flex flex-col gap-md" onSubmit={handleSubmit}>
+          {errorMessage ? (
+            <p
+              className="text-body-sm font-body-sm text-error m-0 px-sm py-xs bg-error-container rounded-lg border border-error/20"
+              role="alert"
+            >
+              {errorMessage}
+            </p>
+          ) : null}
           <Input
-            id="login-email"
-            name="email"
-            label="이메일"
-            type="email"
-            placeholder="이메일 주소"
-            icon="mail"
+            id="login-id"
+            name="loginId"
+            label="아이디"
+            type="text"
+            placeholder="아이디"
+            icon="person"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={loginId}
+            onChange={(e) => setLoginId(e.target.value)}
+            disabled={isLoading}
           />
           <Input
             id="login-password"
@@ -47,10 +88,11 @@ export default function Login() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
           />
           <div className="pt-sm">
-            <Button type="submit" fullWidth className="h-[48px]">
-              로그인
+            <Button type="submit" fullWidth className="h-[48px]" disabled={isLoading}>
+              {isLoading ? '로그인 중...' : '로그인'}
             </Button>
           </div>
         </form>
