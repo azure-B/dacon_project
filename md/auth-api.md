@@ -29,7 +29,7 @@
   "loginId": "user01",
   "email": "user01@example.com",
   "name": "홍길동",
-  "createdAt": "2026-08-31T04:00:00.000Z"
+  "createdAt": "2026-08-31"
 }
 ```
 
@@ -114,7 +114,7 @@
     "loginId": "user01",
     "email": "user01@example.com",
     "name": "홍길동",
-    "createdAt": "2026-08-31T04:00:00.000Z"
+    "createdAt": "2026-08-31
   }
 }
 ```
@@ -167,7 +167,7 @@
     "loginId": "user01",
     "email": "user01@example.com",
     "name": "홍길동",
-    "createdAt": "2026-08-31T04:00:00.000Z"
+    "createdAt": "2026-08-31"
   }
 }
 ```
@@ -245,7 +245,7 @@ Authorization: Bearer <accessToken>
     "loginId": "user01",
     "email": "user01@example.com",
     "name": "홍길동",
-    "createdAt": "2026-08-31T04:00:00.000Z"
+    "createdAt": "2026-08-31"
   }
 }
 ```
