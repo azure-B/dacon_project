@@ -4,6 +4,7 @@ const financialProductModel = require("./financialProduct.model");
 const debtAdjustmentModel = require("./debtAdjustment.model");
 const spendingModel = require("./spending.model");
 const spendingEvaluationModel = require("./spendingEvaluation.model");
+const accountBookModel = require("./accountBook.model");
 
 module.exports = {
   healthModel,
@@ -12,4 +13,5 @@ module.exports = {
   debtAdjustmentModel,
   spendingModel,
   spendingEvaluationModel,
+  accountBookModel,
 };

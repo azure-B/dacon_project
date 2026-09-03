@@ -47,6 +47,19 @@ function getRangeForPeriod(period, now = new Date(), timeZone = aiConfig.evaluat
 }
 
 function listByUserId(userId) {
+  const accountBookModel = require("./accountBook.model");
+  const fromBook = accountBookModel
+    .listByUser(userId)
+    .filter((item) => item.type === "expense")
+    .map((item) => ({
+      id: `ab-${item.id}`,
+      date: item.date,
+      category: item.category,
+      amount: item.amount,
+      merchant: item.memo,
+    }));
+  if (fromBook.length > 0) return fromBook;
+
   const key = String(userId);
   const list = spendingFile.users?.[key];
   return Array.isArray(list) ? list.slice() : [];
