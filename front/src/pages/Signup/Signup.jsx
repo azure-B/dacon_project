@@ -5,11 +5,15 @@ import {
   GOAL_PERIOD_OPTIONS,
   INITIAL_SIGNUP_FORM,
   MANUAL_ASSET_TYPES,
+  MAX_NAME_LENGTH,
   buildSignupPayload,
   createEmptyAsset,
   createEmptyLoan,
   applyProductToAsset,
   applyProductToLoan,
+  isValidEmail,
+  isValidLoginId,
+  isValidPassword,
   setAssetManualMode,
 } from '../../data/signupFormData';
 import {
@@ -19,7 +23,31 @@ import {
   getDepositProducts,
   getLoanProducts,
 } from '../../data/productCatalog';
+import { api } from '../../services/api';
 import './Signup.css';
+
+const SIGNUP_ERROR_MESSAGES = {
+  'loginId is required': '아이디를 입력해주세요.',
+  'password is required': '비밀번호를 입력해주세요.',
+  'email is required': '이메일을 입력해주세요.',
+  'name is required': '이름을 입력해주세요.',
+  'invalid loginId': '아이디는 영문·숫자·밑줄(_)만 사용하며 4~20자여야 합니다.',
+  'invalid password': '비밀번호는 8~64자이며 영문과 숫자를 모두 포함해야 합니다.',
+  'invalid email': '올바른 이메일 형식이 아닙니다.',
+  'invalid name': '이름은 30자 이내로 입력해주세요.',
+  'invalid monthlyIncome': '월급을 올바르게 입력해주세요.',
+  'invalid targetAmount': '목표 금액을 올바르게 입력해주세요.',
+  'invalid targetPeriod': '목표 기간을 올바르게 선택해주세요.',
+  'invalid assetList': '자산 목록 형식이 올바르지 않습니다.',
+  'invalid loanList': '대출 목록 형식이 올바르지 않습니다.',
+  'loginId already exists': '이미 사용 중인 아이디입니다. 다른 아이디를 입력해주세요.',
+  'email already exists': '이미 가입된 이메일입니다. 다른 이메일을 사용하거나 로그인해 주세요.',
+};
+
+function getSignupErrorMessage(error) {
+  const message = error?.message || '';
+  return SIGNUP_ERROR_MESSAGES[message] || '회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.';
+}
 
 const STEPS = [
   { id: 1, label: '기본정보' },
@@ -131,7 +159,8 @@ export default function Signup() {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(INITIAL_SIGNUP_FORM);
   const [errorMessage, setErrorMessage] = useState('');
-  const [submittedPayload, setSubmittedPayload] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedResult, setSubmittedResult] = useState(null);
 
   const updateProfile = (field, value) => {
     setForm((prev) => ({
@@ -255,10 +284,19 @@ export default function Signup() {
   };
 
   const validateStep1 = () => {
-    const { name, email, password, passwordConfirm, termsAccepted } = form.profile;
+    const { loginId, name, email, password, passwordConfirm, termsAccepted } = form.profile;
+    if (!loginId.trim()) return '아이디를 입력해주세요.';
+    if (!isValidLoginId(loginId)) {
+      return '아이디는 영문·숫자·밑줄(_)만 사용하며 4~20자여야 합니다.';
+    }
     if (!name.trim()) return '이름을 입력해주세요.';
+    if (name.trim().length > MAX_NAME_LENGTH) return '이름은 30자 이내로 입력해주세요.';
     if (!email.trim()) return '이메일을 입력해주세요.';
+    if (!isValidEmail(email)) return '올바른 이메일 형식이 아닙니다.';
     if (!password) return '비밀번호를 입력해주세요.';
+    if (!isValidPassword(password)) {
+      return '비밀번호는 8~64자이며 영문과 숫자를 모두 포함해야 합니다.';
+    }
     if (password !== passwordConfirm) return '비밀번호가 일치하지 않습니다.';
     if (!termsAccepted) return '서비스 이용약관에 동의해주세요.';
     return '';
@@ -271,10 +309,30 @@ export default function Signup() {
     }
 
     for (const loan of form.financial.loans) {
-      if (loan.balance !== '' || loan.monthlyPayment !== '') {
-        if (loan.productId === '' && loan.productId !== 0) {
-          return '대출 상품을 선택해주세요.';
-        }
+      const hasLoan =
+        (loan.productId !== '' && loan.productId != null) ||
+        loan.balance !== '' ||
+        loan.monthlyPayment !== '';
+
+      // 비어 있는 대출 행은 "대출 없음"으로 보고 검증 생략
+      if (!hasLoan) continue;
+
+      if (loan.productId === '' && loan.productId !== 0) {
+        return '대출 상품을 선택해주세요.';
+      }
+
+      const balance = Number(loan.balance);
+      if (loan.balance === '' || !Number.isFinite(balance) || balance <= 0) {
+        return '대출 잔액을 0보다 큰 금액으로 입력해주세요.';
+      }
+
+      const monthlyPayment = Number(loan.monthlyPayment);
+      if (
+        loan.monthlyPayment === '' ||
+        !Number.isFinite(monthlyPayment) ||
+        monthlyPayment <= 0
+      ) {
+        return '월 상환액을 0보다 큰 금액으로 입력해주세요.';
       }
     }
 
@@ -324,7 +382,7 @@ export default function Signup() {
     setStep((prev) => Math.max(prev - 1, 1));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setErrorMessage('');
 
@@ -335,11 +393,23 @@ export default function Signup() {
     }
 
     const payload = buildSignupPayload(form);
-    setSubmittedPayload(payload);
-    console.log('[Signup] 임시 저장 payload:', payload);
+    setIsSubmitting(true);
+
+    try {
+      const data = await api.signup(payload);
+      setSubmittedResult({
+        user: data.user,
+        payload,
+      });
+    } catch (submitError) {
+      setErrorMessage(getSignupErrorMessage(submitError));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  if (submittedPayload) {
+  if (submittedResult) {
+    const { user, payload } = submittedResult;
     return (
       <div className="bg-surface-container-lowest text-on-surface min-h-screen flex items-center justify-center p-3 sm:p-margin-mobile md:p-margin-desktop page-shell">
         <main className="w-full max-w-[480px] min-w-0">
@@ -347,20 +417,20 @@ export default function Signup() {
             <div className="w-12 h-12 mx-auto mb-md bg-tertiary-fixed-dim/20 text-on-tertiary-container rounded-full flex items-center justify-center">
               <MaterialIcon name="check_circle" className="text-[28px]" />
             </div>
-            <h1 className="text-headline-md font-headline-md text-primary mb-sm">입력이 완료되었습니다</h1>
+            <h1 className="text-headline-md font-headline-md text-primary mb-sm">회원가입이 완료되었습니다</h1>
             <p className="text-body-sm font-body-sm text-on-surface-variant mb-lg break-keep">
-              재무 정보가 임시로 저장되었습니다. (Supabase 연동 전 — 콘솔에서 payload 확인 가능)
+              계정이 생성되었습니다. 로그인한 뒤 맞춤형 재무 분석을 이용할 수 있습니다.
             </p>
             <div className="text-left bg-surface-container-low rounded-lg p-md mb-lg overflow-x-auto">
-              <p className="text-label-sm font-label-sm text-on-surface-variant mb-xs">저장된 데이터 요약</p>
+              <p className="text-label-sm font-label-sm text-on-surface-variant mb-xs">가입 정보 요약</p>
               <ul className="text-body-sm font-body-sm text-on-surface space-y-xs m-0 pl-md">
-                <li>이름: {submittedPayload.profile.name}</li>
-                <li>월급: ₩{submittedPayload.financial.monthlySalary?.toLocaleString()}</li>
-                <li>자산: {submittedPayload.financial.assets.length}건</li>
-                <li>대출: {submittedPayload.financial.loans.length}건</li>
+                <li>아이디: {user?.loginId || payload.profile.loginId}</li>
+                <li>이름: {user?.name || payload.profile.name}</li>
+                <li>월급: ₩{payload.financial.monthlyIncome?.toLocaleString()}</li>
+                <li>자산: {payload.financial.assetList.length}건</li>
+                <li>대출: {payload.financial.loanList.length}건</li>
                 <li>
-                  목표: ₩{submittedPayload.goal.targetAmount?.toLocaleString()} /{' '}
-                  {submittedPayload.goal.targetMonths}개월
+                  목표: ₩{payload.goal.targetAmount?.toLocaleString()} / {payload.goal.targetPeriod}개월
                 </li>
               </ul>
             </div>
@@ -401,6 +471,18 @@ export default function Signup() {
             {step === 1 ? (
               <div className="space-y-gutter">
                 <Input
+                  id="signup-login-id"
+                  name="loginId"
+                  label="아이디"
+                  placeholder="user01"
+                  icon="badge"
+                  required
+                  hint="영문·숫자·밑줄(_) 4~20자"
+                  value={form.profile.loginId}
+                  onChange={(e) => updateProfile('loginId', e.target.value)}
+                  disabled={isSubmitting}
+                />
+                <Input
                   id="signup-name"
                   name="name"
                   label="이름"
@@ -409,6 +491,7 @@ export default function Signup() {
                   required
                   value={form.profile.name}
                   onChange={(e) => updateProfile('name', e.target.value)}
+                  disabled={isSubmitting}
                 />
                 <Input
                   id="signup-email"
@@ -420,6 +503,7 @@ export default function Signup() {
                   required
                   value={form.profile.email}
                   onChange={(e) => updateProfile('email', e.target.value)}
+                  disabled={isSubmitting}
                 />
                 <Input
                   id="signup-password"
@@ -429,9 +513,10 @@ export default function Signup() {
                   placeholder="••••••••"
                   icon="lock"
                   required
-                  hint="최소 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다."
+                  hint="8~64자, 영문과 숫자를 포함해야 합니다."
                   value={form.profile.password}
                   onChange={(e) => updateProfile('password', e.target.value)}
+                  disabled={isSubmitting}
                 />
                 <Input
                   id="signup-password-confirm"
@@ -443,6 +528,7 @@ export default function Signup() {
                   required
                   value={form.profile.passwordConfirm}
                   onChange={(e) => updateProfile('passwordConfirm', e.target.value)}
+                  disabled={isSubmitting}
                 />
                 <div className="flex items-start gap-sm">
                   <div className="flex items-center shrink-0 min-h-[44px]">
@@ -454,6 +540,7 @@ export default function Signup() {
                       type="checkbox"
                       checked={form.profile.termsAccepted}
                       onChange={(e) => updateProfile('termsAccepted', e.target.checked)}
+                      disabled={isSubmitting}
                     />
                   </div>
                   <div className="text-body-sm font-body-sm min-w-0">
@@ -655,7 +742,7 @@ export default function Signup() {
                             id={`loan-balance-${loan.id}`}
                             label="대출 잔액 (원)"
                             type="number"
-                            min="0"
+                            min="1"
                             placeholder="65000000"
                             value={loan.balance}
                             onChange={(e) => updateLoan(loan.id, 'balance', e.target.value)}
@@ -664,8 +751,9 @@ export default function Signup() {
                             id={`loan-monthly-${loan.id}`}
                             label="월 상환액 (원)"
                             type="number"
-                            min="0"
+                            min="1"
                             placeholder="1245000"
+                            hint="대출이 있는 경우 0보다 큰 금액을 입력해주세요."
                             value={loan.monthlyPayment}
                             onChange={(e) => updateLoan(loan.id, 'monthlyPayment', e.target.value)}
                           />
@@ -724,17 +812,31 @@ export default function Signup() {
 
             <div className="flex flex-col-reverse sm:flex-row gap-sm pt-md">
               {step > 1 ? (
-                <Button type="button" variant="outline" fullWidth className="h-[48px]" onClick={goBack}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  fullWidth
+                  className="h-[48px]"
+                  onClick={goBack}
+                  disabled={isSubmitting}
+                >
                   이전
                 </Button>
               ) : null}
               {step < 3 ? (
-                <Button type="button" variant="secondary" fullWidth className="h-[48px]" onClick={goNext}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  fullWidth
+                  className="h-[48px]"
+                  onClick={goNext}
+                  disabled={isSubmitting}
+                >
                   다음
                 </Button>
               ) : (
-                <Button type="submit" variant="secondary" fullWidth className="h-[48px]">
-                  회원가입 완료
+                <Button type="submit" variant="secondary" fullWidth className="h-[48px]" disabled={isSubmitting}>
+                  {isSubmitting ? '가입 처리 중…' : '회원가입 완료'}
                 </Button>
               )}
             </div>
