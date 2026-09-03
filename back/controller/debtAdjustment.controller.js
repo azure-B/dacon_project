@@ -1,9 +1,13 @@
 const { debtAdjustmentModel } = require("../models");
+const { getPreferredApiKey } = require("../config");
 
 async function analyze(req, res) {
   try {
     const note = req.body?.note ?? req.body?.question ?? "";
-    const result = await debtAdjustmentModel.analyze(req.user, { note });
+    const result = await debtAdjustmentModel.analyze(req.user, {
+      note,
+      apiKey: getPreferredApiKey(),
+    });
     return res.json(result);
   } catch (error) {
     if (error.code === "AI_UNAVAILABLE") {

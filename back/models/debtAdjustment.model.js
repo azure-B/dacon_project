@@ -261,10 +261,12 @@ async function analyze(user, options = {}) {
     const { completeJson } = require("../services/aiClient");
     aiResult = await completeJson(
       buildSystemPrompt(),
-      buildUserPrompt(snapshot, promptDict, extraNote)
+      buildUserPrompt(snapshot, promptDict, extraNote),
+      { apiKey: options.apiKey }
     );
   } catch (error) {
-    if (process.env.AI_REQUIRED === "true") {
+    const { aiConfig } = require("../config");
+    if (aiConfig.required) {
       throw error;
     }
     aiResult = null;

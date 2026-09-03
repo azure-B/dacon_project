@@ -1,16 +1,4 @@
-const REQUEST_TIMEOUT_MS = 25000;
-
-function getOpenAiKey() {
-  return process.env.OPENAI_API_KEY || process.env.AI_API_KEY || "";
-}
-
-function getGeminiKey() {
-  return process.env.GEMINI_API_KEY || "";
-}
-
-function hasRemoteAi() {
-  return Boolean(getOpenAiKey() || getGeminiKey());
-}
+const { aiConfig, hasRemoteAi } = require("../config");
 
 function extractJson(text) {
   const trimmed = String(text || "").trim();
@@ -19,13 +7,8 @@ function extractJson(text) {
   return JSON.parse(raw);
 }
 
-async function completeOpenAi(systemPrompt, userPrompt) {
-  const apiKey = getOpenAiKey();
-  const baseUrl = (process.env.OPENAI_BASE_URL || "https://api.openai.com/v1").replace(
-    /\/$/,
-    ""
-  );
-  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+async function completeOpenAi(systemPrompt, userPrompt, apiKey) {
+  const { baseUrl, model } = aiConfig.openai;
 
   const response = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
@@ -42,7 +25,7 @@ async function completeOpenAi(systemPrompt, userPrompt) {
         { role: "user", content: userPrompt },
       ],
     }),
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    signal: AbortSignal.timeout(aiConfig.timeoutMs),
   });
 
   if (!response.ok) {
@@ -54,17 +37,15 @@ async function completeOpenAi(systemPrompt, userPrompt) {
   }
 
   const data = await response.json();
-  const content = data?.choices?.[0]?.message?.content;
   return {
     provider: "openai",
     model,
-    json: extractJson(content),
+    json: extractJson(data?.choices?.[0]?.message?.content),
   };
 }
 
-async function completeGemini(systemPrompt, userPrompt) {
-  const apiKey = getGeminiKey();
-  const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+async function completeGemini(systemPrompt, userPrompt, apiKey) {
+  const { model } = aiConfig.gemini;
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
 
   const response = await fetch(url, {
@@ -78,7 +59,7 @@ async function completeGemini(systemPrompt, userPrompt) {
         responseMimeType: "application/json",
       },
     }),
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    signal: AbortSignal.timeout(aiConfig.timeoutMs),
   });
 
   if (!response.ok) {
@@ -90,20 +71,23 @@ async function completeGemini(systemPrompt, userPrompt) {
   }
 
   const data = await response.json();
-  const content = data?.candidates?.[0]?.content?.parts?.[0]?.text;
   return {
     provider: "gemini",
     model,
-    json: extractJson(content),
+    json: extractJson(data?.candidates?.[0]?.content?.parts?.[0]?.text),
   };
 }
 
-async function completeJson(systemPrompt, userPrompt) {
-  if (getOpenAiKey()) {
-    return completeOpenAi(systemPrompt, userPrompt);
+async function completeJson(systemPrompt, userPrompt, options = {}) {
+  const overrideKey = options.apiKey || "";
+  if (aiConfig.openai.apiKey) {
+    return completeOpenAi(systemPrompt, userPrompt, aiConfig.openai.apiKey);
   }
-  if (getGeminiKey()) {
-    return completeGemini(systemPrompt, userPrompt);
+  if (aiConfig.gemini.apiKey) {
+    return completeGemini(systemPrompt, userPrompt, aiConfig.gemini.apiKey);
+  }
+  if (overrideKey) {
+    return completeOpenAi(systemPrompt, userPrompt, overrideKey);
   }
   return null;
 }

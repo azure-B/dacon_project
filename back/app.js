@@ -1,8 +1,10 @@
-require("dotenv").config();
+require("dotenv").config({ path: require("path").join(__dirname, ".env") });
 
 const path = require("path");
 const express = require("express");
 const routes = require("./routes");
+const { aiConfig } = require("./config");
+const scheduler = require("./scheduler");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,4 +24,7 @@ app.get("*", (req, res) => {
 
 app.listen(PORT, HOST, () => {
   console.log(`Server running on http://${HOST}:${PORT}`);
+  if (aiConfig.evaluation.schedulerEnabled) {
+    scheduler.start();
+  }
 });

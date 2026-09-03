@@ -1,0 +1,22 @@
+{
+  "users": {
+    "1": [
+      { "id": "tx-0901-1", "date": "2026-09-01", "category": "식비", "amount": 12800, "merchant": "김밥천국" },
+      { "id": "tx-0901-2", "date": "2026-09-01", "category": "교통", "amount": 2800, "merchant": "서울교통공사" },
+      { "id": "tx-0901-3", "date": "2026-09-01", "category": "구독", "amount": 13900, "merchant": "OTT" },
+      { "id": "tx-0902-1", "date": "2026-09-02", "category": "식비", "amount": 45000, "merchant": "배달앱" },
+      { "id": "tx-0902-2", "date": "2026-09-02", "category": "쇼핑", "amount": 32000, "merchant": "쿠팡" },
+      { "id": "tx-0903-1", "date": "2026-09-03", "category": "식비", "amount": 8900, "merchant": "편의점" },
+      { "id": "tx-0903-2", "date": "2026-09-03", "category": "카페", "amount": 6100, "merchant": "스타벅스" },
+      { "id": "tx-0825-1", "date": "2026-08-25", "category": "식비", "amount": 22000, "merchant": "한식" },
+      { "id": "tx-0826-1", "date": "2026-08-26", "category": "교통", "amount": 14000, "merchant": "카카오T" },
+      { "id": "tx-0827-1", "date": "2026-08-27", "category": "쇼핑", "amount": 78000, "merchant": "무신사" },
+      { "id": "tx-0828-1", "date": "2026-08-28", "category": "통신", "amount": 55000, "merchant": "통신요금" },
+      { "id": "tx-0829-1", "date": "2026-08-29", "category": "식비", "amount": 31000, "merchant": "회식" },
+      { "id": "tx-0830-1", "date": "2026-08-30", "category": "구독", "amount": 9900, "merchant": "음악앱" },
+      { "id": "tx-0831-1", "date": "2026-08-31", "category": "식비", "amount": 17500, "merchant": "마트" },
+      { "id": "tx-0810-1", "date": "2026-08-10", "category": "주거", "amount": 450000, "merchant": "월세" },
+      { "id": "tx-0815-1", "date": "2026-08-15", "category": "의료", "amount": 28000, "merchant": "약국" }
+    ]
+  }
+}

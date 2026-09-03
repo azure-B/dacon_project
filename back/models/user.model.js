@@ -218,6 +218,10 @@ users.push({
   productIds: [95, 10],
 });
 
+function findAll() {
+  return users.slice();
+}
+
 module.exports = {
   ACCESS_TOKEN_TTL_SEC,
   hashPassword,
@@ -227,6 +231,7 @@ module.exports = {
   findByLoginId,
   findByEmail,
   findById,
+  findAll,
   create,
   createAccessToken,
   verifyAccessToken,
