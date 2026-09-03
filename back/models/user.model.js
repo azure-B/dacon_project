@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const { EMPTY_FINANCE } = require("../schema/signup.schema");
 
 const ACCESS_TOKEN_TTL_SEC = 3600;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
@@ -38,6 +39,17 @@ function authenticate(loginId, password) {
   return user;
 }
 
+function financeFields(user) {
+  return {
+    monthlyIncome: user.monthlyIncome ?? null,
+    targetAmount: user.targetAmount ?? null,
+    targetPeriod: user.targetPeriod ?? null,
+    assetList: Array.isArray(user.assetList) ? user.assetList.slice() : [],
+    loanList: Array.isArray(user.loanList) ? user.loanList.slice() : [],
+    productIds: Array.isArray(user.productIds) ? user.productIds.slice() : [],
+  };
+}
+
 function toPublic(user) {
   return {
     id: user.id,
@@ -45,11 +57,21 @@ function toPublic(user) {
     email: user.email,
     name: user.name,
     createdAt: String(user.createdAt).slice(0, 10),
+    ...financeFields(user),
   };
 }
 
 function findByLoginId(loginId) {
   return users.find((user) => user.loginId === loginId) || null;
+}
+
+function findByEmail(email) {
+  const normalized = String(email || "").trim().toLowerCase();
+  if (!normalized) return null;
+  return (
+    users.find((user) => String(user.email).trim().toLowerCase() === normalized) ||
+    null
+  );
 }
 
 function findById(id) {
@@ -63,6 +85,12 @@ function create(data) {
     email: data.email,
     name: data.name,
     passwordHash: hashPassword(data.password),
+    monthlyIncome: data.monthlyIncome ?? null,
+    targetAmount: data.targetAmount ?? null,
+    targetPeriod: data.targetPeriod ?? null,
+    assetList: Array.isArray(data.assetList) ? data.assetList.slice() : [],
+    loanList: Array.isArray(data.loanList) ? data.loanList.slice() : [],
+    productIds: Array.isArray(data.productIds) ? data.productIds.slice() : [],
     createdAt: new Date().toISOString(),
   };
   users.push(user);
@@ -140,6 +168,10 @@ users.push({
   name: "홍길동",
   passwordHash: hashPassword("pass1234"),
   createdAt: "2026-08-31T00:00:00.000Z",
+  ...EMPTY_FINANCE,
+  assetList: [],
+  loanList: [],
+  productIds: [],
 });
 
 module.exports = {
@@ -149,6 +181,7 @@ module.exports = {
   authenticate,
   toPublic,
   findByLoginId,
+  findByEmail,
   findById,
   create,
   createAccessToken,

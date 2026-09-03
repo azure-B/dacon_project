@@ -1,4 +1,5 @@
 const { userModel } = require("../models");
+const { parseSignupDto } = require("../dto/signup.dto");
 
 function readLoginId(body) {
   const raw = body?.loginId ?? body?.userId;
@@ -40,6 +41,27 @@ function login(req, res) {
   });
 }
 
+function signup(req, res) {
+  const parsed = parseSignupDto(req.body);
+  if (parsed.error) {
+    return res.status(400).json({ error: parsed.error });
+  }
+
+  const { data } = parsed;
+  if (userModel.findByLoginId(data.loginId)) {
+    return res.status(409).json({ error: "loginId already exists" });
+  }
+  if (userModel.findByEmail(data.email)) {
+    return res.status(409).json({ error: "email already exists" });
+  }
+
+  const user = userModel.create(data);
+  return res.status(201).json({
+    user: userModel.toPublic(user),
+  });
+}
+
 module.exports = {
   login,
+  signup,
 };
