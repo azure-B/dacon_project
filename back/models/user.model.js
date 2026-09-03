@@ -1,5 +1,4 @@
 const crypto = require("crypto");
-const { EMPTY_FINANCE } = require("../schema/signup.schema");
 
 const ACCESS_TOKEN_TTL_SEC = 3600;
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
@@ -101,6 +100,31 @@ function base64url(value) {
   return Buffer.from(value).toString("base64url");
 }
 
+function verifyAccessToken(token) {
+  if (!token) return null;
+  const session = sessions.get(token);
+  if (!session) return null;
+  if (Date.now() >= session.expiresAt) {
+    sessions.delete(token);
+    return null;
+  }
+
+  const parts = String(token).split(".");
+  if (parts.length !== 3) return null;
+
+  const expected = crypto
+    .createHmac("sha256", JWT_SECRET)
+    .update(`${parts[0]}.${parts[1]}`)
+    .digest("base64url");
+  const actual = parts[2];
+  const expectedBuf = Buffer.from(expected);
+  const actualBuf = Buffer.from(actual);
+  if (expectedBuf.length !== actualBuf.length) return null;
+  if (!crypto.timingSafeEqual(expectedBuf, actualBuf)) return null;
+
+  return findById(session.userId);
+}
+
 function createAccessToken(user) {
   const now = Math.floor(Date.now() / 1000);
   const header = base64url(JSON.stringify({ alg: "HS256", typ: "JWT" }));
@@ -168,10 +192,30 @@ users.push({
   name: "홍길동",
   passwordHash: hashPassword("pass1234"),
   createdAt: "2026-08-31T00:00:00.000Z",
-  ...EMPTY_FINANCE,
-  assetList: [],
-  loanList: [],
-  productIds: [],
+  monthlyIncome: 4200000,
+  targetAmount: 10000000,
+  targetPeriod: 24,
+  assetList: [
+    {
+      productId: 10,
+      isManual: false,
+      amount: 1500000,
+      상품명: "KB Star 정기예금",
+    },
+  ],
+  loanList: [
+    {
+      productId: 95,
+      balance: 65000000,
+      monthlyPayment: 1245000,
+      상품명: "OK희망대출",
+      은행명: "OK저축은행",
+      상품_유형: "신용대출",
+      이자율_최저: 6.5,
+      이자율_최고: 12,
+    },
+  ],
+  productIds: [95, 10],
 });
 
 module.exports = {
@@ -185,6 +229,7 @@ module.exports = {
   findById,
   create,
   createAccessToken,
+  verifyAccessToken,
   isLoginBlocked,
   recordLoginFailure,
   clearLoginFailures,
