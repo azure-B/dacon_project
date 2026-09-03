@@ -3,6 +3,7 @@ const authController = require("./auth.controller");
 const debtAdjustmentController = require("./debtAdjustment.controller");
 const spendingEvaluationController = require("./spendingEvaluation.controller");
 const accountBookController = require("./accountBook.controller");
+const spamCheckController = require("./spamCheck.controller");
 
 module.exports = {
   healthController,
@@ -10,4 +11,5 @@ module.exports = {
   debtAdjustmentController,
   spendingEvaluationController,
   accountBookController,
+  spamCheckController,
 };
