@@ -6,6 +6,19 @@ const {
 
 let adminClient = null;
 let anonClient = null;
+let wsTransport = null;
+
+function getWsTransport() {
+  if (wsTransport !== null) return wsTransport || undefined;
+  try {
+    // Node < 22: supabase-js가 native WebSocket을 요구함
+    // eslint-disable-next-line global-require
+    wsTransport = require("ws");
+  } catch {
+    wsTransport = false;
+  }
+  return wsTransport || undefined;
+}
 
 function decodeJwtPayload(token) {
   try {
@@ -34,13 +47,19 @@ function createSupabaseClient(key, options = {}) {
     error.code = "SUPABASE_NOT_CONFIGURED";
     throw error;
   }
+  const transport = getWsTransport();
+  const { realtime: realtimeOpts, ...rest } = options;
   return createClient(supabaseConfig.url, key, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
       detectSessionInUrl: false,
     },
-    ...options,
+    realtime: {
+      ...(transport ? { transport } : {}),
+      ...(realtimeOpts || {}),
+    },
+    ...rest,
   });
 }
 
