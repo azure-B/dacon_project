@@ -216,46 +216,63 @@ async function create(data) {
 }
 
 async function authenticate(loginId, password) {
-  let email = "";
-  let stub = null;
+  try {
+    let email = "";
+    let stub = null;
 
-  if (hasAdminAccess()) {
-    stub = await findByLoginId(loginId);
-    email = stub?.email || "";
-  } else {
+    if (hasAdminAccess()) {
+      stub = await findByLoginId(loginId);
+      email = stub?.email || "";
+    } else {
+      const auth = getAuthClient();
+      const { data, error } = await auth.rpc("email_for_login_id", {
+        p_login_id: String(loginId || "").trim(),
+      });
+      // RPC 미배포·조회 실패는 500 대신 자격 없음으로 처리
+      if (error) {
+        console.error("[authenticate] email_for_login_id:", error.message || error);
+        return null;
+      }
+      email = data || "";
+    }
+    if (!email) return null;
+
     const auth = getAuthClient();
-    const { data, error } = await auth.rpc("email_for_login_id", {
-      p_login_id: String(loginId || "").trim(),
-    });
-    if (error) throw error;
-    email = data || "";
-  }
-  if (!email) return null;
-
-  const auth = getAuthClient();
-  const { data, error } = await auth.auth.signInWithPassword({
-    email,
-    password,
-  });
-  if (error || !data?.session?.access_token) return null;
-
-  const user =
-    (await findById(data.user.id, data.session.access_token)) ||
-    stub ||
-    rowToUser({
-      id: data.user.id,
-      login_id: loginId,
+    const { data, error } = await auth.auth.signInWithPassword({
       email,
-      name: loginId,
-      created_at: data.user.created_at,
+      password,
     });
+    if (error || !data?.session?.access_token) return null;
 
-  return {
-    user,
-    accessToken: data.session.access_token,
-    tokenType: data.session.token_type || "Bearer",
-    expiresIn: data.session.expires_in || ACCESS_TOKEN_TTL_SEC,
-  };
+    let profile = null;
+    try {
+      profile = await findById(data.user.id, data.session.access_token);
+    } catch (profileError) {
+      console.error("[authenticate] findById:", profileError.message || profileError);
+    }
+
+    const user =
+      profile ||
+      stub ||
+      rowToUser({
+        id: data.user.id,
+        login_id: loginId,
+        email,
+        name: loginId,
+        created_at: data.user.created_at,
+      });
+
+    return {
+      user,
+      accessToken: data.session.access_token,
+      tokenType: data.session.token_type || "Bearer",
+      expiresIn: data.session.expires_in || ACCESS_TOKEN_TTL_SEC,
+    };
+  } catch (error) {
+    if (error.code === "SUPABASE_NOT_CONFIGURED") throw error;
+    console.error("[authenticate]", error.message || error);
+    return null;
+  }
 }
 
 async function verifyAccessToken(token) {

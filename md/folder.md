@@ -14,7 +14,7 @@ dacon/
 │   └── rules/                # 영역별 Cursor 규칙
 ├── back/                     # Express 서버
 │   ├── app.js                # 진입점 (API + front 정적 서빙)
-│   ├── config/               # ai·supabase 설정
+│   ├── config/               # ai·supabase·demoAuth 설정
 │   ├── controller/           # 요청 처리
 │   ├── models/               # 데이터 로직 (Supabase)
 │   ├── routes/               # URL 매핑

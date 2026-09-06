@@ -1,5 +1,11 @@
 const { userModel } = require("../models");
 const { parseSignupDto } = require("../dto/signup.dto");
+const {
+  DEMO_ACCESS_TOKEN,
+  DEMO_LOGIN_ID,
+  DEMO_EXPIRES_IN,
+  isDemoAuthEnabled,
+} = require("../config/demoAuth");
 
 function readLoginId(body) {
   const raw = body?.loginId ?? body?.userId;
@@ -7,7 +13,46 @@ function readLoginId(body) {
   return String(raw).trim();
 }
 
+async function buildDemoSession() {
+  const user =
+    (await userModel.findByLoginId(DEMO_LOGIN_ID)) ||
+    {
+      id: "demo",
+      loginId: DEMO_LOGIN_ID,
+      email: `${DEMO_LOGIN_ID}@example.com`,
+      name: DEMO_LOGIN_ID,
+    };
+  return {
+    accessToken: DEMO_ACCESS_TOKEN,
+    tokenType: "Bearer",
+    expiresIn: DEMO_EXPIRES_IN,
+    user: userModel.toPublic(user),
+  };
+}
+
 async function login(req, res) {
+  if (isDemoAuthEnabled()) {
+    try {
+      return res.json(await buildDemoSession());
+    } catch (error) {
+      if (error.code === "SUPABASE_NOT_CONFIGURED") {
+        return res.status(503).json({ error: "supabase not configured" });
+      }
+      // DB 조회 실패해도 UI 진입용 데모 세션은 발급
+      return res.json({
+        accessToken: DEMO_ACCESS_TOKEN,
+        tokenType: "Bearer",
+        expiresIn: DEMO_EXPIRES_IN,
+        user: {
+          id: "demo",
+          loginId: DEMO_LOGIN_ID,
+          email: `${DEMO_LOGIN_ID}@example.com`,
+          name: DEMO_LOGIN_ID,
+        },
+      });
+    }
+  }
+
   const loginId = readLoginId(req.body);
   const password =
     req.body?.password === undefined || req.body?.password === null

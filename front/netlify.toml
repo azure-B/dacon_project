@@ -1,5 +1,5 @@
 # Netlify — front (React/Vite)
-# Site settings에서도 Root directory = front 로 맞출 것
+# Site settings: Base directory = front
 
 [build]
   command = "npm run build"
@@ -8,13 +8,21 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# SPA 라우팅
+# --- 필수: Netlify → Site configuration → Environment variables ---
+#   VITE_API_BASE = https://<your-render-service>.onrender.com/api
+# 저장 후 Trigger deploy (빌드 시점에 주입됨. 값만 바꾸고 재빌드 안 하면 반영 안 됨)
+#
+# 또는 아래 프록시를 쓰고 VITE_API_BASE 없이 /api 상대경로를 쓸 수도 있음.
+# Render URL로 바꾼 뒤 주석 해제, 그리고 아래 SPA /* 보다 위에 있어야 함.
+#
+# [[redirects]]
+#   from = "/api/*"
+#   to = "https://YOUR-SERVICE.onrender.com/api/:splat"
+#   status = 200
+#   force = true
+
+# SPA 라우팅 (API 프록시보다 아래에 둘 것)
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-# 로컬 대신 배포 API를 쓰려면 Netlify UI → Environment variables:
-#   VITE_API_BASE = https://<your-render-service>.onrender.com/api
-#
-# (빌드 시점에 주입되므로 값 바꾼 뒤 Redeploy 필요)

@@ -73,6 +73,8 @@ Supabase Auth·DB 스키마·환경변수는 **`md/API/supabase.md`**, SQL은 **
 
 아이디/비밀번호를 검증하고 액세스 토큰을 발급합니다.
 
+`DEMO_AUTO_LOGIN`이 `false`가 아니면(기본 ON) Supabase 비밀번호 인증을 건너뛰고 `accessToken: "demo"` · `demo01` 세션을 바로 발급합니다. 끄려면 Render 환경변수 `DEMO_AUTO_LOGIN=false`.
+
 ### Request
 
 `loginId` 또는 `userId` 중 하나를 사용할 수 있습니다. 둘 다 있으면 `loginId`를 사용합니다.
