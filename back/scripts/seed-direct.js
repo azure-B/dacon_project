@@ -99,6 +99,32 @@ async function main() {
 
   console.log("demo user", profile.login_id, userId);
 
+  const financePatch = {
+    name: "데모유저",
+    monthly_income: 4200000,
+    target_amount: 5000000,
+    target_period: 12,
+    asset_list: [
+      { productId: 10, amount: 2000000, 상품명: "KB Star 정기예금", isManual: false },
+    ],
+    loan_list: [
+      {
+        productId: 95,
+        balance: 30000000,
+        monthlyPayment: 450000,
+        상품명: "신용대출 샘플",
+        은행명: "샘플저축은행",
+        상품_유형: "신용대출",
+        이자율_최저: 6.5,
+        이자율_최고: 11,
+      },
+    ],
+    product_ids: [95, 10],
+  };
+  const { error: fErr } = await admin.from("profiles").update(financePatch).eq("id", userId);
+  if (fErr) throw fErr;
+  console.log("profile finance seeded (loan/asset)");
+
   // auth helpers (DB URL 없으면 스킵)
   const fs = require("fs");
   const path = require("path");
