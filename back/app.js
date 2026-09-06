@@ -1,3 +1,14 @@
+// Node < 22: supabase-js가 REST 호출에도 native WebSocket을 요구함 → 로그인/DB 전부 실패
+// 로그인에 웹소켓이 필요한 게 아니라, 라이브러리 제약이라 앱 기동 시 폴리필한다.
+if (typeof globalThis.WebSocket === "undefined") {
+  try {
+    // eslint-disable-next-line global-require
+    globalThis.WebSocket = require("ws");
+  } catch {
+    // ws 미설치 시 createClient 단계에서 다시 안내
+  }
+}
+
 require("./config/supabaseConfig").loadProjectEnv();
 require("dotenv").config({ path: require("path").join(__dirname, ".env") });
 
@@ -44,7 +55,7 @@ if (!apiOnly) {
 }
 
 app.listen(PORT, HOST, () => {
-  console.log(`Server running on http://${HOST}:${PORT} (apiOnly=${apiOnly})`);
+  console.log(`Server running on http://${HOST}:${PORT} (apiOnly=${apiOnly}, node=${process.version})`);
   if (aiConfig.evaluation.schedulerEnabled) {
     scheduler.start();
   }

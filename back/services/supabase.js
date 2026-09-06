@@ -4,21 +4,18 @@ const {
   assertSupabaseConfigured,
 } = require("../config/supabaseConfig");
 
+// app.js 보다 먼저 로드될 수 있어 여기서도 폴리필
+if (typeof globalThis.WebSocket === "undefined") {
+  try {
+    // eslint-disable-next-line global-require
+    globalThis.WebSocket = require("ws");
+  } catch {
+    // ignore
+  }
+}
+
 let adminClient = null;
 let anonClient = null;
-let wsTransport = null;
-
-function getWsTransport() {
-  if (wsTransport !== null) return wsTransport || undefined;
-  try {
-    // Node < 22: supabase-js가 native WebSocket을 요구함
-    // eslint-disable-next-line global-require
-    wsTransport = require("ws");
-  } catch {
-    wsTransport = false;
-  }
-  return wsTransport || undefined;
-}
 
 function decodeJwtPayload(token) {
   try {
@@ -33,7 +30,6 @@ function decodeJwtPayload(token) {
 function isServiceRoleKey(key) {
   if (!key) return false;
   const value = String(key).trim();
-  // 새 API 키: secret 만 service_role. publishable/anon 은 관리자 아님
   if (value.startsWith("sb_secret_")) return true;
   if (value.startsWith("sb_publishable_")) return false;
   const payload = decodeJwtPayload(value);
@@ -47,7 +43,8 @@ function createSupabaseClient(key, options = {}) {
     error.code = "SUPABASE_NOT_CONFIGURED";
     throw error;
   }
-  const transport = getWsTransport();
+  const transport =
+    typeof globalThis.WebSocket !== "undefined" ? globalThis.WebSocket : undefined;
   const { realtime: realtimeOpts, ...rest } = options;
   return createClient(supabaseConfig.url, key, {
     auth: {
