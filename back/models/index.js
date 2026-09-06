@@ -5,6 +5,7 @@ const debtAdjustmentModel = require("./debtAdjustment.model");
 const spendingModel = require("./spending.model");
 const spendingEvaluationModel = require("./spendingEvaluation.model");
 const accountBookModel = require("./accountBook.model");
+const simulationModel = require("./simulation.model");
 
 module.exports = {
   healthModel,
@@ -14,4 +15,5 @@ module.exports = {
   spendingModel,
   spendingEvaluationModel,
   accountBookModel,
+  simulationModel,
 };

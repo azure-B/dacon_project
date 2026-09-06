@@ -1,41 +1,11 @@
 const { aiConfig, PERIODS, getPreferredApiKey } = require("../config");
 const { completeJson } = require("../services/aiClient");
+const { getDataClient } = require("../services/supabase");
 const spendingModel = require("./spending.model");
 const userModel = require("./user.model");
 
-const results = new Map();
-
-function resultKey(userId, period) {
-  return `${userId}:${period}`;
-}
-
-function saveResult(userId, period, payload) {
-  const record = {
-    ...payload,
-    savedAt: new Date().toISOString(),
-  };
-  results.set(resultKey(userId, period), record);
-  return record;
-}
-
-function getLatest(userId, period) {
-  if (period) return results.get(resultKey(userId, period)) || null;
-  const found = [];
-  for (const value of results.values()) {
-    if (value.user?.id === userId) found.push(value);
-  }
-  return found.sort((a, b) => String(b.savedAt).localeCompare(String(a.savedAt)));
-}
-
 function buildSystemPrompt(period) {
-  return [
-    "당신은 한국 개인 소비내역 평가 보조 분석가입니다.",
-    `평가 주기: ${period} (daily=전일, weekly=직전 7일, monthly=직전 달).`,
-    "법률 자문이 아닙니다. 입력된 소비내역과 이용자 재무 정보만 사용하세요.",
-    "반드시 JSON만 반환하세요:",
-    '{ "insight": string, "riskLevel": "low"|"medium"|"high", "comment": string, "recommendations": [ { "category": string, "title": string, "detail": string, "estimatedMonthlySaving": number } ] }',
-    "과소비 카테고리와 줄일 수 있는 금액을 구체적으로 제시하세요.",
-  ].join("\n");
+  return `KO spend eval ${period}. JSON only. Fields: insight=한국어문장(최대80자), riskLevel=low|medium|high, comment=한국어문장(최대60자), recommendations=[{category,title,detail(최대40자),estimatedMonthlySaving,difficulty:쉬움|보통|어려움}] max3. insight/comment에 숫자만 쓰지 말 것. 법률자문금지.`;
 }
 
 function buildFallback(period, summary, finance) {
@@ -53,7 +23,7 @@ function buildFallback(period, summary, finance) {
     recommendations.push({
       category: top.category,
       title: `${top.category} 지출 점검`,
-      detail: `${period} 기간 ${top.category}가 ${top.amount.toLocaleString("ko-KR")}원으로 가장 큽니다. 빈도·단가를 줄이면 상환 여력을 늘릴 수 있습니다.`,
+      detail: `${period} 기간 ${top.category}가 ${top.amount.toLocaleString("ko-KR")}원으로 가장 큽니다.`,
       estimatedMonthlySaving: Math.round(top.amount * 0.15),
     });
   } else {
@@ -76,9 +46,78 @@ function buildFallback(period, summary, finance) {
   };
 }
 
-/**
- * 소비내역과 API key를 받아 주기별 평가를 수행한다.
- */
+function rowToEvaluation(row, user = null) {
+  if (!row) return null;
+  return {
+    period: row.period,
+    range:
+      row.range_from || row.range_to
+        ? { from: row.range_from, to: row.range_to }
+        : null,
+    user: user
+      ? { id: user.id, loginId: user.loginId, name: user.name }
+      : { id: row.user_id },
+    summary: row.summary || {},
+    spending: row.spending || [],
+    finance: row.finance || null,
+    insight: row.insight || "",
+    riskLevel: row.risk_level || "low",
+    comment: row.comment || "",
+    recommendations: row.recommendations || [],
+    provider: row.provider || null,
+    model: row.model || null,
+    savedAt: row.saved_at,
+  };
+}
+
+async function saveResult(userId, period, payload, accessToken = "") {
+  const db = getDataClient(accessToken);
+  const record = {
+    user_id: userId,
+    period,
+    range_from: payload.range?.from || null,
+    range_to: payload.range?.to || null,
+    summary: payload.summary || {},
+    spending: payload.spending || [],
+    finance: payload.finance || null,
+    insight: payload.insight || "",
+    risk_level: payload.riskLevel || "low",
+    comment: payload.comment || "",
+    recommendations: payload.recommendations || [],
+    provider: payload.provider || null,
+    model: payload.model || null,
+    saved_at: new Date().toISOString(),
+  };
+  const { data, error } = await db
+    .from("spending_evaluations")
+    .upsert(record, { onConflict: "user_id,period" })
+    .select("*")
+    .single();
+  if (error) throw error;
+  return rowToEvaluation(data, payload.user);
+}
+
+async function getLatest(userId, period, accessToken = "") {
+  const db = getDataClient(accessToken);
+  if (period) {
+    const { data, error } = await db
+      .from("spending_evaluations")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("period", period)
+      .maybeSingle();
+    if (error) throw error;
+    return rowToEvaluation(data);
+  }
+  const { data, error } = await db
+    .from("spending_evaluations")
+    .select("*")
+    .eq("user_id", userId)
+    .order("saved_at", { ascending: false });
+  if (error) throw error;
+  return (data || []).map((row) => rowToEvaluation(row));
+}
+
 async function evaluateSpending({
   period,
   spending,
@@ -92,9 +131,7 @@ async function evaluateSpending({
   const payload = {
     period,
     range,
-    user: user
-      ? { id: user.id, loginId: user.loginId, name: user.name }
-      : null,
+    user: user ? { id: user.id, loginId: user.loginId, name: user.name } : null,
     summary,
     spending,
     finance: finance
@@ -108,11 +145,21 @@ async function evaluateSpending({
 
   let aiResult = null;
   try {
-    aiResult = await completeJson(
-      buildSystemPrompt(period),
-      JSON.stringify({ period, range, summary, spending, finance: payload.finance }, null, 2),
-      { apiKey: apiKey || getPreferredApiKey() }
-    );
+    const compact = {
+      period,
+      total: summary.total,
+      top: (summary.topCategories || []).slice(0, 3).map((c) => ({
+        c: c.category,
+        a: Math.round(Number(c.amount) / 10000),
+      })),
+      n: summary.count,
+      inc: finance?.monthlyIncome != null ? Math.round(Number(finance.monthlyIncome) / 10000) : null,
+    };
+    aiResult = await completeJson(buildSystemPrompt(period), JSON.stringify(compact), {
+      apiKey: apiKey || getPreferredApiKey(),
+      maxTokens: 280,
+      temperature: 0.1,
+    });
   } catch (error) {
     if (aiConfig.required) throw error;
     aiResult = null;
@@ -120,30 +167,50 @@ async function evaluateSpending({
 
   const source = aiResult?.json && typeof aiResult.json === "object" ? aiResult.json : fallback;
   const recommendations = Array.isArray(source.recommendations)
-    ? source.recommendations.slice(0, 5).map((item) => ({
-        category: String(item.category || "소비"),
-        title: String(item.title || "지출 제안"),
-        detail: String(item.detail || ""),
-        estimatedMonthlySaving: Math.round(Number(item.estimatedMonthlySaving) || 0),
-      }))
-    : fallback.recommendations;
+    ? source.recommendations.slice(0, 5).map((item) => {
+        const saving = Math.round(Number(item.estimatedMonthlySaving) || 0);
+        let difficulty = String(item.difficulty || "").trim();
+        if (!["쉬움", "보통", "어려움", "매우 쉬움"].includes(difficulty)) {
+          if (saving >= 150000) difficulty = "보통";
+          else if (saving >= 50000) difficulty = "쉬움";
+          else difficulty = "매우 쉬움";
+        }
+        return {
+          category: String(item.category || "소비"),
+          title: String(item.title || "지출 제안"),
+          detail: String(item.detail || ""),
+          estimatedMonthlySaving: saving,
+          difficulty,
+        };
+      })
+    : fallback.recommendations.map((item) => ({
+        ...item,
+        difficulty: item.difficulty || "쉬움",
+      }));
+
+  function pickText(raw, fb, minLen = 12) {
+    const text = String(raw ?? "").trim();
+    if (!text) return fb;
+    if (/^<=?\d+/.test(text)) return fb;
+    if (/^\d+(\.\d+)?%?$/.test(text)) return fb;
+    if (text.length < minLen) return fb;
+    return text;
+  }
 
   return {
     ...payload,
-    insight: String(source.insight || fallback.insight),
+    insight: pickText(source.insight, fallback.insight),
     riskLevel: ["low", "medium", "high"].includes(source.riskLevel)
       ? source.riskLevel
       : fallback.riskLevel,
-    comment: String(source.comment || fallback.comment),
+    comment: pickText(source.comment, fallback.comment, 8),
     recommendations,
-    provider: aiResult?.provider || "fallback",
-    model: aiResult?.model || null,
   };
 }
 
-async function evaluateUserPeriod(user, period, now = new Date()) {
+async function evaluateUserPeriod(user, period, now = new Date(), accessToken = "") {
   const range = spendingModel.getRangeForPeriod(period, now);
-  const spending = spendingModel.findByUserAndRange(user.id, range);
+  const spending = await spendingModel.findByUserAndRange(user.id, range, accessToken);
   let finance = null;
   try {
     const debtAdjustmentModel = require("./debtAdjustment.model");
@@ -160,11 +227,11 @@ async function evaluateUserPeriod(user, period, now = new Date()) {
     range,
     finance,
   });
-  return saveResult(user.id, period, result);
+  return saveResult(user.id, period, result, accessToken);
 }
 
 async function runPeriodPipeline(period, now = new Date()) {
-  const users = userModel.findAll();
+  const users = await userModel.findAll();
   const reports = [];
   for (const user of users) {
     reports.push(await evaluateUserPeriod(user, period, now));

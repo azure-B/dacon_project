@@ -1,0 +1,10 @@
+# 이 파일을 supabase.txt 로 복사한 뒤 값을 채우세요. (supabase.txt 는 gitignore)
+#
+# Supabase Dashboard → Project Settings → API
+SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+SUPABASE_ANON_KEY=sb_publishable_...또는_eyJ...anon_jwt
+SUPABASE_SERVICE_ROLE_KEY=sb_secret_...또는_eyJ...service_role_jwt
+#
+# Project Settings → Database → Connection string → URI
+# [YOUR-PASSWORD] 를 실제 DB 비밀번호로 바꾼 전체 문자열
+SUPABASE_DB_URL=postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT.supabase.co:5432/postgres

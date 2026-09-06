@@ -11,7 +11,7 @@ export default function Footer() {
   return (
     <footer className="mt-auto flex flex-col items-center md:flex-row md:justify-between px-3 sm:px-margin-mobile md:px-margin-desktop py-md md:py-lg w-full min-w-0 bg-surface-container-lowest border-t border-outline-variant text-center md:text-left gap-sm md:gap-md">
       <div className="text-label-sm font-label-sm font-semibold text-on-surface-variant break-keep">
-        © 2026 AI 재무 인터렉티브. 모든 권리 보유.
+        © 2026 머니로그. 함께 천천히 정리해요.
       </div>
       <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-sm sm:gap-md w-full md:w-auto">
         {FOOTER_LINKS.map((link) => (

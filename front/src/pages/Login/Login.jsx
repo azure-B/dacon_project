@@ -19,8 +19,9 @@ function getLoginErrorMessage(error) {
 
 export default function Login() {
   const navigate = useNavigate();
-  const [loginId, setLoginId] = useState('');
-  const [password, setPassword] = useState('');
+  // 로컬/데모용 기본값 (실제 서비스 배포 전 제거)
+  const [loginId, setLoginId] = useState('demo01');
+  const [password, setPassword] = useState('pass1234');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -50,10 +51,10 @@ export default function Login() {
           <div className="w-12 h-12 bg-primary-container text-on-primary-container rounded-lg flex items-center justify-center mb-sm shadow-level-1">
             <MaterialIcon name="account_balance" className="text-[28px]" />
           </div>
-          <h1 className="text-headline-md font-headline-md text-primary m-0 tracking-tight">AI 재무 인터렉티브</h1>
+          <h1 className="text-headline-md font-headline-md text-primary m-0 tracking-tight">머니로그</h1>
           <p className="text-body-md font-body-md text-on-surface-variant m-0 mt-xs">
-            인공지능과 함께 현재 재무상태를 확인하고
-            <br className="hidden sm:block" /> 더 나은 금융계획을 세워보세요.
+            돈 흐름을 가볍게 들여다보고
+            <br className="hidden sm:block" /> 다음 한 걸음을 같이 정해보세요.
           </p>
         </div>
 

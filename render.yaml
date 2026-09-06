@@ -1,0 +1,38 @@
+# Render Blueprint — Express API (back/)
+# Dashboard → New → Blueprint → 이 저장소 연결
+# 또는 Web Service를 수동 생성해도 됨 (Root Directory = back)
+
+services:
+  - type: web
+    name: dacon-api
+    runtime: node
+    plan: free
+    rootDir: back
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: API_ONLY
+        value: "true"
+      - key: CORS_ORIGIN
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: AI_REQUIRED
+        value: "false"
+      - key: EVALUATION_SCHEDULER_ENABLED
+        value: "true"
+      - key: EVALUATION_TZ
+        value: Asia/Seoul
+      - key: FINANCIAL_PRODUCTS_SOURCE
+        value: dummy

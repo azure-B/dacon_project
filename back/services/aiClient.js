@@ -7,8 +7,21 @@ function extractJson(text) {
   return JSON.parse(raw);
 }
 
-async function completeOpenAi(systemPrompt, userPrompt, apiKey) {
+async function completeOpenAi(systemPrompt, userPrompt, apiKey, options = {}) {
   const { baseUrl, model } = aiConfig.openai;
+
+  const body = {
+    model,
+    temperature: options.temperature ?? 0.2,
+    response_format: { type: "json_object" },
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+  };
+  if (options.maxTokens) {
+    body.max_tokens = options.maxTokens;
+  }
 
   const response = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
@@ -16,15 +29,7 @@ async function completeOpenAi(systemPrompt, userPrompt, apiKey) {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      model,
-      temperature: 0.2,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-    }),
+    body: JSON.stringify(body),
     signal: AbortSignal.timeout(aiConfig.timeoutMs),
   });
 
@@ -44,9 +49,17 @@ async function completeOpenAi(systemPrompt, userPrompt, apiKey) {
   };
 }
 
-async function completeGemini(systemPrompt, userPrompt, apiKey) {
+async function completeGemini(systemPrompt, userPrompt, apiKey, options = {}) {
   const { model } = aiConfig.gemini;
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+
+  const generationConfig = {
+    temperature: options.temperature ?? 0.2,
+    responseMimeType: "application/json",
+  };
+  if (options.maxTokens) {
+    generationConfig.maxOutputTokens = options.maxTokens;
+  }
 
   const response = await fetch(url, {
     method: "POST",
@@ -54,10 +67,7 @@ async function completeGemini(systemPrompt, userPrompt, apiKey) {
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: systemPrompt }] },
       contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-      generationConfig: {
-        temperature: 0.2,
-        responseMimeType: "application/json",
-      },
+      generationConfig,
     }),
     signal: AbortSignal.timeout(aiConfig.timeoutMs),
   });
@@ -81,13 +91,13 @@ async function completeGemini(systemPrompt, userPrompt, apiKey) {
 async function completeJson(systemPrompt, userPrompt, options = {}) {
   const overrideKey = options.apiKey || "";
   if (aiConfig.openai.apiKey) {
-    return completeOpenAi(systemPrompt, userPrompt, aiConfig.openai.apiKey);
+    return completeOpenAi(systemPrompt, userPrompt, aiConfig.openai.apiKey, options);
   }
   if (aiConfig.gemini.apiKey) {
-    return completeGemini(systemPrompt, userPrompt, aiConfig.gemini.apiKey);
+    return completeGemini(systemPrompt, userPrompt, aiConfig.gemini.apiKey, options);
   }
   if (overrideKey) {
-    return completeOpenAi(systemPrompt, userPrompt, overrideKey);
+    return completeOpenAi(systemPrompt, userPrompt, overrideKey, options);
   }
   return null;
 }

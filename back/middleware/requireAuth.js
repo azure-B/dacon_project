@@ -7,20 +7,26 @@ function readBearerToken(req) {
   return token.trim();
 }
 
-function requireAuth(req, res, next) {
+async function requireAuth(req, res, next) {
   const token = readBearerToken(req);
   if (!token) {
     return res.status(401).json({ error: "unauthorized" });
   }
 
-  const user = userModel.verifyAccessToken(token);
-  if (!user) {
+  try {
+    const user = await userModel.verifyAccessToken(token);
+    if (!user) {
+      return res.status(401).json({ error: "invalid token" });
+    }
+    req.user = user;
+    req.accessToken = token;
+    return next();
+  } catch (error) {
+    if (error.code === "SUPABASE_NOT_CONFIGURED") {
+      return res.status(503).json({ error: "supabase not configured" });
+    }
     return res.status(401).json({ error: "invalid token" });
   }
-
-  req.user = user;
-  req.accessToken = token;
-  return next();
 }
 
 module.exports = {

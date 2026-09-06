@@ -5,11 +5,11 @@ import { getAccessToken, getStoredUser } from '../../../services/authStorage';
 import './Header.css';
 
 export const NAV_ITEMS = [
-  { to: '/', label: '대시보드', end: true },
-  { to: '/debt-analysis', label: '부채 분석' },
-  { to: '/simulation', label: '시뮬레이션' },
-  { to: '/ai-feedback', label: 'AI 가계부' },
-  { to: '/ai-report', label: 'AI 리포트' },
+  { to: '/', label: '홈', end: true },
+  { to: '/debt-analysis', label: '빚 정리' },
+  { to: '/simulation', label: '만약에' },
+  { to: '/ai-feedback', label: '가계부' },
+  { to: '/ai-report', label: '한 장 요약' },
 ];
 
 function navClassName({ isActive }) {
@@ -64,7 +64,7 @@ export default function Header() {
             to="/"
             className="text-headline-sm md:text-headline-md font-headline-md font-bold text-primary tracking-tight truncate max-w-[52vw] sm:max-w-none"
           >
-            AI 재무 인터렉티브
+            머니로그
           </Link>
           <div className="hidden lg:flex items-center gap-lg ml-lg">
             {NAV_ITEMS.map((item) => (
@@ -88,13 +88,6 @@ export default function Header() {
             onClick={() => setMenuOpen((open) => !open)}
           >
             <MaterialIcon name={menuOpen ? 'close' : 'menu'} />
-          </button>
-          <button
-            type="button"
-            className="hover:text-secondary transition-colors p-sm rounded-full hover:bg-surface-variant hidden lg:flex min-h-[44px] min-w-[44px] items-center justify-center"
-            aria-label="알림"
-          >
-            <MaterialIcon name="notifications" />
           </button>
           {isLoggedIn ? (
             <div className="hidden lg:flex items-center gap-xs shrink-0">

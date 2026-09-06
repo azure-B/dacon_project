@@ -7,10 +7,21 @@ dist/
 dist-ssr/
 build/
 
-# Environment
+# Environment (프로젝트 전역·백엔드)
 .env
 .env.*
 !.env.example
+!**/.env.example
+
+# Local secrets — config/ (실키만 무시, 예시는 커밋)
+config/.env
+config/.env.*
+!config/.env.example
+config/*.txt
+!config/*.example.txt
+config/*.pem
+config/*.key
+config/secrets.*
 
 # Logs
 logs/
@@ -31,4 +42,4 @@ venv/
 Thumbs.db
 
 # Vite cache
-.vite/ 
+.vite/

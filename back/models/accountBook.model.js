@@ -1,92 +1,118 @@
-const spendingFile = require("../data/spending.json");
+const { getDataClient } = require("../services/supabase");
 
-let nextId = 1;
-const transactions = [];
-
-function toPublic(item) {
+function toPublic(row) {
+  if (!row) return null;
   return {
-    id: item.id,
-    userId: item.userId,
-    type: item.type,
-    amount: item.amount,
-    category: item.category,
-    memo: item.memo,
-    date: item.date,
-    createdAt: item.createdAt,
-    updatedAt: item.updatedAt,
+    id: Number(row.id),
+    userId: row.user_id,
+    type: row.type,
+    amount: Number(row.amount),
+    category: row.category,
+    memo: row.memo || "",
+    date: String(row.date).slice(0, 10),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }
 
-function inRange(item, filter) {
+function applyFilters(query, filter = {}) {
+  let q = query;
   if (filter.year != null && filter.month != null) {
-    const prefix = `${filter.year}-${String(filter.month).padStart(2, "0")}`;
-    if (!item.date.startsWith(prefix)) return false;
+    const y = Number(filter.year);
+    const m = Number(filter.month);
+    const from = `${y}-${String(m).padStart(2, "0")}-01`;
+    const nextMonth = m === 12 ? 1 : m + 1;
+    const nextYear = m === 12 ? y + 1 : y;
+    const toExclusive = `${nextYear}-${String(nextMonth).padStart(2, "0")}-01`;
+    q = q.gte("date", from).lt("date", toExclusive);
   } else if (filter.year != null) {
-    if (!item.date.startsWith(`${filter.year}-`)) return false;
+    const y = Number(filter.year);
+    q = q.gte("date", `${y}-01-01`).lt("date", `${y + 1}-01-01`);
   }
-  if (filter.from && item.date < filter.from) return false;
-  if (filter.to && item.date > filter.to) return false;
-  if (filter.type && item.type !== filter.type) return false;
-  if (filter.category && item.category !== filter.category) return false;
-  return true;
+  if (filter.from) q = q.gte("date", filter.from);
+  if (filter.to) q = q.lte("date", filter.to);
+  if (filter.type) q = q.eq("type", filter.type);
+  if (filter.category) q = q.eq("category", filter.category);
+  return q;
 }
 
-function listByUser(userId, filter = {}) {
-  return transactions
-    .filter((item) => item.userId === userId)
-    .filter((item) => inRange(item, filter))
-    .sort((a, b) => {
-      if (a.date === b.date) return b.id - a.id;
-      return a.date < b.date ? 1 : -1;
-    })
-    .map(toPublic);
+async function listByUser(userId, filter = {}, accessToken = "") {
+  const db = getDataClient(accessToken);
+  let query = db
+    .from("account_book_transactions")
+    .select("*")
+    .eq("user_id", userId)
+    .order("date", { ascending: false })
+    .order("id", { ascending: false });
+  query = applyFilters(query, filter);
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data || []).map(toPublic);
 }
 
-function findByIdForUser(id, userId) {
+async function findByIdForUser(id, userId, accessToken = "") {
   const numericId = Number(id);
   if (!Number.isInteger(numericId)) return null;
-  return (
-    transactions.find((item) => item.id === numericId && item.userId === userId) ||
-    null
-  );
+  const db = getDataClient(accessToken);
+  const { data, error } = await db
+    .from("account_book_transactions")
+    .select("*")
+    .eq("id", numericId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  return toPublic(data);
 }
 
-function create(userId, data) {
-  const now = new Date().toISOString();
-  const item = {
-    id: nextId++,
-    userId,
-    type: data.type,
-    amount: data.amount,
-    category: data.category,
-    memo: data.memo || "",
-    date: data.date,
-    createdAt: now,
-    updatedAt: now,
-  };
-  transactions.push(item);
-  return toPublic(item);
+async function create(userId, data, accessToken = "") {
+  const db = getDataClient(accessToken);
+  const { data: row, error } = await db
+    .from("account_book_transactions")
+    .insert({
+      user_id: userId,
+      type: data.type,
+      amount: data.amount,
+      category: data.category,
+      memo: data.memo || "",
+      date: data.date,
+    })
+    .select("*")
+    .single();
+  if (error) throw error;
+  return toPublic(row);
 }
 
-function update(id, userId, data) {
-  const item = findByIdForUser(id, userId);
-  if (!item) return null;
-  const stored = transactions.find((row) => row.id === item.id);
-  Object.assign(stored, data, { updatedAt: new Date().toISOString() });
-  return toPublic(stored);
+async function update(id, userId, data, accessToken = "") {
+  const numericId = Number(id);
+  if (!Number.isInteger(numericId)) return null;
+  const db = getDataClient(accessToken);
+  const { data: row, error } = await db
+    .from("account_book_transactions")
+    .update(data)
+    .eq("id", numericId)
+    .eq("user_id", userId)
+    .select("*")
+    .maybeSingle();
+  if (error) throw error;
+  return toPublic(row);
 }
 
-function remove(id, userId) {
-  const index = transactions.findIndex(
-    (item) => item.id === Number(id) && item.userId === userId
-  );
-  if (index < 0) return false;
-  transactions.splice(index, 1);
-  return true;
+async function remove(id, userId, accessToken = "") {
+  const numericId = Number(id);
+  if (!Number.isInteger(numericId)) return false;
+  const db = getDataClient(accessToken);
+  const { data, error } = await db
+    .from("account_book_transactions")
+    .delete()
+    .eq("id", numericId)
+    .eq("user_id", userId)
+    .select("id");
+  if (error) throw error;
+  return Array.isArray(data) && data.length > 0;
 }
 
-function summarize(userId, filter = {}) {
-  const list = listByUser(userId, filter);
+async function summarize(userId, filter = {}, accessToken = "") {
+  const list = await listByUser(userId, filter, accessToken);
   let totalIncome = 0;
   let totalExpense = 0;
   for (const item of list) {
@@ -105,9 +131,9 @@ function summarize(userId, filter = {}) {
   };
 }
 
-function categorySummary(userId, filter = {}) {
-  const list = listByUser(userId, filter);
-  const totals = summarize(userId, filter);
+async function categorySummary(userId, filter = {}, accessToken = "") {
+  const list = await listByUser(userId, filter, accessToken);
+  const totals = await summarize(userId, filter, accessToken);
   const map = new Map();
 
   for (const item of list) {
@@ -141,35 +167,6 @@ function categorySummary(userId, filter = {}) {
     items,
   };
 }
-
-function seedFromSpendingFile() {
-  const rows = spendingFile.users?.["1"] || [];
-  for (const row of rows) {
-    create(1, {
-      type: "expense",
-      amount: row.amount,
-      category: row.category,
-      memo: row.merchant || "",
-      date: row.date,
-    });
-  }
-  create(1, {
-    type: "income",
-    amount: 4200000,
-    category: "급여",
-    memo: "9월 급여",
-    date: "2026-09-01",
-  });
-  create(1, {
-    type: "income",
-    amount: 4200000,
-    category: "급여",
-    memo: "8월 급여",
-    date: "2026-08-25",
-  });
-}
-
-seedFromSpendingFile();
 
 module.exports = {
   toPublic,

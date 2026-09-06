@@ -36,12 +36,12 @@ function getDebtErrorMessage(error) {
     return '로그인이 필요합니다. 로그인 후 다시 시도해주세요.';
   }
   if (error?.status === 502 || error?.code === 'ai unavailable') {
-    return 'AI 분석 서버에 일시적으로 연결할 수 없습니다. 잠시 후 다시 시도해주세요.';
+    return '지금은 연결이 원활하지 않아요. 잠시 후 다시 시도해주세요.';
   }
   if (error?.status === 500 || error?.code === 'debt adjustment failed') {
-    return '채무조정 분석 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+    return '빚 정리를 불러오는 중 문제가 생겼어요. 잠시 후 다시 눌러주세요.';
   }
-  return error?.message || '채무조정 분석을 불러오지 못했습니다.';
+  return error?.message || '빚 정리를 불러오지 못했어요.';
 }
 
 function buildLoanSegments(loans, totalDebt) {
@@ -112,17 +112,17 @@ export default function DebtAnalysis() {
       <div className="flex-1 px-3 sm:px-margin-mobile md:px-margin-desktop py-lg md:py-xl min-w-0">
         <div className="mb-lg md:mb-xl">
           <h1 className="text-headline-lg-mobile md:text-display-lg font-display-lg text-on-background break-keep">
-            부채 분석 및 지출 내역
+            빚, 조금 덜 무겁게
           </h1>
           <p className="text-body-sm md:text-body-lg font-body-lg text-on-surface-variant mt-sm">
-            전문적인 재무 데이터 분석을 통한 부채 최적화 및 지출 관리.
+            지금 가진 빚과 지출을 차분히 정리해 볼게요. 어려운 용어 없이요.
           </p>
         </div>
 
         {isLoading ? (
           <Card className="p-md md:p-lg mb-lg flex items-center gap-md">
             <MaterialIcon name="progress_activity" className="text-primary text-headline-md animate-spin" />
-            <p className="text-body-md font-body-md text-on-surface m-0">채무조정 분석을 불러오는 중…</p>
+            <p className="text-body-md font-body-md text-on-surface m-0">빚 정리를 살펴보는 중…</p>
           </Card>
         ) : null}
 
@@ -158,16 +158,10 @@ export default function DebtAnalysis() {
               <MaterialIcon name="tips_and_updates" filled className="text-tertiary-fixed text-headline-lg shrink-0" />
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-sm mb-xs">
-                  <h3 className="text-headline-sm font-headline-sm text-on-primary-container m-0 break-keep">AI 인사이트</h3>
+                  <h3 className="text-headline-sm font-headline-sm text-on-primary-container m-0 break-keep">이렇게 보여요</h3>
                   <span className="text-label-sm font-label-sm px-2 py-1 rounded bg-surface-container-lowest text-on-surface">
                     리스크: {RISK_LABELS[summary.riskLevel] || summary.riskLevel || '-'}
                   </span>
-                  {data.provider ? (
-                    <span className="text-label-sm font-label-sm text-surface-variant">
-                      {data.provider}
-                      {data.model ? ` · ${data.model}` : ''}
-                    </span>
-                  ) : null}
                 </div>
                 <p className="text-body-md font-body-md text-inverse-on-surface font-semibold break-keep m-0">
                   {summary.insight}
@@ -177,9 +171,9 @@ export default function DebtAnalysis() {
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-sm md:gap-md mb-lg md:mb-xl">
-              <SummaryStat label="총 부채" value={formatWon(summary.totalDebt)} />
-              <SummaryStat label="총 자산" value={formatWon(summary.totalAssets)} />
-              <SummaryStat label="월 소득" value={formatWon(summary.monthlyIncome)} />
+              <SummaryStat label="갚을 돈" value={formatWon(summary.totalDebt)} />
+              <SummaryStat label="모아 둔 돈" value={formatWon(summary.totalAssets)} />
+              <SummaryStat label="한 달 수입" value={formatWon(summary.monthlyIncome)} />
               <SummaryStat
                 label="DSR"
                 value={summary.dsrPercent != null ? `${summary.dsrPercent}%` : '-'}
@@ -189,7 +183,7 @@ export default function DebtAnalysis() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-md md:gap-gutter">
               <div className="lg:col-span-7 flex flex-col gap-md md:gap-lg min-w-0">
                 <Card className="p-md md:p-lg min-w-0">
-                  <h2 className="text-headline-md font-headline-md text-primary mb-md">총 부채 현황</h2>
+                  <h2 className="text-headline-md font-headline-md text-primary mb-md">빚이 어디에 있나요</h2>
                   <div className="flex flex-col md:flex-row items-center gap-lg md:gap-xl">
                     <div className="relative w-40 h-40 sm:w-48 sm:h-48 flex-shrink-0 chart-responsive chart-responsive--clip">
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
@@ -252,7 +246,7 @@ export default function DebtAnalysis() {
                 </Card>
 
                 <section className="space-y-md">
-                  <h3 className="text-headline-sm font-headline-sm text-primary mb-sm">보유 부채 상세</h3>
+                  <h3 className="text-headline-sm font-headline-sm text-primary mb-sm">빚 목록</h3>
                   {loans.length === 0 ? (
                     <Card className="p-md">
                       <p className="text-body-sm font-body-sm text-on-surface-variant m-0">표시할 대출이 없습니다.</p>
@@ -353,7 +347,6 @@ export default function DebtAnalysis() {
                             <div key={`${item.title}-${index}`} className="p-md min-w-0">
                               <p className="text-label-sm font-label-sm text-secondary m-0 mb-xs">
                                 {item.category || '추천'}
-                                {item.productId != null ? ` · 상품 #${item.productId}` : ''}
                               </p>
                               <p className="text-body-md font-body-md font-semibold text-on-surface m-0 break-keep">
                                 {item.title}
@@ -371,15 +364,6 @@ export default function DebtAnalysis() {
                         )}
                       </div>
                     </div>
-
-                    {Array.isArray(data.productsUsed) && data.productsUsed.length > 0 ? (
-                      <div>
-                        <h3 className="text-body-lg font-body-lg font-semibold text-on-surface mb-sm">참고 상품 ID</h3>
-                        <p className="text-label-sm font-label-sm text-on-surface-variant m-0 break-words">
-                          {data.productsUsed.join(', ')}
-                        </p>
-                      </div>
-                    ) : null}
 
                     {disclaimer ? (
                       <div className="rounded-lg bg-surface-container-low border border-outline-variant p-md space-y-xs">

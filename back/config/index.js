@@ -5,6 +5,11 @@ const {
   hasRemoteAi,
   getPublicAiStatus,
 } = require("./aiConfig");
+const {
+  supabaseConfig,
+  getPublicSupabaseStatus,
+  assertSupabaseConfigured,
+} = require("./supabaseConfig");
 
 module.exports = {
   aiConfig,
@@ -12,4 +17,7 @@ module.exports = {
   getPreferredApiKey,
   hasRemoteAi,
   getPublicAiStatus,
+  supabaseConfig,
+  getPublicSupabaseStatus,
+  assertSupabaseConfigured,
 };

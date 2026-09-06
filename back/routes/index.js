@@ -5,6 +5,7 @@ const debtAdjustmentRoutes = require("./debtAdjustment.routes");
 const spendingEvaluationRoutes = require("./spendingEvaluation.routes");
 const accountBookRoutes = require("./accountBook.routes");
 const spamCheckRoutes = require("./spamCheck.routes");
+const simulationRoutes = require("./simulation.routes");
 
 const router = express.Router();
 
@@ -14,5 +15,6 @@ router.use("/debt-adjustment", debtAdjustmentRoutes);
 router.use("/spending-evaluations", spendingEvaluationRoutes);
 router.use("/account-book", accountBookRoutes);
 router.use("/spam-check", spamCheckRoutes);
+router.use("/simulation", simulationRoutes);
 
 module.exports = router;

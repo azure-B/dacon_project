@@ -78,30 +78,35 @@ function pickPromptDict(snapshot) {
 }
 
 function buildSystemPrompt() {
-  return [
-    "당신은 한국 개인금융 채무조정 보조 분석가입니다.",
-    "법률·세무 자문이 아니며, 실제 금리·한도·승인은 개인 신용과 금융사 심사를 따릅니다.",
-    "입력된 이용자 재무 정보와 금융상품 카탈로그만 근거로 사용하세요.",
-    "반드시 JSON 객체만 반환하세요. 키는 다음을 지킵니다:",
-    '{ "insight": string, "riskLevel": "low"|"medium"|"high", "comment": string, "recommendations": [ { "category": string, "title": string, "detail": string, "productId": number|null, "estimatedMonthlySaving": number } ] }',
-    "recommendations는 1~5개. productId는 카탈로그에 있는 값만 사용합니다.",
-    "고금리 대출을 더 낮은 금리 상품으로 대환하는 방안을 우선 검토하세요.",
-    "대환 후보는 보유 대출과 같은 유형(예: 신용대출→신용대출)만 고르세요. 전세·주담대·학자금으로 신용대출을 바꾸라고 하지 마세요.",
-    "예적금은 비상자금 유지와 조기 상환 재원으로만 제안하세요.",
-  ].join("\n");
+  return 'KO debt adj. JSON only. Fields: insight=한국어문장(최대80자), riskLevel=low|medium|high, comment=한국어문장(최대60자), recommendations=[{category,title,detail(최대40자),productId,estimatedMonthlySaving}] max3. insight/comment에 숫자만 쓰지 말 것. 같은대출유형대환만. 법률자문금지.';
 }
 
 function buildUserPrompt(snapshot, promptDict, extraNote) {
-  return JSON.stringify(
-    {
-      instruction: "위 이용자의 채무조정 분석 JSON을 작성하세요.",
-      extraNote: extraNote || null,
-      finance: snapshot,
-      products: promptDict,
+  const products = Object.values(promptDict || {})
+    .slice(0, 8)
+    .map((p) => ({
+      id: p.productId,
+      n: String(p.productName || "").slice(0, 20),
+      t: p.productType || p.category,
+      r: p.interestRate,
+    }));
+  return JSON.stringify({
+    note: extraNote ? String(extraNote).slice(0, 80) : null,
+    f: {
+      inc: Math.round((snapshot.monthlyIncome || 0) / 10000),
+      debt: Math.round((snapshot.totals?.totalDebt || 0) / 10000),
+      assets: Math.round((snapshot.totals?.totalAssets || 0) / 10000),
+      pay: Math.round((snapshot.totals?.monthlyPayment || 0) / 10000),
+      dsr: snapshot.totals?.dsrPercent ?? null,
     },
-    null,
-    2
-  );
+    loans: (snapshot.loanList || []).slice(0, 5).map((l) => ({
+      id: l.productId ?? null,
+      bal: Math.round(Number(l.balance || 0) / 10000),
+      r: l.이자율_최저 || l.interestRate || null,
+      t: l.상품_유형 || l.productType || null,
+    })),
+    products,
+  });
 }
 
 function normalizeRecommendations(rawList, promptDict) {
@@ -203,21 +208,31 @@ function buildFallbackAnalysis(snapshot, promptDict) {
 
   const insight =
     totals.dsrPercent != null
-      ? `월 소득 대비 대출 상환 비율(DSR)은 약 ${totals.dsrPercent}%입니다.`
-      : "저장된 대출 상환액과 소득을 기준으로 채무조정 방향을 제안합니다.";
+      ? `한 달 수입 중 빚 갚는 돈이 약 ${totals.dsrPercent}%쯤 돼요.`
+      : "지금 가진 빚과 수입을 기준으로, 조금 덜 부담되게 가는 길을 골라봤어요.";
 
   return {
     insight,
     riskLevel,
     comment:
       totals.totalDebt > 0
-        ? "카탈로그상 더 낮은 금리 상품이 있으면 대환을 우선 검토하세요. 실제 한도와 승인은 신용·소득 심사를 따릅니다."
-        : "등록된 대출이 없습니다. 목표 금액과 예적금 위주로 저축 계획을 유지하세요.",
+        ? "금리가 더 낮은 상품이 있으면 갈아타는 쪽을 먼저 봐보세요. 실제 한도와 승인은 심사에 따라 달라요."
+        : "등록된 대출이 없어요. 목표 금액과 예적금 위주로 차근히 모아가면 좋아요.",
     recommendations,
   };
 }
 
-function mergeAnalysis(snapshot, promptDict, aiJson, provider, model) {
+/** AI가 길이 제한 표기(<=80 등)를 값으로 오해한 경우 fallback 사용 */
+function pickText(raw, fallback, minLen = 12) {
+  const text = String(raw ?? "").trim();
+  if (!text) return fallback;
+  if (/^<=?\d+/.test(text)) return fallback;
+  if (/^\d+(\.\d+)?%?$/.test(text)) return fallback;
+  if (text.length < minLen) return fallback;
+  return text;
+}
+
+function mergeAnalysis(snapshot, promptDict, aiJson) {
   const catalog = financialProductModel.getPromptCatalog();
   const fallback = buildFallbackAnalysis(snapshot, promptDict);
   const source = aiJson && typeof aiJson === "object" ? aiJson : fallback;
@@ -235,8 +250,8 @@ function mergeAnalysis(snapshot, promptDict, aiJson, provider, model) {
       riskLevel: ["low", "medium", "high"].includes(source.riskLevel)
         ? source.riskLevel
         : fallback.riskLevel,
-      insight: String(source.insight || fallback.insight),
-      comment: String(source.comment || fallback.comment),
+      insight: pickText(source.insight, fallback.insight),
+      comment: pickText(source.comment, fallback.comment, 8),
     },
     loans: snapshot.loanList,
     assets: snapshot.assetList,
@@ -246,15 +261,13 @@ function mergeAnalysis(snapshot, promptDict, aiJson, provider, model) {
     ),
     productsUsed: Object.keys(promptDict).map(Number),
     disclaimer: catalog.disclaimer,
-    provider,
-    model: model || null,
   };
 }
 
 async function analyze(user, options = {}) {
   const snapshot = buildFinanceSnapshot(user);
   const promptDict = pickPromptDict(snapshot);
-  const extraNote = options.note ? String(options.note).slice(0, 500) : "";
+  const extraNote = options.note ? String(options.note).slice(0, 80) : "";
 
   let aiResult = null;
   try {
@@ -262,7 +275,7 @@ async function analyze(user, options = {}) {
     aiResult = await completeJson(
       buildSystemPrompt(),
       buildUserPrompt(snapshot, promptDict, extraNote),
-      { apiKey: options.apiKey }
+      { apiKey: options.apiKey, maxTokens: 260, temperature: 0.1 }
     );
   } catch (error) {
     const { aiConfig } = require("../config");
@@ -273,16 +286,10 @@ async function analyze(user, options = {}) {
   }
 
   if (!aiResult) {
-    return mergeAnalysis(snapshot, promptDict, null, "fallback", null);
+    return mergeAnalysis(snapshot, promptDict, null);
   }
 
-  return mergeAnalysis(
-    snapshot,
-    promptDict,
-    aiResult.json,
-    aiResult.provider,
-    aiResult.model
-  );
+  return mergeAnalysis(snapshot, promptDict, aiResult.json);
 }
 
 module.exports = {

@@ -7,7 +7,7 @@ function readLoginId(body) {
   return String(raw).trim();
 }
 
-function login(req, res) {
+async function login(req, res) {
   const loginId = readLoginId(req.body);
   const password =
     req.body?.password === undefined || req.body?.password === null
@@ -26,39 +26,58 @@ function login(req, res) {
     return res.status(429).json({ error: "too many login attempts" });
   }
 
-  const user = userModel.authenticate(loginId, password);
-  if (!user) {
-    userModel.recordLoginFailure(ip, loginId);
-    return res.status(401).json({ error: "invalid credentials" });
+  try {
+    const session = await userModel.authenticate(loginId, password);
+    if (!session) {
+      userModel.recordLoginFailure(ip, loginId);
+      return res.status(401).json({ error: "invalid credentials" });
+    }
+
+    userModel.clearLoginFailures(ip, loginId);
+    return res.json({
+      accessToken: session.accessToken,
+      tokenType: session.tokenType,
+      expiresIn: session.expiresIn,
+      user: userModel.toPublic(session.user),
+    });
+  } catch (error) {
+    if (error.code === "SUPABASE_NOT_CONFIGURED") {
+      return res.status(503).json({ error: "supabase not configured" });
+    }
+    return res.status(500).json({ error: "login failed" });
   }
-
-  userModel.clearLoginFailures(ip, loginId);
-  const token = userModel.createAccessToken(user);
-
-  res.json({
-    ...token,
-    user: userModel.toPublic(user),
-  });
 }
 
-function signup(req, res) {
+async function signup(req, res) {
   const parsed = parseSignupDto(req.body);
   if (parsed.error) {
     return res.status(400).json({ error: parsed.error });
   }
 
   const { data } = parsed;
-  if (userModel.findByLoginId(data.loginId)) {
-    return res.status(409).json({ error: "loginId already exists" });
-  }
-  if (userModel.findByEmail(data.email)) {
-    return res.status(409).json({ error: "email already exists" });
-  }
+  try {
+    if (await userModel.findByLoginId(data.loginId)) {
+      return res.status(409).json({ error: "loginId already exists" });
+    }
+    if (await userModel.findByEmail(data.email)) {
+      return res.status(409).json({ error: "email already exists" });
+    }
 
-  const user = userModel.create(data);
-  return res.status(201).json({
-    user: userModel.toPublic(user),
-  });
+    const user = await userModel.create(data);
+    return res.status(201).json({
+      user: userModel.toPublic(user),
+    });
+  } catch (error) {
+    if (error.code === "SUPABASE_NOT_CONFIGURED") {
+      return res.status(503).json({ error: "supabase not configured" });
+    }
+    if (error.code === "EMAIL_EXISTS" || error.code === "LOGIN_ID_EXISTS") {
+      return res.status(409).json({
+        error: error.code === "LOGIN_ID_EXISTS" ? "loginId already exists" : "email already exists",
+      });
+    }
+    return res.status(500).json({ error: "signup failed" });
+  }
 }
 
 module.exports = {

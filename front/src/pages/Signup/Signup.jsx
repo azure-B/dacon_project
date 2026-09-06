@@ -450,9 +450,9 @@ export default function Signup() {
       <main className="w-full max-w-[560px] min-w-0">
         <Card className="p-md sm:p-lg md:p-xl">
           <div className="text-center mb-md">
-            <h1 className="text-headline-lg font-headline-lg text-primary mb-sm font-inter">AI 재무 인터렉티브</h1>
+            <h1 className="text-headline-lg font-headline-lg text-primary mb-sm font-inter">머니로그</h1>
             <p className="text-body-md font-body-md text-on-surface-variant break-keep">
-              계정을 생성하고 재무 정보를 입력하면 맞춤형 분석을 시작할 수 있습니다.
+              계정만 만들면, 내 돈 상황부터 차근차근 정리할 수 있어요.
             </p>
           </div>
 

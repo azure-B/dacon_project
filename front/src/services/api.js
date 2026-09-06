@@ -1,6 +1,7 @@
 import { getAccessToken } from './authStorage';
 
-const API_BASE = '/api';
+/** 로컬: Vite 프록시 `/api` · 배포: Netlify env `VITE_API_BASE` (예: https://xxx.onrender.com/api) */
+const API_BASE = (import.meta.env.VITE_API_BASE || '/api').replace(/\/$/, '');
 
 export async function request(endpoint, options = {}) {
   const { headers: customHeaders, ...rest } = options;
@@ -64,6 +65,18 @@ export const api = {
     request(`/account-book/${id}`, {
       method: 'DELETE',
     }),
+  runSimulation: (data) =>
+    request('/simulation', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  runSpendingEvaluation: (data = { period: 'monthly' }) =>
+    request('/spending-evaluations/run', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  getSpendingEvaluations: (params = {}) =>
+    request(`/spending-evaluations${toQuery(params)}`),
 };
 
 function toQuery(params = {}) {

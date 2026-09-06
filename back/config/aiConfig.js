@@ -1,5 +1,8 @@
+const fs = require("fs");
 const path = require("path");
+require("./supabaseConfig").loadProjectEnv();
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
+require("dotenv").config({ path: path.join(__dirname, "..", "..", "config", ".env") });
 
 function readString(name, fallback = "") {
   const value = process.env[name];
@@ -13,6 +16,18 @@ function readFlag(name, fallback = false) {
   return ["1", "true", "yes", "on"].includes(String(value).toLowerCase());
 }
 
+/** 프로젝트 루트 config/config.txt 첫 줄 (환경변수 없을 때 OpenAI 키 폴백) */
+function readConfigFileApiKey() {
+  const keyPath = path.join(__dirname, "..", "..", "config", "config.txt");
+  try {
+    if (!fs.existsSync(keyPath)) return "";
+    const firstLine = fs.readFileSync(keyPath, "utf8").split(/\r?\n/)[0] || "";
+    return firstLine.trim();
+  } catch {
+    return "";
+  }
+}
+
 const PERIODS = Object.freeze({
   DAILY: "daily",
   WEEKLY: "weekly",
@@ -21,7 +36,10 @@ const PERIODS = Object.freeze({
 
 const aiConfig = {
   openai: {
-    apiKey: readString("OPENAI_API_KEY") || readString("AI_API_KEY"),
+    apiKey:
+      readString("OPENAI_API_KEY") ||
+      readString("AI_API_KEY") ||
+      readConfigFileApiKey(),
     baseUrl: (readString("OPENAI_BASE_URL", "https://api.openai.com/v1") || "").replace(
       /\/$/,
       ""

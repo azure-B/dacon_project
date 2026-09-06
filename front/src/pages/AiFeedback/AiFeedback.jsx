@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, Input, MaterialIcon } from '../../components/common';
+import { Button, Card, Input, MaterialIcon, WipBadge } from '../../components/common';
 import { api } from '../../services/api';
 import { getAccessToken, getStoredUser } from '../../services/authStorage';
 import './AiFeedback.css';
 
 const SIDE_ITEMS = [
-  { id: 'overview', icon: 'analytics', label: '개요' },
-  { id: 'portfolio', icon: 'description', label: '포트폴리오 보고서' },
-  { id: 'risk', icon: 'settings_applications', label: '리스크 설정' },
-  { id: 'audit', icon: 'history', label: '감사 로그' },
-  { id: 'security', icon: 'shield', label: '보안' },
+  { id: 'overview', icon: 'analytics', label: '한눈에' },
+  { id: 'portfolio', icon: 'description', label: '거래 목록' },
+  { id: 'risk', icon: 'settings_applications', label: '예산 감각', wip: true },
+  { id: 'audit', icon: 'history', label: '지난달', wip: true },
+  { id: 'security', icon: 'shield', label: '보안', wip: true },
 ];
 
 /** @see back/schema/accountBook.schema.js */
@@ -461,8 +461,8 @@ export default function AiFeedback() {
   const isBusy = isSubmitting || actionId != null;
 
   return (
-    <div className="flex min-h-full antialiased page-shell min-w-0">
-      <nav className="h-[calc(100vh-4rem)] w-64 sticky top-16 bg-surface-container-low border-r border-outline-variant flex-col py-md gap-sm z-40 hidden md:flex shrink-0">
+    <div className="flex min-h-[calc(100vh-4rem)] items-stretch antialiased page-shell min-w-0">
+      <nav className="hidden md:flex flex-col w-64 shrink-0 self-stretch min-h-[calc(100vh-4rem)] sticky top-16 bg-surface-container-low border-r border-outline-variant py-md gap-sm z-40">
         {SIDE_ITEMS.map((item) => {
           const active = sideTab === item.id;
           return (
@@ -477,7 +477,8 @@ export default function AiFeedback() {
               }
             >
               <MaterialIcon name={item.icon} filled={active} className={active ? '' : 'group-hover:text-primary transition-colors'} />
-              <span className="text-label-md font-label-md">{item.label}</span>
+              <span className="text-label-md font-label-md flex-1 text-left">{item.label}</span>
+              {item.wip ? <WipBadge /> : null}
             </button>
           );
         })}
@@ -521,15 +522,15 @@ export default function AiFeedback() {
 
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-lg gap-md border-b border-outline-variant pb-md">
             <div>
-              <h1 className="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-surface">AI 가계부 분석</h1>
+              <h1 className="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-surface">이번 달 가계부</h1>
               <p className="text-body-md font-body-md text-on-surface-variant mt-sm">
-                {monthLabel ? `${monthLabel} 거래·요약 현황` : '이번 달 거래·요약 현황'}
+                {monthLabel ? `${monthLabel}, 어디에 썼는지 같이 볼까요` : '어디에 썼는지 같이 볼까요'}
               </p>
             </div>
             <div className="flex gap-sm bg-surface-container-low p-1 rounded-lg border border-outline-variant self-stretch sm:self-start md:self-auto overflow-x-auto hide-scrollbar">
               {[
-                { id: 'day', label: '일간', disabled: true },
-                { id: 'week', label: '주간', disabled: true },
+                { id: 'day', label: '일간', disabled: true, wip: true },
+                { id: 'week', label: '주간', disabled: true, wip: true },
                 { id: 'month', label: '월간', disabled: false },
               ].map((item) => (
                 <button
@@ -537,13 +538,14 @@ export default function AiFeedback() {
                   type="button"
                   disabled={item.disabled}
                   onClick={() => !item.disabled && setPeriod(item.id)}
-                  className={`px-md py-xs rounded-md text-label-md font-label-md min-h-[44px] shrink-0 ${
+                  className={`px-md py-xs rounded-md text-label-md font-label-md min-h-[44px] shrink-0 inline-flex items-center gap-1 ${
                     period === item.id
                       ? 'bg-surface shadow-sm text-primary font-medium'
                       : 'text-on-surface-variant hover:bg-surface-variant transition-colors disabled:opacity-40 disabled:cursor-not-allowed'
                   }`}
                 >
                   {item.label}
+                  {item.wip ? <WipBadge /> : null}
                 </button>
               ))}
             </div>
@@ -778,44 +780,57 @@ export default function AiFeedback() {
                   {expenseCategories.length === 0 ? (
                     <p className="text-body-sm font-body-sm text-on-surface-variant m-0 py-xl text-center">표시할 지출 카테고리가 없습니다.</p>
                   ) : (
-                    <div className="flex-1 flex items-end justify-between gap-1 sm:gap-sm md:gap-md pt-10 sm:pt-xl relative min-h-[200px] sm:min-h-[240px] chart-responsive chart-responsive--clip">
-                      <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-8">
+                    <div className="relative w-full pt-8 sm:pt-10 chart-responsive">
+                      <div className="absolute inset-x-0 top-8 sm:top-10 bottom-8 flex flex-col justify-between pointer-events-none">
                         <div className="w-full border-t border-outline-variant/30" />
                         <div className="w-full border-t border-outline-variant/30" />
                         <div className="w-full border-t border-outline-variant/30" />
                         <div className="w-full border-t border-outline-variant/30" />
                         <div className="w-full border-t border-outline-variant/30" />
                       </div>
-                      {expenseCategories.slice(0, 8).map((item, index) => {
-                        const heightPct =
-                          maxExpenseAmount > 0 ? Math.max(8, Math.round((Number(item.amount) / maxExpenseAmount) * 100)) : 8;
-                        const isTop = index === 0;
-                        return (
-                          <div key={`${item.category}-${item.type}`} className="flex flex-col items-center gap-xs z-10 group w-full relative">
-                            {isTop ? (
-                              <div className="absolute -top-7 sm:-top-8 left-1/2 -translate-x-1/2 bg-primary text-on-primary text-[10px] py-1 px-2 rounded font-bold whitespace-nowrap z-20">
-                                {item.ratio}%
-                              </div>
-                            ) : null}
+                      <div className="relative z-10 flex items-end justify-between gap-1 sm:gap-sm md:gap-md h-[180px] sm:h-[220px] w-full">
+                        {expenseCategories.slice(0, 8).map((item, index) => {
+                          const heightPct =
+                            maxExpenseAmount > 0
+                              ? Math.max(8, Math.round((Number(item.amount) / maxExpenseAmount) * 100))
+                              : 8;
+                          const isTop = index === 0;
+                          return (
                             <div
-                              className={`w-full max-w-[32px] sm:max-w-[40px] rounded-t-sm ${
-                                isTop
-                                  ? 'bg-primary shadow-sm'
-                                  : 'bg-secondary-fixed-dim group-hover:bg-secondary-container transition-colors'
-                              }`}
-                              style={{ height: `${heightPct}%` }}
-                              title={`${item.category}: ${formatWon(item.amount)}`}
-                            />
-                            <span
-                              className={`text-label-sm font-label-sm truncate max-w-full ${
-                                isTop ? 'text-primary font-bold' : 'text-on-surface-variant'
-                              }`}
+                              key={`${item.category}-${item.type}`}
+                              className="flex-1 min-w-0 h-full flex flex-col items-center justify-end gap-xs group"
                             >
-                              {item.category}
-                            </span>
-                          </div>
-                        );
-                      })}
+                              <div className="w-full flex-1 flex items-end justify-center relative min-h-0">
+                                <div
+                                  className={`absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] py-0.5 px-1.5 rounded font-bold whitespace-nowrap z-20 ${
+                                    isTop
+                                      ? 'bg-primary text-on-primary'
+                                      : 'bg-surface-container-high text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity'
+                                  }`}
+                                >
+                                  {item.ratio}%
+                                </div>
+                                <div
+                                  className={`w-full max-w-[36px] sm:max-w-[44px] rounded-t-sm ${
+                                    isTop
+                                      ? 'bg-primary shadow-sm'
+                                      : 'bg-secondary-container group-hover:bg-secondary transition-colors'
+                                  }`}
+                                  style={{ height: `${heightPct}%` }}
+                                  title={`${item.category}: ${formatWon(item.amount)} (${item.ratio}%)`}
+                                />
+                              </div>
+                              <span
+                                className={`text-label-sm font-label-sm truncate max-w-full shrink-0 ${
+                                  isTop ? 'text-primary font-bold' : 'text-on-surface-variant'
+                                }`}
+                              >
+                                {item.category}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </Card>

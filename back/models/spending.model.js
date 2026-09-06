@@ -46,10 +46,10 @@ function getRangeForPeriod(period, now = new Date(), timeZone = aiConfig.evaluat
   return { from, to };
 }
 
-function listByUserId(userId) {
+async function listByUserId(userId, accessToken = "") {
   const accountBookModel = require("./accountBook.model");
-  const fromBook = accountBookModel
-    .listByUser(userId)
+  const bookRows = await accountBookModel.listByUser(userId, {}, accessToken);
+  const fromBook = bookRows
     .filter((item) => item.type === "expense")
     .map((item) => ({
       id: `ab-${item.id}`,
@@ -65,8 +65,9 @@ function listByUserId(userId) {
   return Array.isArray(list) ? list.slice() : [];
 }
 
-function findByUserAndRange(userId, range) {
-  return listByUserId(userId).filter((item) => {
+async function findByUserAndRange(userId, range, accessToken = "") {
+  const list = await listByUserId(userId, accessToken);
+  return list.filter((item) => {
     const date = String(item.date || "");
     return date >= range.from && date <= range.to;
   });
@@ -82,15 +83,20 @@ function summarize(spending) {
     byCategory[category] = (byCategory[category] || 0) + amount;
   }
   const topCategories = Object.entries(byCategory)
-    .sort((a, b) => b[1] - a[1])
-    .map(([category, amount]) => ({ category, amount }));
-  return { total, byCategory, topCategories, count: spending.length };
+    .map(([category, amount]) => ({ category, amount }))
+    .sort((a, b) => b.amount - a.amount);
+  return {
+    total,
+    byCategory,
+    topCategories,
+    count: spending.length,
+  };
 }
 
 module.exports = {
+  PERIODS,
   getRangeForPeriod,
   listByUserId,
   findByUserAndRange,
   summarize,
-  toTimeZoneDateString,
 };
