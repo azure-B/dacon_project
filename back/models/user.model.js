@@ -72,36 +72,49 @@ async function findByLoginId(loginId) {
   if (!normalized) return null;
 
   if (hasAdminAccess()) {
-    const db = getAdminClient();
-    const { data, error } = await db
-      .from("profiles")
-      .select("*")
-      .eq("login_id", normalized)
-      .maybeSingle();
-    if (error) throw error;
-    return rowToUser(data);
+    try {
+      const db = getAdminClient();
+      const { data, error } = await db
+        .from("profiles")
+        .select("*")
+        .eq("login_id", normalized)
+        .maybeSingle();
+      if (error) throw error;
+      if (data) return rowToUser(data);
+    } catch (adminError) {
+      console.error("[findByLoginId] admin:", adminError.message || adminError);
+      // anon RPC 폴백
+    }
   }
 
   // anon: RPC로 email만 조회 후, 프로필은 로그인 세션에서 채움
-  const auth = getAuthClient();
-  const { data: email, error } = await auth.rpc("email_for_login_id", {
-    p_login_id: normalized,
-  });
-  if (error) throw error;
-  if (!email) return null;
-  return {
-    id: null,
-    loginId: normalized,
-    email,
-    name: normalized,
-    createdAt: null,
-    monthlyIncome: null,
-    targetAmount: null,
-    targetPeriod: null,
-    assetList: [],
-    loanList: [],
-    productIds: [],
-  };
+  try {
+    const auth = getAuthClient();
+    const { data: email, error } = await auth.rpc("email_for_login_id", {
+      p_login_id: normalized,
+    });
+    if (error) throw error;
+    if (!email) return null;
+    return {
+      id: null,
+      loginId: normalized,
+      email,
+      name: normalized,
+      createdAt: null,
+      monthlyIncome: null,
+      targetAmount: null,
+      targetPeriod: null,
+      assetList: [],
+      loanList: [],
+      productIds: [],
+    };
+  } catch (rpcError) {
+    console.error("[findByLoginId] rpc:", rpcError.message || rpcError);
+    const err = new Error(rpcError.message || "findByLoginId failed");
+    err.code = rpcError.code || "FIND_LOGIN_FAILED";
+    err.cause = rpcError;
+    throw err;
+  }
 }
 
 async function findByEmail(email) {

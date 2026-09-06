@@ -1,4 +1,5 @@
 const { userModel } = require("../models");
+const { hasAdminAccess } = require("../services/supabase");
 const {
   DEMO_LOGIN_ID,
   isDemoAuthEnabled,
@@ -14,22 +15,33 @@ function readBearerToken(req) {
 
 async function attachDemoUser(req, res, next) {
   try {
+    if (!hasAdminAccess()) {
+      return res.status(503).json({
+        error: "demo auth failed",
+        message:
+          "Render SUPABASE_SERVICE_ROLE_KEY가 service_role 시크릿이 아닙니다. Dashboard → API → service_role 키를 그대로 넣어주세요.",
+      });
+    }
+
     const user = await userModel.findByLoginId(DEMO_LOGIN_ID);
     if (!user?.id) {
       return res.status(503).json({
         error: "demo user missing",
-        message: "demo01 프로필이 없습니다. seed 스크립트를 실행해주세요.",
+        message:
+          "demo01 프로필이 없습니다. 로컬에서 seed를 실행했는지, Render SUPABASE_URL이 같은 프로젝트인지 확인하세요.",
       });
     }
     req.user = user;
-    // service_role 경로로 DB 접근 (가짜 JWT 아님)
     req.accessToken = "";
     return next();
   } catch (error) {
     if (error.code === "SUPABASE_NOT_CONFIGURED") {
       return res.status(503).json({ error: "supabase not configured" });
     }
-    return res.status(503).json({ error: "demo auth failed" });
+    return res.status(503).json({
+      error: "demo auth failed",
+      message: error.message || "demo auth failed",
+    });
   }
 }
 

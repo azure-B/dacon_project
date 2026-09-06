@@ -107,26 +107,28 @@ async function request(path, { method = "GET", token, body } = {}) {
 async function main() {
   console.log("BASE", BASE);
 
-  let login;
+  // 데모 자동로그인은 프로필 없이도 200을 줄 수 있음 → 가입을 먼저 보장
   try {
-    login = await request("/auth/login", {
-      method: "POST",
-      body: { loginId: DEMO.loginId, password: DEMO.password },
-    });
-    console.log("login ok (existing)", login.user?.loginId);
-  } catch (_loginError) {
-    try {
-      await request("/auth/signup", { method: "POST", body: DEMO });
-      console.log("signup ok");
-    } catch (error) {
-      if (error.status !== 409) throw error;
+    await request("/auth/signup", { method: "POST", body: DEMO });
+    console.log("signup ok");
+  } catch (error) {
+    if (error.status === 409) {
       console.log("signup skipped (already exists)");
+    } else {
+      console.warn("signup warning:", error.message, error.body || "");
     }
-    login = await request("/auth/login", {
-      method: "POST",
-      body: { loginId: DEMO.loginId, password: DEMO.password },
-    });
-    console.log("login ok", login.user?.loginId);
+  }
+
+  const login = await request("/auth/login", {
+    method: "POST",
+    body: { loginId: DEMO.loginId, password: DEMO.password },
+  });
+  console.log("login ok", login.user?.loginId, "id=", login.user?.id);
+
+  if (!login.user?.id || login.user.id === "demo") {
+    throw new Error(
+      "demo01 프로필이 DB에 없습니다. Supabase SQL(001_init) 실행·SERVICE_ROLE_KEY 확인 후 다시 시도하세요."
+    );
   }
 
   const token = login.accessToken;

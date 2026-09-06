@@ -19,8 +19,11 @@ function decodeJwtPayload(token) {
 
 function isServiceRoleKey(key) {
   if (!key) return false;
-  if (String(key).startsWith("sb_secret_")) return true;
-  const payload = decodeJwtPayload(key);
+  const value = String(key).trim();
+  // 새 API 키: secret 만 service_role. publishable/anon 은 관리자 아님
+  if (value.startsWith("sb_secret_")) return true;
+  if (value.startsWith("sb_publishable_")) return false;
+  const payload = decodeJwtPayload(value);
   return payload?.role === "service_role";
 }
 

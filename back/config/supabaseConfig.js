@@ -83,11 +83,27 @@ function assertSupabaseConfigured() {
   }
 }
 
+function isServiceRoleKeyValue(key) {
+  if (!key) return false;
+  const value = String(key).trim();
+  if (value.startsWith("sb_secret_")) return true;
+  if (value.startsWith("sb_publishable_")) return false;
+  try {
+    const part = value.split(".")[1];
+    if (!part) return false;
+    const payload = JSON.parse(Buffer.from(part, "base64url").toString("utf8"));
+    return payload?.role === "service_role";
+  } catch {
+    return false;
+  }
+}
+
 function getPublicSupabaseStatus() {
   return {
     configured: Boolean(supabaseConfig.url && (supabaseConfig.anonKey || supabaseConfig.serviceRoleKey)),
     hasAnonKey: Boolean(supabaseConfig.anonKey),
     hasServiceRoleKey: Boolean(supabaseConfig.serviceRoleKey),
+    hasValidServiceRoleKey: isServiceRoleKeyValue(supabaseConfig.serviceRoleKey),
     hasDbUrl: Boolean(supabaseConfig.dbUrl),
   };
 }
