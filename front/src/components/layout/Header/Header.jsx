@@ -5,23 +5,27 @@ import { getAccessToken, getStoredUser } from '../../../services/authStorage';
 import './Header.css';
 
 export const NAV_ITEMS = [
-  { to: '/', label: '홈', end: true },
-  { to: '/debt-analysis', label: '빚 정리' },
-  { to: '/simulation', label: '만약에' },
-  { to: '/ai-feedback', label: '가계부' },
-  { to: '/ai-report', label: '한 장 요약' },
+  { to: '/', label: '대시보드', end: true },
+  { to: '/debt-analysis', label: '부채 분석' },
+  { to: '/simulation', label: '시뮬레이션' },
+  { to: '/ai-feedback', label: 'AI 가계부' },
+  { to: '/ai-report', label: 'AI 리포트' },
 ];
 
 function navClassName({ isActive }) {
-  return isActive
-    ? 'text-secondary font-bold border-b-2 border-secondary pb-1 text-label-md font-label-md'
-    : 'text-on-surface-variant hover:text-secondary transition-colors text-label-md font-label-md';
+  return [
+    'header__nav-link',
+    isActive ? 'header__nav-link--active' : 'header__nav-link--idle',
+  ].join(' ');
 }
 
 function drawerNavClassName({ isActive }) {
-  return isActive
-    ? 'text-secondary font-bold text-label-md font-label-md min-h-[44px] flex items-center py-2 px-sm rounded-lg bg-surface-container-low'
-    : 'text-on-surface text-label-md font-label-md min-h-[44px] flex items-center py-2 px-sm rounded-lg hover:bg-surface-variant transition-colors';
+  return [
+    'header__drawer-link text-label-numeric font-label-numeric min-h-[44px] flex items-center py-2 px-md rounded-full',
+    isActive
+      ? 'bg-primary-container text-on-primary-container font-semibold shadow-extrude-sm'
+      : 'text-on-surface-variant hover:text-editorial-sage-light hover:bg-surface-container-high',
+  ].join(' ');
 }
 
 function getAuthDisplay() {
@@ -57,54 +61,70 @@ export default function Header() {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <header className="header relative">
-      <nav className="sticky top-0 z-50 flex justify-between items-center w-full px-3 sm:px-margin-mobile md:px-margin-desktop bg-surface h-16 border-b border-outline-variant shadow-sm">
-        <div className="flex items-center gap-sm md:gap-md min-w-0 flex-1">
-          <Link
-            to="/"
-            className="text-headline-sm md:text-headline-md font-headline-md font-bold text-primary tracking-tight truncate max-w-[52vw] sm:max-w-none"
-          >
-            머니로그
-          </Link>
-          <div className="hidden lg:flex items-center gap-lg ml-lg">
-            {NAV_ITEMS.map((item) => (
-              <NavLink key={item.to} to={item.to} end={item.end} className={navClassName}>
-                {item.label}
-              </NavLink>
-            ))}
+    <header className="header">
+      <nav className="header__bar h-20 max-w-[1440px] mx-auto px-3 sm:px-margin-mobile lg:px-margin flex items-center justify-between gap-md">
+        <Link to="/" className="header__brand flex items-center gap-sm min-w-0" onClick={closeMenu}>
+          <div className="w-10 h-10 rounded-DEFAULT bg-surface-architectural border border-border-hairline flex items-center justify-center shadow-[inset_0_1px_2px_rgba(255,255,255,0.1)] shrink-0">
+            <MaterialIcon name="finance_mode" className="text-primary text-[22px]" />
           </div>
-        </div>
-        <div className="flex items-center gap-xs sm:gap-sm text-primary ml-auto shrink-0">
-          {isLoggedIn ? (
-            <span className="lg:hidden text-label-sm font-label-md text-on-surface-variant max-w-[72px] sm:max-w-[100px] truncate">
-              {displayName}
+          <div className="flex flex-col min-w-0">
+            <span className="font-headline-sm text-headline-sm text-editorial-sage-light tracking-tight truncate">
+              머니로그
             </span>
-          ) : null}
+            <span className="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase hidden sm:block">
+              AI 재무 인터렉티브
+            </span>
+          </div>
+        </Link>
+
+        <div className="header__nav-shell hidden xl:flex items-center gap-space-xs p-1.5 rounded-full bg-surface-charcoal/90 border border-border-hairline shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]">
+          {NAV_ITEMS.map((item) => (
+            <NavLink key={item.to} to={item.to} end={item.end} className={navClassName}>
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-sm shrink-0">
+          <div className="hidden md:flex items-center gap-2 px-md py-1.5 rounded-full bg-surface-architectural border border-border-hairline">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-signal-positive" />
+            </span>
+            <span className="font-label-caps text-label-caps text-editorial-sage-muted">
+              {isLoggedIn ? '동기화됨' : '게스트'}
+            </span>
+          </div>
+
           <button
             type="button"
-            className="hover:text-secondary transition-colors p-sm rounded-full hover:bg-surface-variant lg:hidden min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="header__icon-btn xl:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full text-editorial-sage-light hover:bg-surface-container"
             aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((open) => !open)}
           >
             <MaterialIcon name={menuOpen ? 'close' : 'menu'} />
           </button>
+
           {isLoggedIn ? (
-            <div className="hidden lg:flex items-center gap-xs shrink-0">
-              <span className="text-label-md font-label-md text-on-surface-variant max-w-[120px] truncate">
+            <div className="hidden xl:flex items-center gap-sm pl-space-xs">
+              <span className="font-label-numeric text-label-numeric text-on-surface-variant max-w-[100px] truncate">
                 {displayName}
               </span>
-              <span className="p-sm rounded-full text-primary cursor-default min-h-[44px] min-w-[44px] flex items-center justify-center" aria-label="계정">
-                <MaterialIcon name="account_circle" />
-              </span>
+              <div
+                className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-glow-primary"
+                aria-label="계정"
+              >
+                <MaterialIcon name="person" className="text-on-primary text-[18px]" />
+              </div>
             </div>
           ) : (
             <Link
               to="/login"
-              className="hover:text-secondary transition-colors p-sm rounded-full hover:bg-surface-variant hidden lg:flex min-h-[44px] min-w-[44px] items-center justify-center"
-              aria-label="계정"
+              className="hidden xl:flex w-8 h-8 rounded-full bg-surface-container-high border border-border-hairline items-center justify-center text-editorial-sage-light hover:border-primary/40 transition-colors"
+              aria-label="로그인"
             >
-              <MaterialIcon name="account_circle" />
+              <MaterialIcon name="person" className="text-[18px]" />
             </Link>
           )}
         </div>
@@ -112,13 +132,8 @@ export default function Header() {
 
       {menuOpen ? (
         <>
-          <button
-            type="button"
-            className="header__overlay lg:hidden"
-            aria-label="메뉴 닫기"
-            onClick={closeMenu}
-          />
-          <div className="header__drawer lg:hidden bg-surface border-b border-outline-variant px-3 sm:px-margin-mobile py-md flex flex-col gap-xs">
+          <button type="button" className="header__overlay xl:hidden" aria-label="메뉴 닫기" onClick={closeMenu} />
+          <div className="header__drawer xl:hidden bg-surface-charcoal border-b border-border-hairline px-3 sm:px-margin-mobile py-md flex flex-col gap-xs">
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={`drawer-${item.to}`}
@@ -130,16 +145,18 @@ export default function Header() {
                 {item.label}
               </NavLink>
             ))}
-            <div className="border-t border-outline-variant/50 mt-sm pt-sm">
+            <div className="border-t border-border-subtle mt-sm pt-sm">
               {isLoggedIn ? (
-                <div className="flex items-center gap-sm py-2 px-sm">
-                  <MaterialIcon name="account_circle" className="text-primary shrink-0" />
-                  <span className="text-label-md font-label-md text-on-surface-variant truncate">{displayName}</span>
+                <div className="flex items-center gap-sm py-2 px-md">
+                  <MaterialIcon name="person" className="text-primary shrink-0" />
+                  <span className="text-label-numeric font-label-numeric text-on-surface-variant truncate">
+                    {displayName}
+                  </span>
                 </div>
               ) : (
                 <Link
                   to="/login"
-                  className="flex items-center gap-sm text-label-md font-label-md text-secondary min-h-[44px] py-2 px-sm"
+                  className="header__drawer-link flex items-center gap-sm text-label-numeric font-label-numeric text-primary min-h-[44px] py-2 px-md rounded-full hover:bg-surface-container"
                   onClick={closeMenu}
                 >
                   <MaterialIcon name="login" className="shrink-0" />

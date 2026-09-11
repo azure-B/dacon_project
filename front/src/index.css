@@ -1,3 +1,6 @@
+@import './styles/tokens.css';
+@import './styles/typography.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,24 +38,28 @@
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border: 1px solid #e2e8f0;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+  background: var(--color-surface-card-frosted);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border-hairline);
+  box-shadow: var(--shadow-card);
 }
 
 .progress-bar-gradient {
-  background: linear-gradient(90deg, #1960a3 0%, #2b6cb0 100%);
+  background: linear-gradient(90deg, var(--color-secondary-container) 0%, var(--color-primary) 55%, var(--color-primary-fixed) 100%);
 }
 
 .card-shadow {
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-card);
 }
 
-.card-hover-shadow:hover {
-  box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.08);
+.card-hover-lift {
+  transition: transform var(--ease-tactile), box-shadow var(--ease-tactile), border-color var(--ease-tactile);
+}
+
+.card-hover-lift:hover {
   transform: translateY(-2px);
-  transition: all 0.3s ease;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+  border-color: rgba(72, 228, 147, 0.28);
 }
 
 @keyframes spin {
@@ -65,6 +72,33 @@
   animation: spin 1.5s linear infinite;
 }
 
+@keyframes section-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.section-reveal {
+  animation: section-reveal var(--ease-reveal) both;
+}
+
+.section-reveal-delay-1 {
+  animation-delay: 60ms;
+}
+
+.section-reveal-delay-2 {
+  animation-delay: 120ms;
+}
+
+.section-reveal-delay-3 {
+  animation-delay: 180ms;
+}
+
 html {
   overflow-x: hidden;
 }
@@ -73,9 +107,16 @@ body {
   margin: 0;
   min-width: 320px;
   overflow-x: hidden;
-  background-color: #f8f9ff;
-  color: #0b1c30;
-  font-family: 'Noto Sans KR', Inter, sans-serif;
+  background-color: var(--color-canvas-deep);
+  color: var(--color-on-surface);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--color-primary-container);
+  color: var(--color-on-primary-container);
 }
 
 #root {
@@ -84,7 +125,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ── Mobile responsive utilities ── */
 .page-shell {
   width: 100%;
   min-width: 0;
@@ -110,6 +150,19 @@ body {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-reveal,
+  .section-reveal-delay-1,
+  .section-reveal-delay-2,
+  .section-reveal-delay-3 {
+    animation: none;
+  }
+
+  .card-hover-lift:hover {
+    transform: none;
+  }
 }
 
 @media (max-width: 767px) {

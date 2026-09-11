@@ -1,0 +1,106 @@
+/**
+ * Stitch dark-emerald design tokens (from front/publish).
+ * Use via CSS vars and Tailwind theme mapping — do not load CDN Tailwind.
+ */
+:root {
+  /* Canvas / surface */
+  --color-canvas-deep: #0b110e;
+  --color-background: #0f1512;
+  --color-surface: #0f1512;
+  --color-surface-dim: #0f1512;
+  --color-surface-bright: #343b37;
+  --color-surface-charcoal: #0e1612;
+  --color-surface-architectural: #141e19;
+  --color-surface-card-frosted: rgba(20, 30, 25, 0.65);
+  --color-surface-container-lowest: #090f0c;
+  --color-surface-container-low: #171d1a;
+  --color-surface-container: #1b211e;
+  --color-surface-container-high: #252b28;
+  --color-surface-container-highest: #303633;
+  --color-surface-variant: #303633;
+
+  /* Brand / primary */
+  --color-primary: #48e493;
+  --color-primary-container: #18c77a;
+  --color-on-primary: #00391f;
+  --color-on-primary-container: #004c2b;
+  --color-primary-fixed: #66feaa;
+  --color-primary-fixed-dim: #43e090;
+  --color-on-primary-fixed: #002110;
+  --color-surface-tint: #43e090;
+
+  /* Secondary / tertiary */
+  --color-secondary: #4edea3;
+  --color-secondary-container: #00a572;
+  --color-on-secondary: #003824;
+  --color-on-secondary-container: #00311f;
+  --color-secondary-fixed: #6ffbbe;
+  --color-secondary-fixed-dim: #4edea3;
+  --color-tertiary: #0ce85b;
+  --color-tertiary-container: #00c94d;
+  --color-on-tertiary: #003910;
+  --color-tertiary-fixed: #6cff82;
+  --color-tertiary-fixed-dim: #00e559;
+
+  /* Text */
+  --color-on-background: #dee4de;
+  --color-on-surface: #dee4de;
+  --color-on-surface-variant: #bbcabd;
+  --color-editorial-sage-light: #e2e8e2;
+  --color-editorial-sage-muted: #d8e0d8;
+  --color-outline: #869488;
+  --color-outline-variant: #3c4a40;
+
+  /* Borders */
+  --color-border-hairline: rgba(16, 185, 129, 0.15);
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+
+  /* Signals */
+  --color-signal-positive: #18c77a;
+  --color-signal-positive-subtle: rgba(24, 199, 122, 0.14);
+  --color-signal-advisory: #f5a623;
+  --color-signal-advisory-subtle: rgba(245, 166, 35, 0.12);
+  --color-signal-risk: #ff5c4d;
+  --color-signal-risk-subtle: rgba(255, 92, 77, 0.12);
+
+  /* Error */
+  --color-error: #ffb4ab;
+  --color-error-container: #93000a;
+  --color-on-error: #690005;
+  --color-on-error-container: #ffdad6;
+
+  /* Inverse */
+  --color-inverse-surface: #dee4de;
+  --color-inverse-on-surface: #2c322e;
+  --color-inverse-primary: #006d3f;
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-gutter: 1.5rem;
+  --space-gutter-mobile: 1rem;
+  --space-margin: 3rem;
+  --space-margin-mobile: 1.25rem;
+
+  /* Radius */
+  --radius-DEFAULT: 1rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
+  --radius-full: 9999px;
+
+  /* Elevation / tactile */
+  --shadow-extrude: 0 4px 0 #0d6d43;
+  --shadow-extrude-sm: 0 2px 0 #0d6d43;
+  --shadow-header: 0 12px 36px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --shadow-glow-primary: 0 0 12px rgba(24, 199, 122, 0.35);
+
+  /* Motion */
+  --ease-tactile: 150ms ease;
+  --ease-reveal: 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  --header-height: 5rem;
+}

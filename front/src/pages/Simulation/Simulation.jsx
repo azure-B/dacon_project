@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, MaterialIcon } from '../../components/common';
+import { Button, Card, MaterialIcon, SegmentedControl, WipBadge } from '../../components/common';
+import { PageContainer } from '../../components/layout';
 import { api } from '../../services/api';
 import { getAccessToken } from '../../services/authStorage';
 import './Simulation.css';
@@ -12,12 +13,29 @@ const SCENARIOS = [
   { id: 'rate', icon: 'percent', title: '금리가 오른다면', desc: '기준금리 +1%p일 때' },
 ];
 
+const RANGE_OPTIONS = [
+  { id: '1y', label: '1년' },
+  { id: '3y', label: '3년' },
+  { id: '5y', label: '5년' },
+];
+
+const QUICK_CHIPS = [
+  '금리가 0.5% 오르면?',
+  '보너스 500만원을 빚 갚는데 쓰면?',
+  '배달비를 월 10만원 줄이면?',
+  '생활비를 15% 줄이면?',
+];
+
 const DEFAULT_CHART = {
   assetPath: 'M0,85 L25,84 L50,83 L75,82 L100,81',
   holdPath: 'M0,85 L25,84 L50,83 L75,82 L100,81',
   debtPath: 'M0,45 L25,45 L50,45 L75,45 L100,45',
   yMaxLabel: '',
 };
+
+const CHART_ASSET = '#18C77A';
+const CHART_DEBT = '#FF5C4D';
+const CHART_HOLD = '#869488';
 
 export default function Simulation() {
   const [prompt, setPrompt] = useState('배달비를 월 10만원 줄이면?');
@@ -94,69 +112,220 @@ export default function Simulation() {
   };
 
   return (
-    <div className="flex flex-1 min-w-0 overflow-x-hidden page-shell">
-      <div className="flex-1 p-3 sm:p-margin-mobile md:p-margin-desktop flex flex-col gap-lg md:gap-xl min-w-0">
-        <header className="flex flex-col gap-sm">
-          <h1 className="text-headline-lg-mobile md:text-display-lg font-display-lg text-primary">만약에…</h1>
-          <p className="text-body-sm md:text-body-lg font-body-lg text-on-surface-variant max-w-2xl">
+    <PageContainer className="gap-space-2xl">
+      <header className="section-reveal flex flex-col lg:flex-row lg:items-end justify-between gap-space-md">
+        <div className="flex flex-col gap-sm min-w-0">
+          <h1 className="font-display text-[2.5rem] sm:text-display lg:text-[4rem] text-editorial-sage-light tracking-tight leading-none m-0">
+            만약에…
+          </h1>
+          <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl m-0">
             아래 시나리오를 하나 골라보거나, 궁금한 걸 직접 적고 「그려보기」를 눌러보세요.
           </p>
-        </header>
+        </div>
+        <SegmentedControl
+          options={RANGE_OPTIONS}
+          value={range}
+          onChange={handleRangeChange}
+          disabled={isLoading}
+          className="self-start lg:self-auto shrink-0"
+        />
+      </header>
 
-        <section className="w-full max-w-4xl mx-auto min-w-0">
-          <form
-            className="bg-surface-container-lowest border border-outline-variant rounded-xl p-sm shadow-sm flex flex-col sm:flex-row sm:items-center gap-sm transition-all focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/20"
-            onSubmit={handleSubmit}
-          >
-            <div className="flex items-center flex-1 min-w-0 w-full">
-              <MaterialIcon name="edit_note" className="text-outline ml-sm mr-sm shrink-0" />
-              <input
-                className="w-full min-w-0 bg-transparent border-none focus:ring-0 text-body-sm md:text-body-md font-body-md text-on-surface placeholder:text-outline h-12"
-                placeholder="예: 배달비를 월 10만원 줄이면? 또는 매달 20만원을 추가 상환하면?"
-                type="text"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
+      <section className="section-reveal section-reveal-delay-1 flex flex-col gap-space-md">
+        <form
+          className="w-full bg-surface-charcoal border border-border-hairline/80 p-2 rounded-2xl flex flex-col md:flex-row items-stretch md:items-center gap-2 shadow-lg"
+          onSubmit={handleSubmit}
+        >
+          <div className="flex items-center gap-3 w-full px-4 py-2.5 bg-surface-architectural/80 rounded-xl min-w-0">
+            <MaterialIcon name="neurology" className="text-outline text-[20px] shrink-0" />
+            <input
+              className="w-full min-w-0 bg-transparent border-none focus:ring-0 focus:outline-none font-body-md text-body-md text-editorial-sage-light placeholder:text-outline"
+              placeholder="예: 배달비를 월 10만원 줄이면? 또는 매달 20만원을 추가 상환하면?"
+              type="text"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              disabled={isLoading}
+            />
+            {prompt ? (
+              <button
+                type="button"
+                className="text-outline hover:text-editorial-sage-light transition-colors p-1 shrink-0"
+                onClick={() => setPrompt('')}
                 disabled={isLoading}
-              />
-            </div>
-            <Button type="submit" className="px-md md:px-lg py-sm sm:ml-sm whitespace-nowrap h-12 w-full sm:w-auto shrink-0" disabled={isLoading}>
-              <MaterialIcon name="play_arrow" className="text-[18px]" />
-              <span className="hidden md:inline">{isLoading ? '그려보는 중…' : '그려보기'}</span>
-              <span className="md:hidden">{isLoading ? '그리는 중' : '그려보기'}</span>
-            </Button>
-          </form>
-          {errorMessage ? (
-            <p className="text-body-sm text-error mt-sm m-0" role="alert">
-              {errorMessage}{' '}
-              {errorMessage.includes('로그인') ? (
-                <Link to="/login" className="underline">
-                  로그인
-                </Link>
-              ) : null}
-            </p>
-          ) : null}
-          <div className="flex gap-sm mt-sm flex-wrap">
-            <span className="text-label-sm font-label-sm text-on-surface-variant py-1">이런 것도 궁금하지 않나요:</span>
-            <button
-              type="button"
-              className="text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant px-sm py-2 rounded-full border border-outline-variant hover:bg-surface-variant transition-colors min-h-[44px]"
-              onClick={() => setPrompt('금리가 0.5% 오르면?')}
-              disabled={isLoading}
-            >
-              금리가 0.5% 오르면?
-            </button>
-            <button
-              type="button"
-              className="text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant px-sm py-2 rounded-full border border-outline-variant hover:bg-surface-variant transition-colors min-h-[44px]"
-              onClick={() => setPrompt('보너스 500만원을 빚 갚는데 쓰면?')}
-              disabled={isLoading}
-            >
-              보너스 500만원을 빚 갚는데 쓰면?
-            </button>
+                title="입력 초기화"
+              >
+                <MaterialIcon name="close" className="text-[18px]" />
+              </button>
+            ) : null}
           </div>
-        </section>
+          <Button
+            type="submit"
+            variant="extruded"
+            className="w-full md:w-auto shrink-0 px-6 py-3.5 rounded-xl"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <MaterialIcon name="progress_activity" className="text-[18px] animate-spin" />
+                <span>연산 중…</span>
+              </>
+            ) : (
+              <>
+                <MaterialIcon name="bolt" className="text-[18px]" />
+                <span>그려보기</span>
+              </>
+            )}
+          </Button>
+        </form>
 
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-sm md:gap-md">
+        {errorMessage ? (
+          <p className="text-body-sm font-body-sm text-signal-risk m-0" role="alert">
+            {errorMessage}{' '}
+            {errorMessage.includes('로그인') ? (
+              <Link to="/login" className="underline text-editorial-sage-light">
+                로그인
+              </Link>
+            ) : null}
+          </p>
+        ) : null}
+
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider mr-1">
+            추천 가상 변수:
+          </span>
+          {QUICK_CHIPS.map((chip) => (
+            <button
+              key={chip}
+              type="button"
+              className="px-3.5 py-1.5 rounded-full bg-surface-charcoal hover:bg-surface-container-high border border-border-hairline text-editorial-sage-muted font-body-sm text-body-sm transition-all hover:text-primary min-h-[40px]"
+              onClick={() => setPrompt(chip)}
+              disabled={isLoading}
+            >
+              {chip}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* Chart focal */}
+      <Card
+        variant="architectural"
+        className="section-reveal section-reveal-delay-2 p-space-lg lg:p-space-xl flex flex-col gap-space-lg relative overflow-hidden"
+      >
+        <div className="absolute -right-24 -top-24 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
+        <div className="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-signal-risk/5 blur-3xl pointer-events-none" />
+
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-space-md z-10">
+          <div className="flex items-center gap-space-md min-w-0">
+            <div className="w-12 h-12 rounded-xl bg-surface-charcoal border border-border-hairline flex items-center justify-center text-primary shadow-inner shrink-0">
+              <MaterialIcon name="insights" className="text-[28px]" />
+            </div>
+            <div className="min-w-0">
+              <h2 className="font-headline-md text-headline-md text-editorial-sage-light tracking-tight m-0">
+                앞으로의 돈 흐름
+              </h2>
+              <p className="font-body-sm text-body-sm text-on-surface-variant m-0 mt-0.5">
+                {result?.scenarioLabel || activeMeta?.title || '아직 시나리오를 고르지 않았어요'}
+                {result?.rangeLabel ? ` · ${result.rangeLabel}` : ''}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-space-md bg-surface-charcoal/80 border border-border-hairline px-4 py-2 rounded-xl self-start">
+            <div className="flex items-center gap-2">
+              <span
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ backgroundColor: CHART_ASSET, boxShadow: `0 0 8px ${CHART_ASSET}` }}
+              />
+              <span className="font-label-numeric text-label-numeric text-editorial-sage-muted">
+                이 시나리오 자산
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ backgroundColor: CHART_DEBT, boxShadow: `0 0 8px ${CHART_DEBT}` }}
+              />
+              <span className="font-label-numeric text-label-numeric text-editorial-sage-muted">남은 빚</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full border border-outline bg-transparent" />
+              <span className="font-label-numeric text-label-numeric text-editorial-sage-muted">
+                지금처럼 뒀을 때
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="simulation__chart relative w-full min-h-[220px] sm:min-h-[280px] lg:min-h-[360px] bg-surface-charcoal/90 rounded-xl p-4 flex flex-col justify-between z-10 shadow-inner border border-border-hairline/60 chart-responsive--clip">
+          <div className="absolute left-3 top-4 bottom-10 flex flex-col justify-between text-[10px] sm:text-xs text-on-surface-variant w-8 sm:w-10 pointer-events-none">
+            <span className="truncate">{chart.yMaxLabel || '높음'}</span>
+            <span className="truncate">중간</span>
+            <span className="truncate">낮음</span>
+            <span>0</span>
+          </div>
+          <div className="absolute inset-4 bottom-10 left-12 sm:left-14 flex flex-col justify-between pointer-events-none">
+            <div className="w-full border-t border-border-subtle border-dashed opacity-50" />
+            <div className="w-full border-t border-border-subtle border-dashed opacity-50" />
+            <div className="w-full border-t border-border-subtle border-dashed opacity-50" />
+            <div className="w-full" />
+          </div>
+          <svg
+            key={chartKey}
+            className="simulation__chart-svg absolute bottom-10 left-12 sm:left-14 right-4 top-4 transition-opacity duration-500 ease-out"
+            preserveAspectRatio="none"
+            viewBox="0 0 100 100"
+          >
+            <path
+              d={chart.assetPath}
+              fill="none"
+              stroke={CHART_ASSET}
+              strokeWidth="2.5"
+              vectorEffect="non-scaling-stroke"
+            />
+            <path
+              d={chart.holdPath}
+              fill="none"
+              opacity="0.55"
+              stroke={CHART_HOLD}
+              strokeDasharray="3,3"
+              strokeWidth="1.5"
+              vectorEffect="non-scaling-stroke"
+            />
+            <path
+              d={chart.debtPath}
+              fill="none"
+              stroke={CHART_DEBT}
+              strokeWidth="2.5"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+          <div className="absolute bottom-2 left-12 sm:left-14 right-4 flex justify-between text-[10px] sm:text-xs text-on-surface-variant gap-1">
+            {xLabels.map((label) => (
+              <span key={label} className="truncate">
+                {label}
+              </span>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* Scenario matrix */}
+      <section className="section-reveal section-reveal-delay-3 flex flex-col gap-space-md">
+        <div className="flex items-end justify-between gap-sm flex-wrap">
+          <div>
+            <span className="font-label-caps text-label-caps text-primary uppercase tracking-wider">
+              SCENARIO MATRIX
+            </span>
+            <h2 className="font-headline-md text-headline-md text-editorial-sage-light tracking-tight m-0">
+              가상 시나리오 비교
+            </h2>
+          </div>
+          <span className="font-body-sm text-body-sm text-outline hidden md:block">
+            카드 클릭 시 해당 시나리오가 바로 적용됩니다
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
           {SCENARIOS.map((item) => {
             const isActive = activeScenario === item.id;
             return (
@@ -165,180 +334,116 @@ export default function Simulation() {
                 type="button"
                 onClick={() => handleScenarioClick(item.id)}
                 disabled={isLoading}
-                className={`bg-surface-container-lowest p-md rounded-lg shadow-sm text-left transition-shadow group min-h-[44px] ${
+                className={`text-left p-6 rounded-2xl shadow-sm flex flex-col justify-between gap-space-md relative transition-all duration-300 hover:-translate-y-0.5 min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed ${
                   isActive
-                    ? 'border-2 border-secondary relative overflow-hidden'
-                    : 'border border-outline-variant hover:shadow-md focus:border-secondary focus:ring-1 focus:ring-secondary'
+                    ? 'bg-surface-architectural border-2 border-primary'
+                    : 'bg-surface-charcoal/80 border border-border-hairline hover:bg-surface-architectural'
                 }`}
               >
-                {isActive ? (
-                  <div className="absolute top-0 right-0 bg-secondary text-on-secondary px-2 py-1 rounded-bl-lg text-[10px] font-bold">
-                    선택됨
-                  </div>
-                ) : null}
-                <div className="flex justify-between items-start mb-sm">
+                <div className="flex items-center justify-between mb-1">
+                  <span
+                    className={`font-label-caps text-label-caps uppercase tracking-wider ${
+                      isActive ? 'text-primary font-bold' : 'text-outline'
+                    }`}
+                  >
+                    {isActive ? '선택된 시나리오' : '시나리오'}
+                  </span>
                   <MaterialIcon
-                    name={item.icon}
-                    className={isActive ? 'text-secondary' : 'text-on-surface-variant group-hover:text-primary transition-colors'}
+                    name={isActive ? 'check_circle' : 'radio_button_unchecked'}
+                    className={isActive ? 'text-primary text-[22px]' : 'text-outline text-[20px]'}
                   />
                 </div>
-                <h3 className="text-headline-sm font-headline-sm text-primary mb-xs">{item.title}</h3>
-                <p className="text-body-sm font-body-sm text-on-surface-variant">{item.desc}</p>
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <MaterialIcon
+                      name={item.icon}
+                      className={isActive ? 'text-primary' : 'text-on-surface-variant'}
+                    />
+                    <h3 className="font-headline-sm text-headline-sm text-editorial-sage-light m-0 font-bold">
+                      {item.title}
+                    </h3>
+                  </div>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant m-0 leading-relaxed">
+                    {item.desc}
+                  </p>
+                </div>
               </button>
             );
           })}
-        </section>
+        </div>
+      </section>
 
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-md lg:gap-lg min-w-0">
-          <Card className="lg:col-span-2 p-md md:p-lg flex flex-col overflow-hidden min-w-0">
-            <div className="flex flex-col md:flex-row justify-between md:items-center gap-sm md:gap-0 mb-md">
-              <div>
-                <h2 className="text-headline-sm font-headline-sm text-primary">앞으로의 돈 흐름</h2>
-                <p className="text-body-sm font-body-sm text-on-surface-variant mt-xs">
-                  {result?.scenarioLabel || activeMeta?.title || '아직 시나리오를 고르지 않았어요'}
-                  {result?.rangeLabel ? ` · ${result.rangeLabel}` : ''}
-                </p>
-              </div>
-              <div className="flex bg-surface-container-low rounded-lg p-xs self-start md:self-auto">
-                {[
-                  { id: '1y', label: '1년' },
-                  { id: '3y', label: '3년' },
-                  { id: '5y', label: '5년' },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => handleRangeChange(item.id)}
-                    disabled={isLoading}
-                    className={`px-sm py-xs text-label-sm font-label-sm rounded-md min-h-[44px] min-w-[44px] ${
-                      range === item.id
-                        ? 'bg-surface-container-lowest shadow-sm text-primary font-bold'
-                        : 'text-on-surface-variant hover:bg-surface-variant'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
+      {/* Results + WIP CTA */}
+      <section className="grid grid-cols-1 lg:grid-cols-3 gap-space-lg section-reveal">
+        <Card variant="architectural" className="lg:col-span-2 p-space-lg flex flex-col gap-space-md" hoverLift>
+          <div className="flex items-center gap-sm">
+            <MaterialIcon name="insights" className="text-secondary" />
+            <h3 className="font-headline-sm text-headline-sm text-editorial-sage-light m-0">
+              이렇게 달라질 수 있어요
+            </h3>
+          </div>
+          <div className="bg-surface-charcoal/80 rounded-lg p-space-md border-l-4 border-secondary">
+            <p className="font-body-md text-body-md text-editorial-sage-light m-0">
+              {isLoading
+                ? '시나리오를 계산해 보는 중…'
+                : result?.insight || '시나리오를 고르면 여기에 결과가 나타나요.'}
+            </p>
+          </div>
+          <div className="flex flex-col gap-sm">
+            <div className="flex justify-between items-center gap-sm py-xs border-b border-border-subtle">
+              <span className="font-body-sm text-body-sm text-on-surface-variant min-w-0">{gapLabelKey}</span>
+              <span className="font-label-numeric text-label-numeric text-signal-positive font-bold financial-value shrink-0">
+                {result?.assetGapLabel || '-'}
+              </span>
             </div>
-            <div className="chart-responsive--clip flex-1 min-h-[220px] sm:min-h-[250px] md:min-h-[300px] relative mt-md border-b border-l border-outline-variant pl-8 sm:pl-10 md:pl-12 pb-8">
-              <div className="absolute left-0 top-0 h-[calc(100%-2rem)] flex flex-col justify-between text-[10px] sm:text-xs text-on-surface-variant w-7 sm:w-9 md:w-10 shrink-0">
-                <span className="truncate">{chart.yMaxLabel || '높음'}</span>
-                <span className="truncate">중간</span>
-                <span className="truncate">낮음</span>
-                <span>0</span>
-              </div>
-              <div className="absolute inset-0 bottom-8 left-8 sm:left-10 md:left-12 flex flex-col justify-between pointer-events-none">
-                <div className="w-full border-t border-outline-variant border-dashed opacity-50" />
-                <div className="w-full border-t border-outline-variant border-dashed opacity-50" />
-                <div className="w-full border-t border-outline-variant border-dashed opacity-50" />
-                <div className="w-full" />
-              </div>
-              <svg
-                key={chartKey}
-                className="absolute bottom-8 left-8 sm:left-10 md:left-12 right-0 h-[calc(100%-2rem)] w-[calc(100%-2rem)] sm:w-[calc(100%-2.5rem)] md:w-[calc(100%-3rem)] transition-all duration-500 ease-out"
-                preserveAspectRatio="none"
-                viewBox="0 0 100 100"
-              >
-                <path
-                  d={chart.assetPath}
-                  fill="none"
-                  stroke="#2B6CB0"
-                  strokeWidth="2"
-                  vectorEffect="non-scaling-stroke"
-                />
-                <path
-                  d={chart.holdPath}
-                  fill="none"
-                  opacity="0.5"
-                  stroke="#2B6CB0"
-                  strokeDasharray="2,2"
-                  strokeWidth="1"
-                  vectorEffect="non-scaling-stroke"
-                />
-                <path
-                  d={chart.debtPath}
-                  fill="none"
-                  stroke="#ba1a1a"
-                  strokeWidth="2"
-                  vectorEffect="non-scaling-stroke"
-                />
-              </svg>
-              <div className="absolute bottom-0 left-8 sm:left-10 md:left-12 right-0 flex justify-between text-[10px] sm:text-xs text-on-surface-variant gap-1">
-                {xLabels.map((label) => (
-                  <span key={label} className="truncate">
-                    {label}
-                  </span>
-                ))}
-              </div>
+            <div className="flex justify-between items-center gap-sm py-xs border-b border-border-subtle">
+              <span className="font-body-sm text-body-sm text-on-surface-variant min-w-0">목표, 얼마나 빨라질까</span>
+              <span className="font-label-numeric text-label-numeric text-editorial-sage-light font-bold shrink-0">
+                {result?.goalAcceleration || '-'}
+              </span>
             </div>
-            <div className="flex flex-wrap justify-center gap-sm md:gap-lg mt-md md:mt-xl pt-sm">
-              <div className="flex items-center gap-xs">
-                <div className="w-3 h-3 rounded-full bg-[#2B6CB0]" />
-                <span className="text-label-sm font-label-sm text-on-surface-variant">이 시나리오 자산</span>
-              </div>
-              <div className="flex items-center gap-xs">
-                <div className="w-3 h-3 rounded-full border border-[#2B6CB0] bg-transparent flex items-center justify-center">
-                  <div className="w-full border-t border-[#2B6CB0] border-dashed" />
-                </div>
-                <span className="text-label-sm font-label-sm text-on-surface-variant">지금처럼 뒀을 때</span>
-              </div>
-              <div className="flex items-center gap-xs">
-                <div className="w-3 h-3 rounded-full bg-error" />
-                <span className="text-label-sm font-label-sm text-on-surface-variant">남은 빚</span>
-              </div>
-            </div>
-          </Card>
-
-          <div className="flex flex-col gap-md">
-            <Card className="p-md flex-1">
-              <div className="flex items-center gap-sm mb-md">
-                <MaterialIcon name="insights" className="text-secondary" />
-                <h3 className="text-headline-sm font-headline-sm text-primary">이렇게 달라질 수 있어요</h3>
-              </div>
-              <div className="bg-surface-container-low rounded-lg p-sm mb-md border-l-4 border-secondary">
-                <p className="text-body-md font-body-md text-on-surface">
-                  {isLoading
-                    ? '시나리오를 계산해 보는 중…'
-                    : result?.insight || '시나리오를 고르면 여기에 결과가 나타나요.'}
-                </p>
-              </div>
-              <div className="flex flex-col gap-sm">
-                <div className="flex justify-between items-center gap-sm py-xs border-b border-outline-variant">
-                  <span className="text-body-sm font-body-sm text-on-surface-variant min-w-0">{gapLabelKey}</span>
-                  <span className="text-label-md font-label-md text-[#00b47d] font-bold financial-value shrink-0">
-                    {result?.assetGapLabel || '-'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center gap-sm py-xs border-b border-outline-variant">
-                  <span className="text-body-sm font-body-sm text-on-surface-variant min-w-0">목표, 얼마나 빨라질까</span>
-                  <span className="text-label-md font-label-md text-primary font-bold shrink-0">
-                    {result?.goalAcceleration || '-'}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center gap-sm py-xs border-b border-outline-variant">
-                  <span className="text-body-sm font-body-sm text-on-surface-variant min-w-0">가정한 연 수익률</span>
-                  <span className="text-label-md font-label-md text-primary font-bold shrink-0">
-                    {result?.annualReturn || '-'}
-                  </span>
-                </div>
-              </div>
-            </Card>
-            <div className="bg-primary-container text-on-primary-container rounded-xl shadow-sm p-md">
-              <h4 className="text-headline-sm font-headline-sm mb-xs text-on-primary-fixed">다음에 해볼 일</h4>
-              <p className="text-body-sm font-body-sm mb-md opacity-90">
-                {result?.strategy || '시나리오를 하나 골라보면 다음에 해볼 일을 알려드려요.'}
-              </p>
-              <Button variant="secondary" fullWidth className="py-sm min-h-[44px]" type="button" disabled title="공사중">
-                자동이체 설정하기
-                <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200/80">
-                  공사중
-                </span>
-              </Button>
+            <div className="flex justify-between items-center gap-sm py-xs border-b border-border-subtle">
+              <span className="font-body-sm text-body-sm text-on-surface-variant min-w-0">가정한 연 수익률</span>
+              <span className="font-label-numeric text-label-numeric text-editorial-sage-light font-bold shrink-0">
+                {result?.annualReturn || '-'}
+              </span>
             </div>
           </div>
-        </section>
-      </div>
-    </div>
+          {result?.strategy ? (
+            <p className="font-body-sm text-body-sm text-on-surface-variant m-0 pt-space-xs">
+              {result.strategy}
+            </p>
+          ) : null}
+        </Card>
+
+        <Card variant="frosted" className="p-space-lg flex flex-col gap-space-md justify-between">
+          <div className="flex flex-col gap-space-sm">
+            <div className="flex items-center justify-between gap-sm">
+              <span className="font-label-caps text-label-caps text-outline uppercase tracking-wider">
+                다음에 해볼 일
+              </span>
+              <WipBadge />
+            </div>
+            <h4 className="font-headline-sm text-headline-sm text-editorial-sage-light m-0">
+              자동이체 연동
+            </h4>
+            <p className="font-body-sm text-body-sm text-on-surface-variant m-0">
+              {result?.strategy || '시나리오를 하나 골라보면 다음에 해볼 일을 알려드려요.'}
+            </p>
+          </div>
+          <Button
+            variant="extruded"
+            fullWidth
+            className="py-space-sm min-h-[44px]"
+            type="button"
+            disabled
+            title="공사중"
+          >
+            자동이체 설정하기
+            <WipBadge />
+          </Button>
+        </Card>
+      </section>
+    </PageContainer>
   );
 }

@@ -1,319 +1,285 @@
-<!DOCTYPE html>
-
-<html lang="ko"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>재무 시뮬레이션 - AI 재무 인터렉티브</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "on-secondary-fixed": "#001c38",
-                        "secondary-container": "#7db6ff",
-                        "tertiary-fixed": "#6ffbbe",
-                        "on-error-container": "#93000a",
-                        "surface-variant": "#d3e4fe",
-                        "on-secondary-container": "#00477f",
-                        "surface-tint": "#455f88",
-                        "surface-bright": "#f8f9ff",
-                        "on-secondary-fixed-variant": "#004881",
-                        "tertiary-container": "#003e28",
-                        "surface": "#f8f9ff",
-                        "on-tertiary": "#ffffff",
-                        "tertiary": "#002617",
-                        "secondary-fixed": "#d3e4ff",
-                        "secondary-fixed-dim": "#a2c9ff",
-                        "primary-fixed-dim": "#adc7f7",
-                        "error-container": "#ffdad6",
-                        "surface-container-high": "#dce9ff",
-                        "inverse-on-surface": "#eaf1ff",
-                        "primary-container": "#1a365d",
-                        "on-secondary": "#ffffff",
-                        "surface-container-low": "#eff4ff",
-                        "error": "#ba1a1a",
-                        "secondary": "#1960a3",
-                        "outline-variant": "#c4c6cf",
-                        "on-primary-container": "#86a0cd",
-                        "tertiary-fixed-dim": "#4edea3",
-                        "on-tertiary-container": "#00b47d",
-                        "on-background": "#0b1c30",
-                        "background": "#f8f9ff",
-                        "primary-fixed": "#d6e3ff",
-                        "on-primary-fixed": "#001b3c",
-                        "on-surface": "#0b1c30",
-                        "primary": "#002045",
-                        "on-tertiary-fixed": "#002113",
-                        "surface-dim": "#cbdbf5",
-                        "surface-container": "#e5eeff",
-                        "on-primary": "#ffffff",
-                        "inverse-primary": "#adc7f7",
-                        "on-surface-variant": "#43474e",
-                        "inverse-surface": "#213145",
-                        "on-primary-fixed-variant": "#2d476f",
-                        "on-tertiary-fixed-variant": "#005236",
-                        "surface-container-lowest": "#ffffff",
-                        "surface-container-highest": "#d3e4fe",
-                        "outline": "#74777f",
-                        "on-error": "#ffffff"
-                    },
-                    "borderRadius": {
-                        "DEFAULT": "0.125rem",
-                        "lg": "0.25rem",
-                        "xl": "0.5rem",
-                        "full": "0.75rem"
-                    },
-                    "spacing": {
-                        "gutter": "24px",
-                        "unit": "4px",
-                        "container-max": "1280px",
-                        "xs": "4px",
-                        "sm": "8px",
-                        "md": "16px",
-                        "margin-desktop": "64px",
-                        "margin-mobile": "16px",
-                        "xl": "48px",
-                        "lg": "24px"
-                    },
-                    "fontFamily": {
-                        "label-sm": ["Inter", "Noto Sans KR", "sans-serif"],
-                        "headline-sm": ["Inter", "Noto Sans KR", "sans-serif"],
-                        "body-md": ["Noto Sans KR", "sans-serif"],
-                        "label-md": ["Inter", "Noto Sans KR", "sans-serif"],
-                        "body-sm": ["Noto Sans KR", "sans-serif"],
-                        "headline-md": ["Inter", "Noto Sans KR", "sans-serif"],
-                        "body-lg": ["Noto Sans KR", "sans-serif"],
-                        "headline-lg-mobile": ["Inter", "Noto Sans KR", "sans-serif"],
-                        "headline-lg": ["Inter", "Noto Sans KR", "sans-serif"],
-                        "display-lg": ["Inter", "Noto Sans KR", "sans-serif"]
-                    },
-                    "fontSize": {
-                        "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.03em", "fontWeight": "500" }],
-                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
-                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
-                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
-                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
-                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
-                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
-                        "headline-lg-mobile": ["28px", { "lineHeight": "1.3", "fontWeight": "600" }],
-                        "headline-lg": ["32px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600" }],
-                        "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }]
-                    }
-                }
+<!DOCTYPE html><html class="dark" lang="ko" style=""><svg class="inline-defs-container" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"></svg><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><title>AI 재무 인터렉티브</title><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "secondary-fixed-dim": "#4edea3",
+              "on-error-container": "#ffdad6",
+              "signal-positive-subtle": "rgba(24, 199, 122, 0.14)",
+              "surface-container-high": "#252b28",
+              "inverse-on-surface": "#2c322e",
+              "on-primary": "#00391f",
+              "surface-card-frosted": "rgba(20, 30, 25, 0.65)",
+              "tertiary-fixed-dim": "#00e559",
+              "on-primary-fixed": "#002110",
+              "inverse-primary": "#006d3f",
+              "outline-variant": "#3c4a40",
+              "on-tertiary-fixed-variant": "#00531b",
+              "surface-charcoal": "#0E1612",
+              "signal-advisory": "#F5A623",
+              "error-container": "#93000a",
+              "signal-positive": "#18C77A",
+              "on-surface-variant": "#bbcabd",
+              "tertiary-container": "#00c94d",
+              "surface-bright": "#343b37",
+              "border-subtle": "rgba(255, 255, 255, 0.08)",
+              "surface-container-low": "#171d1a",
+              "on-tertiary-container": "#004d18",
+              "primary-fixed": "#66feaa",
+              "on-primary-container": "#004c2b",
+              "secondary-fixed": "#6ffbbe",
+              "surface-tint": "#43e090",
+              "signal-risk-subtle": "rgba(255, 92, 77, 0.12)",
+              "on-secondary-fixed-variant": "#005236",
+              "background": "#0f1512",
+              "surface-architectural": "#141E19",
+              "signal-advisory-subtle": "rgba(245, 166, 35, 0.12)",
+              "secondary-container": "#00a572",
+              "on-primary-fixed-variant": "#00522f",
+              "editorial-sage-light": "#E2E8E2",
+              "on-background": "#dee4de",
+              "primary-container": "#18c77a",
+              "on-error": "#690005",
+              "inverse-surface": "#dee4de",
+              "outline": "#869488",
+              "surface-container": "#1b211e",
+              "primary": "#48e493",
+              "on-secondary-fixed": "#002113",
+              "tertiary": "#0ce85b",
+              "on-tertiary-fixed": "#002106",
+              "surface-dim": "#0f1512",
+              "canvas-deep": "#0B110E",
+              "border-hairline": "rgba(16, 185, 129, 0.15)",
+              "surface-variant": "#303633",
+              "secondary": "#4edea3",
+              "signal-risk": "#FF5C4D",
+              "tertiary-fixed": "#6cff82",
+              "on-tertiary": "#003910",
+              "error": "#ffb4ab",
+              "on-surface": "#dee4de",
+              "primary-fixed-dim": "#43e090",
+              "surface-container-lowest": "#090f0c",
+              "on-secondary": "#003824",
+              "surface": "#0f1512",
+              "surface-container-highest": "#303633",
+              "editorial-sage-muted": "#D8E0D8",
+              "on-secondary-container": "#00311f"
+            },
+            "borderRadius": {
+              "DEFAULT": "1rem",
+              "lg": "2rem",
+              "xl": "3rem",
+              "full": "9999px"
+            },
+            "spacing": {
+              "space-lg": "1.5rem",
+              "space-xl": "2rem",
+              "gutter": "1.5rem",
+              "margin-mobile": "1.25rem",
+              "space-2xl": "3rem",
+              "space-xs": "0.25rem",
+              "margin": "3rem",
+              "space-md": "1rem",
+              "gutter-mobile": "1rem",
+              "space-sm": "0.5rem"
+            },
+            "fontFamily": {
+              "headline-lg-mobile": ["Space Grotesk"],
+              "display-mobile": ["Space Grotesk"],
+              "body-sm": ["Geist"],
+              "label-caps": ["Space Grotesk"],
+              "label-numeric": ["Space Grotesk"],
+              "headline-sm": ["Space Grotesk"],
+              "display": ["Space Grotesk"],
+              "body-md": ["Geist"],
+              "body-lg": ["Geist"],
+              "headline-md": ["Space Grotesk"],
+              "headline-lg": ["Space Grotesk"]
+            },
+            "fontSize": {
+              "headline-lg-mobile": ["1.875rem", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+              "display-mobile": ["2.5rem", {"lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "700"}],
+              "body-sm": ["0.8125rem", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+              "label-caps": ["0.6875rem", {"lineHeight": "1", "letterSpacing": "0.08em", "fontWeight": "700"}],
+              "label-numeric": ["0.875rem", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600"}],
+              "headline-sm": ["1.25rem", {"lineHeight": "1.35", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+              "display": ["3.75rem", {"lineHeight": "1.05", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+              "body-md": ["0.9375rem", {"lineHeight": "1.55", "letterSpacing": "-0.005em", "fontWeight": "400"}],
+              "body-lg": ["1.125rem", {"lineHeight": "1.6", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+              "headline-md": ["1.75rem", {"lineHeight": "1.25", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+              "headline-lg": ["2.5rem", {"lineHeight": "1.15", "letterSpacing": "-0.03em", "fontWeight": "700"}]
             }
+          }
         }
-    </script>
-<style>
-        body { font-family: 'Noto Sans KR', sans-serif; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-        .filled-icon { font-variation-settings: 'FILL' 1; }
-        
-        /* Custom scrollbar for inner areas */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #c4c6cf; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #74777f; }
-    </style>
-</head>
-<body class="bg-background text-on-background min-h-screen flex flex-col">
-<!-- TopNavBar -->
-<nav class="sticky top-0 z-50 flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-16 bg-surface shadow-sm border-b border-outline-variant">
-<div class="flex items-center gap-md">
-<button class="md:hidden p-2 -ml-2 rounded-full hover:bg-surface-variant transition-colors text-on-surface-variant">
-<span class="material-symbols-outlined">menu</span>
-</button>
-<span class="text-headline-sm md:text-headline-md font-headline-md font-bold text-primary tracking-tight">AI 재무 인터렉티브</span>
-</div>
-<div class="hidden lg:flex items-center gap-gutter">
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-secondary transition-colors" href="#">대시보드</a>
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-secondary transition-colors" href="#">부채 분석</a>
-<a class="text-label-md font-label-md text-secondary font-bold border-b-2 border-secondary pb-1 transition-opacity" href="#">시뮬레이션</a>
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-secondary transition-colors" href="#">AI 가계부</a>
-<a class="text-label-md font-label-md text-on-surface-variant hover:text-secondary transition-colors" href="#">AI 리포트</a>
-</div>
-<div class="flex items-center gap-sm">
-<button class="p-2 rounded-full hover:bg-surface-variant transition-colors text-on-surface-variant">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-<button class="p-2 rounded-full hover:bg-surface-variant transition-colors text-on-surface-variant">
-<span class="material-symbols-outlined">account_circle</span>
-</button>
-</div>
-</nav>
-<div class="flex flex-1 overflow-hidden">
-<!-- Main Content Canvas -->
-<main class="flex-1 overflow-y-auto p-margin-mobile md:p-margin-desktop flex flex-col gap-xl">
-<!-- Header Section -->
-<header class="flex flex-col gap-sm">
-<h1 class="text-headline-lg-mobile md:text-display-lg font-display-lg text-primary">재무 시뮬레이션</h1>
-<p class="text-body-sm md:text-body-lg font-body-lg text-on-surface-variant max-w-2xl">
-                    다양한 금융 시나리오를 바탕으로 미래의 자산 및 부채 흐름을 예측하고 최적의 전략을 도출합니다.
-                </p>
-</header>
-<!-- AI Natural Language Input Area -->
-<section class="w-full max-w-4xl mx-auto">
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-sm shadow-sm flex items-center transition-all focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/20">
-<span class="material-symbols-outlined text-outline ml-sm mr-sm">smart_toy</span>
-<input class="w-full bg-transparent border-none focus:ring-0 text-body-sm md:text-body-md font-body-md text-on-surface placeholder:text-outline h-12" placeholder="예: 배달비를 월 10만원 줄이면? 또는 매달 20만원을 추가 상환하면?" type="text" value="배달비를 월 10만원 줄이면?"/>
-<button class="bg-primary text-on-primary px-md md:px-lg py-sm rounded-lg text-label-sm md:text-label-md font-label-md ml-sm hover:bg-primary/90 transition-colors whitespace-nowrap flex items-center gap-xs">
-<span class="material-symbols-outlined text-[18px]">play_arrow</span>
-<span class="hidden md:inline">시뮬레이션 실행</span>
-<span class="md:hidden">실행</span>
-</button>
-</div>
-<div class="flex gap-sm mt-sm flex-wrap">
-<span class="text-label-sm font-label-sm text-on-surface-variant py-1">추천 질문:</span>
-<button class="text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant px-sm py-1 rounded-full border border-outline-variant hover:bg-surface-variant transition-colors">금리가 0.5% 오르면?</button>
-<button class="text-label-sm font-label-sm bg-surface-container-low text-on-surface-variant px-sm py-1 rounded-full border border-outline-variant hover:bg-surface-variant transition-colors">보너스 500만원을 빚 갚는데 쓰면?</button>
-</div>
-</section>
-<!-- Scenario Selection Grid -->
-<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
-<button class="bg-surface-container-lowest border border-outline-variant p-md rounded-lg shadow-sm text-left hover:shadow-md transition-shadow focus:border-secondary focus:ring-1 focus:ring-secondary group">
-<div class="flex justify-between items-start mb-sm">
-<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">trending_flat</span>
-</div>
-<h3 class="text-headline-sm font-headline-sm text-primary mb-xs">현재 유지</h3>
-<p class="text-body-sm font-body-sm text-on-surface-variant">현재의 수입/지출 패턴 유지</p>
-</button>
-<button class="bg-surface-container-lowest border-2 border-secondary p-md rounded-lg shadow-sm text-left relative overflow-hidden group">
-<div class="absolute top-0 right-0 bg-secondary text-on-secondary px-2 py-1 rounded-bl-lg text-[10px] font-bold">활성 시나리오</div>
-<div class="flex justify-between items-start mb-sm">
-<span class="material-symbols-outlined text-secondary">savings</span>
-</div>
-<h3 class="text-headline-sm font-headline-sm text-primary mb-xs">월 10만원 저축</h3>
-<p class="text-body-sm font-body-sm text-on-surface-variant">지출 절감액을 저축으로 전환</p>
-</button>
-<button class="bg-surface-container-lowest border border-outline-variant p-md rounded-lg shadow-sm text-left hover:shadow-md transition-shadow group">
-<div class="flex justify-between items-start mb-sm">
-<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">payments</span>
-</div>
-<h3 class="text-headline-sm font-headline-sm text-primary mb-xs">월 10만원 추가 상환</h3>
-<p class="text-body-sm font-body-sm text-on-surface-variant">대출 원금 우선 상환 전략</p>
-</button>
-<button class="bg-surface-container-lowest border border-outline-variant p-md rounded-lg shadow-sm text-left hover:shadow-md transition-shadow group">
-<div class="flex justify-between items-start mb-sm">
-<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">percent</span>
-</div>
-<h3 class="text-headline-sm font-headline-sm text-primary mb-xs">금리 변동</h3>
-<p class="text-body-sm font-body-sm text-on-surface-variant">스트레스 테스트 (기준금리 +1%)</p>
-</button>
-</section>
-<!-- Results Dashboard (Bento Grid) -->
-<section class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
-<!-- Main Chart Area -->
-<div class="lg:col-span-2 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-md md:p-lg flex flex-col overflow-hidden">
-<div class="flex flex-col md:flex-row justify-between md:items-center gap-sm md:gap-0 mb-md">
-<div>
-<h2 class="text-headline-sm font-headline-sm text-primary">자산/부채 추이 시뮬레이션</h2>
-<p class="text-body-sm font-body-sm text-on-surface-variant mt-xs">시나리오: 월 10만원 저축 (배달비 절감)</p>
-</div>
-<div class="flex bg-surface-container-low rounded-lg p-xs self-start md:self-auto">
-<button class="px-sm py-xs text-label-sm font-label-sm text-on-surface-variant hover:bg-surface-variant rounded-md">3개월</button>
-<button class="px-sm py-xs text-label-sm font-label-sm text-on-surface-variant hover:bg-surface-variant rounded-md">6개월</button>
-<button class="px-sm py-xs text-label-sm font-label-sm bg-surface-container-lowest shadow-sm text-primary rounded-md font-bold">1년</button>
-</div>
-</div>
-<!-- Faux Chart Area -->
-<div class="flex-1 min-h-[250px] md:min-h-[300px] relative mt-md border-b border-l border-outline-variant ml-8 md:ml-0">
-<!-- Y-Axis Labels -->
-<div class="absolute left-[-35px] md:left-[-45px] top-0 h-full flex flex-col justify-between text-[10px] text-on-surface-variant">
-<span>1.5억</span>
-<span>1.0억</span>
-<span>5천만</span>
-<span>0</span>
-</div>
-<!-- Grid Lines -->
-<div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
-<div class="w-full border-t border-outline-variant border-dashed opacity-50"></div>
-<div class="w-full border-t border-outline-variant border-dashed opacity-50"></div>
-<div class="w-full border-t border-outline-variant border-dashed opacity-50"></div>
-<div class="w-full"></div>
-</div>
-<!-- Projected Assets Line (Blue) -->
-<svg class="absolute inset-0 w-full h-full preserve-aspect-ratio-none" preserveaspectratio="none" viewbox="0 0 100 100">
-<path d="M0,80 L20,75 L40,65 L60,55 L80,45 L100,30" fill="none" stroke="#2B6CB0" stroke-width="2" vector-effect="non-scaling-stroke"></path>
-<!-- Baseline (Dashed) -->
-<path d="M0,80 L20,78 L40,75 L60,72 L80,70 L100,65" fill="none" opacity="0.5" stroke="#2B6CB0" stroke-dasharray="2,2" stroke-width="1" vector-effect="non-scaling-stroke"></path>
-</svg>
-<!-- Projected Debt Line (Red/Error) -->
-<svg class="absolute inset-0 w-full h-full preserve-aspect-ratio-none" preserveaspectratio="none" viewbox="0 0 100 100">
-<path d="M0,40 L20,42 L40,43 L60,45 L80,48 L100,50" fill="none" stroke="#ba1a1a" stroke-width="2" vector-effect="non-scaling-stroke"></path>
-</svg>
-<!-- X-Axis Labels -->
-<div class="absolute bottom-[-25px] w-full flex justify-between text-[10px] text-on-surface-variant px-1 md:px-sm">
-<span>현재</span>
-<span>3개월</span>
-<span>6개월</span>
-<span>9개월</span>
-<span>1년</span>
-</div>
-</div>
-<!-- Legend -->
-<div class="flex flex-wrap justify-center gap-sm md:gap-lg mt-xl pt-sm">
-<div class="flex items-center gap-xs">
-<div class="w-3 h-3 rounded-full bg-[#2B6CB0]"></div>
-<span class="text-label-sm font-label-sm text-on-surface-variant">예상 총 자산</span>
-</div>
-<div class="flex items-center gap-xs">
-<div class="w-3 h-3 rounded-full border border-[#2B6CB0] bg-transparent flex items-center justify-center">
-<div class="w-full border-t border-[#2B6CB0] border-dashed"></div>
-</div>
-<span class="text-label-sm font-label-sm text-on-surface-variant">현재 유지 시 (자산)</span>
-</div>
-<div class="flex items-center gap-xs">
-<div class="w-3 h-3 rounded-full bg-error"></div>
-<span class="text-label-sm font-label-sm text-on-surface-variant">예상 총 부채</span>
-</div>
-</div>
-</div>
-<!-- AI Analysis Summary -->
-<div class="flex flex-col gap-md">
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm p-md flex-1">
-<div class="flex items-center gap-sm mb-md">
-<span class="material-symbols-outlined text-secondary">psychology</span>
-<h3 class="text-headline-sm font-headline-sm text-primary">인공지능 시뮬레이션 결과</h3>
-</div>
-<div class="bg-surface-container-low rounded-lg p-sm mb-md border-l-4 border-secondary">
-<p class="text-body-md font-body-md text-on-surface">
-                                매월 배달비 10만원을 절감하여 연 5% 수익률의 적금에 투자할 경우, 1년 뒤 자산이 <strong>1,227,000원</strong> 추가 증가합니다.
-                            </p>
-</div>
-<div class="flex flex-col gap-sm">
-<div class="flex justify-between items-center py-xs border-b border-outline-variant">
-<span class="text-body-sm font-body-sm text-on-surface-variant">1년 후 예상 자산 격차</span>
-<span class="text-label-md font-label-md text-[#00b47d] font-bold">+ 120만 원</span>
-</div>
-<div class="flex justify-between items-center py-xs border-b border-outline-variant">
-<span class="text-body-sm font-body-sm text-on-surface-variant">목표 달성 시기 단축</span>
-<span class="text-label-md font-label-md text-primary font-bold">2개월 단축</span>
-</div>
-<div class="flex justify-between items-center py-xs border-b border-outline-variant">
-<span class="text-body-sm font-body-sm text-on-surface-variant">투자 수익률 (연환산)</span>
-<span class="text-label-md font-label-md text-primary font-bold">5.0%</span>
-</div>
-</div>
-</div>
-<!-- Action Card -->
-<div class="bg-primary-container text-on-primary-container rounded-xl shadow-sm p-md">
-<h4 class="text-headline-sm font-headline-sm mb-xs text-on-primary-fixed">전략 제안</h4>
-<p class="text-body-sm font-body-sm mb-md opacity-90">
-                            현재 시나리오가 긍정적입니다. 해당 전략을 실제 재무 목표에 적용하시겠습니까?
-                        </p>
-<button class="w-full bg-secondary text-on-secondary py-sm rounded-lg text-label-md font-label-md hover:bg-secondary/90 transition-colors">
-                            자동이체 설정하기
-                        </button>
-</div>
-</div>
-</section>
-<!-- Footer -->
-<footer class="mt-lg pt-lg border-t border-outline-variant text-center pb-md">
-<p class="text-body-sm font-body-sm text-on-surface-variant">© 2024 AI 재무 인터렉티브. All rights reserved.</p>
-</footer>
-</main>
-</div>
-</body></html>
+      }</script></head><body class="bg-canvas-deep text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 inset-x-0 z-50 bg-surface-dim/85 backdrop-blur-xl border-b border-border-hairline shadow-[0_12px_36px_rgba(0,0,0,0.6)]"><div class="h-20 max-w-[1440px] mx-auto px-margin-mobile lg:px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><div class="w-10 h-10 rounded-DEFAULT bg-surface-architectural border border-border-hairline flex items-center justify-center shadow-[inset_0_1px_2px_rgba(255,255,255,0.1)]"><span class="material-symbols-outlined text-primary text-[22px]">finance_mode</span></div><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-editorial-sage-light tracking-tight">KINETIC CAPITAL</span><span class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase">AI 재무 인터렉티브</span></div></div><nav class="hidden xl:flex items-center gap-space-xs p-1.5 rounded-full bg-surface-charcoal/90 border border-border-hairline shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]" data-active-classes="bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_0_#0D6D43]"><a class="px-space-md py-space-xs rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" data-path="main-dashboard" href="#">대시보드</a><a class="px-space-md py-space-xs rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" data-path="debt-analysis" href="#">부채 분석</a><a aria-current="page" class="px-space-md py-space-xs rounded-full transition-all bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_0_#0D6D43]" data-path="financial-simulation" href="#">시뮬레이션</a><a class="px-space-md py-space-xs rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" data-path="ai-account-book" href="#">AI 가계부</a><a class="px-space-md py-space-xs rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" data-path="ai-financial-report" href="#">AI 리포트</a></nav><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center gap-2 px-space-md py-1.5 rounded-full bg-surface-architectural border border-border-hairline"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-signal-positive"></span></span><span class="font-label-caps text-label-caps text-editorial-sage-muted">AI 엔진 실시간 동기화됨</span></div><div class="flex items-center gap-space-sm pl-space-xs"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-[0_0_12px_rgba(24,199,122,0.35)]"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="w-full pt-20 min-h-screen bg-canvas-deep"><div class="flex flex-col w-full">
+    <div class="max-w-[1440px] w-full mx-auto px-margin-mobile lg:px-margin py-space-xl space-y-space-xl">
+    <!-- Top Telemetry & Header Section -->
+    <div class="flex flex-col gap-space-md">
+    
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-space-md">
+    <div>
+    <h1 class="font-display text-display lg:text-[4rem] text-editorial-sage-light tracking-tight leading-none">
+                자산 궤적 가상 시뮬레이터
+              </h1>
+    <p class="font-body-md text-body-md text-on-surface-variant mt-2 max-w-2xl">
+                가계 지출 구조와 금융 시장 변동성을 정밀 확률 모델에 대입하여 부채 소멸 곡선과 자산 형성점(Golden Cross)을 오차범위 1.6% 내에서 실시간 산출합니다.
+              </p>
+    </div>
+    <div class="flex items-center gap-2 self-start lg:self-auto bg-surface-charcoal p-1.5 rounded-full shadow-inner">
+    <button class="scenario-timeline-tab px-4 py-2 rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface transition-all" type="button">3개월</button>
+    <button class="scenario-timeline-tab px-4 py-2 rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface transition-all" type="button">6개월</button>
+    <button class="scenario-timeline-tab px-4 py-2 rounded-full font-label-numeric text-label-numeric bg-primary-container text-on-primary-container font-bold shadow-sm" type="button">1년 (Active)</button>
+    <button class="scenario-timeline-tab px-4 py-2 rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface transition-all" type="button">3년</button>
+    </div>
+    </div>
+    <!-- Natural Language What-if Interactive Pill Input -->
+    <div class="w-full bg-surface-charcoal border border-border-hairline/80 p-2 rounded-2xl flex flex-col md:flex-row items-center gap-2 shadow-lg"><div class="flex items-center gap-3 w-full px-4 py-2.5 bg-surface-architectural/80 rounded-xl"><span class="material-symbols-outlined text-outline text-[20px]">neurology</span><input class="w-full bg-transparent font-body-md text-editorial-sage-light placeholder-outline focus:outline-none" id="simulationQueryInput" placeholder="가정할 지출 변화나 금리 시나리오를 자유롭게 입력하세요..." type="text" value="배달비를 월 10만원 줄이고 적금에 넣으면?"><button class="text-outline hover:text-editorial-sage-light transition-colors p-1" id="clearInputBtn" type="button" title="입력 초기화"><span class="material-symbols-outlined text-[18px]">close</span></button></div><button class="w-full md:w-auto shrink-0 px-6 py-3.5 bg-primary text-on-primary rounded-xl font-headline-sm text-[15px] font-bold flex items-center justify-center gap-2 shadow-sm hover:bg-primary-container transition-all" id="runSimulationBtn" type="button"><span class="material-symbols-outlined text-[18px]">bolt</span><span class="">시뮬레이션 가동</span></button></div>
+    <!-- Quick recommendation chips -->
+    <div class="flex flex-wrap items-center gap-2 pt-1"><span class="font-label-caps text-label-caps text-outline uppercase tracking-wider mr-1">추천 가상 변수:</span><button class="quick-chip px-3.5 py-1.5 rounded-full bg-surface-charcoal hover:bg-surface-container-high border border-border-hairline text-editorial-sage-muted font-body-sm transition-all hover:text-primary" data-val="배달비 월 10만 절감 후 적금 불입" type="button">배달비 월 10만 절감</button><button class="quick-chip px-3.5 py-1.5 rounded-full bg-surface-charcoal hover:bg-surface-container-high border border-border-hairline text-editorial-sage-muted font-body-sm transition-all hover:text-primary" data-val="기준금리 0.5% 인상 시 상환부담" type="button">기준금리 0.5% 인상</button><button class="quick-chip px-3.5 py-1.5 rounded-full bg-surface-charcoal hover:bg-surface-container-high border border-border-hairline text-editorial-sage-muted font-body-sm transition-all hover:text-primary" data-val="보너스 500만원 대출 원금 조기 상환" type="button">보너스 500만원 조기 상환</button><button class="quick-chip px-3.5 py-1.5 rounded-full bg-surface-charcoal hover:bg-surface-container-high border border-border-hairline text-editorial-sage-muted font-body-sm transition-all hover:text-primary" data-val="고정 생활비 15% 감축 루프 실행" type="button">생활비 15% 감축 루프</button></div>
+    </div>
+    <!-- The Golden Cross Hero Visual Chart Section -->
+    <div class="w-full bg-surface-architectural rounded-2xl p-space-lg lg:p-space-xl shadow-2xl relative overflow-hidden flex flex-col gap-space-lg border border-border-hairline"><div class="absolute -right-24 -top-24 w-96 h-96 rounded-full bg-primary/5 blur-3xl pointer-events-none"></div><div class="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-signal-risk/5 blur-3xl pointer-events-none"></div><div class="flex flex-col md:flex-row md:items-center justify-between gap-space-md z-10"><div class="flex items-center gap-space-md"><div class="w-12 h-12 rounded-xl bg-surface-charcoal border border-border-hairline flex items-center justify-center text-primary shadow-inner"><span class="material-symbols-outlined text-[28px]">insights</span></div><div><div class="flex items-center gap-2"><span class="font-headline-md text-headline-md text-editorial-sage-light tracking-tight">자산-부채 역전 궤적 다이어그램</span></div><p class="font-body-sm text-body-sm text-on-surface-variant">골든 크로스(자산 총액이 잔여 부채를 상회하는 역전점) 실시간 확률 몬테카를로 궤적</p></div></div><div class="flex flex-wrap items-center gap-space-md bg-surface-charcoal/80 border border-border-hairline px-4 py-2 rounded-xl"><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-signal-positive shadow-[0_0_8px_#18C77A]"></span><span class="font-label-numeric text-label-numeric text-editorial-sage-muted">총자산 궤적</span></div><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-signal-risk shadow-[0_0_8px_#FF5C4D]"></span><span class="font-label-numeric text-label-numeric text-editorial-sage-muted">잔여 부채</span></div><div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-signal-advisory shadow-[0_0_8px_#F5A623]"></span><span class="font-label-numeric text-label-numeric text-signal-advisory font-semibold">골든 크로스 예측점</span></div></div></div><div class="relative w-full h-[380px] lg:h-[440px] bg-surface-charcoal/90 rounded-xl p-4 flex flex-col justify-between z-10 shadow-inner border border-border-hairline/60"><svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 1000 400"><defs><linearGradient id="assetGlow" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#18C77A" stop-opacity="0.30"></stop><stop offset="100%" stop-color="#18C77A" stop-opacity="0.0"></stop></linearGradient><linearGradient id="debtGlow" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#FF5C4D" stop-opacity="0.15"></stop><stop offset="100%" stop-color="#FF5C4D" stop-opacity="0.0"></stop></linearGradient><filter height="120%" id="shadowFilter" width="120%" x="-10%" y="-10%"><feDropShadow dx="0" dy="2" flood-color="#18C77A" flood-opacity="0.6" stdDeviation="4"></feDropShadow></filter><filter height="120%" id="debtShadow" width="120%" x="-10%" y="-10%"><feDropShadow dx="0" dy="2" flood-color="#FF5C4D" flood-opacity="0.5" stdDeviation="3"></feDropShadow></filter></defs><line opacity="0.25" stroke="#303633" stroke-dasharray="4 4" stroke-width="1" x1="60" x2="960" y1="60" y2="60"></line><line opacity="0.25" stroke="#303633" stroke-dasharray="4 4" stroke-width="1" x1="60" x2="960" y1="140" y2="140"></line><line opacity="0.25" stroke="#303633" stroke-dasharray="4 4" stroke-width="1" x1="60" x2="960" y1="220" y2="220"></line><line opacity="0.25" stroke="#303633" stroke-dasharray="4 4" stroke-width="1" x1="60" x2="960" y1="300" y2="300"></line><line opacity="0.85" stroke="#F5A623" stroke-dasharray="6 4" stroke-width="2" x1="580" x2="580" y1="30" y2="350"></line><path d="M 60,320 C 220,310 400,270 580,200 C 740,140 860,100 960,65 L 960,360 L 60,360 Z" fill="url(#assetGlow)"></path><path d="M 60,80 C 240,110 420,150 580,200 C 720,240 840,280 960,320 L 960,360 L 60,360 Z" fill="url(#debtGlow)"></path><path d="M 60,80 C 240,110 420,150 580,200 C 720,240 840,280 960,320" fill="none" filter="url(#debtShadow)" stroke="#FF5C4D" stroke-width="3.5"></path><path d="M 60,320 C 220,310 400,270 580,200 C 740,140 860,100 960,65" fill="none" filter="url(#shadowFilter)" stroke="#18C77A" stroke-width="4"></path><path d="M 60,320 C 260,315 500,290 680,240 C 800,200 890,165 960,130" fill="none" opacity="0.4" stroke="#869488" stroke-dasharray="3 3" stroke-width="2"></path><circle cx="60" cy="80" fill="#FF5C4D" r="5"></circle><circle cx="60" cy="320" fill="#18C77A" r="5"></circle><circle cx="960" cy="320" fill="#FF5C4D" r="5"></circle><circle cx="960" cy="65" fill="#18C77A" r="6"></circle><circle cx="580" cy="200" fill="#F5A623" opacity="0.25" r="18"><animate attributeName="r" dur="2.4s" repeatCount="indefinite" values="12;22;12"></animate><animate attributeName="opacity" dur="2.4s" repeatCount="indefinite" values="0.35;0.1;0.35"></animate></circle><circle cx="580" cy="200" fill="#0B110E" r="8" stroke="#F5A623" stroke-width="3"></circle><circle cx="580" cy="200" fill="#18C77A" r="3.5"></circle></svg><div class="absolute left-1/2 md:left-[58%] top-14 -translate-x-1/2 bg-surface-container/95 backdrop-blur-md px-4 py-3 rounded-xl border border-signal-advisory/30 shadow-2xl flex items-center gap-3 pointer-events-none"><div class="w-9 h-9 rounded-lg bg-signal-advisory-subtle flex items-center justify-center text-signal-advisory"><span class="material-symbols-outlined text-[22px]">stars</span></div><div><div class="flex items-center gap-1.5"><span class="font-label-caps text-label-caps text-signal-advisory font-bold uppercase">골든 크로스 변곡점</span><span class="px-1.5 py-0.2 rounded bg-signal-positive text-on-primary font-label-caps text-[9px] font-bold">2개월 단축</span></div><p class="font-headline-sm text-headline-sm text-editorial-sage-light font-bold mt-0.5">2024년 8월 예측 (₩26,840,000)</p></div></div><div class="flex items-center justify-between text-outline font-label-numeric text-label-numeric px-4 pt-2 border-t border-surface-bright/20"><span class="">2024.01 (기저)</span><span class="">2024.04 (Q1)</span><span class="text-signal-advisory font-bold">2024.08 (Golden Cross)</span><span class="">2024.10 (Q3)</span><span class="text-editorial-sage-light">2024.12 (1년 완료)</span></div></div><div class="grid grid-cols-1 md:grid-cols-3 gap-space-md"><div class="bg-surface-charcoal/80 border border-border-hairline p-4 rounded-xl flex items-center justify-between shadow-sm"><div><span class="font-label-caps text-label-caps text-on-surface-variant uppercase">현재 잔여 부채</span><div class="font-display-mobile text-display-mobile text-signal-risk tracking-tight mt-1">₩38,400,000</div></div><span class="material-symbols-outlined text-signal-risk text-[32px] opacity-60">trending_down</span></div><div class="bg-surface-charcoal/80 border border-border-hairline p-4 rounded-xl flex items-center justify-between shadow-sm"><div><span class="font-label-caps text-label-caps text-on-surface-variant uppercase">1년 후 예상 총자산</span><div class="font-display-mobile text-display-mobile text-primary tracking-tight mt-1">₩43,150,000</div></div><span class="material-symbols-outlined text-primary text-[32px] opacity-60">trending_up</span></div><div class="bg-surface-charcoal/80 border border-border-hairline p-4 rounded-xl flex items-center justify-between shadow-sm"><div><span class="font-label-caps text-label-caps text-on-surface-variant uppercase">순자산 순증 가속도</span><div class="font-display-mobile text-display-mobile text-editorial-sage-light tracking-tight mt-1">+₩14,750,000</div></div><div class="px-2 py-1 rounded bg-signal-positive-subtle text-signal-positive font-label-numeric text-label-numeric font-bold">+34.2% YoY</div></div></div></div>
+    <!-- Scenario Matrix Comparison (4 Tactile Bento Cards) -->
+    <div class="flex flex-col gap-space-md">
+    <div class="flex items-end justify-between">
+    <div>
+    <span class="font-label-caps text-label-caps text-primary uppercase tracking-wider">SCENARIO MATRIX SELECTION</span>
+    <h2 class="font-headline-md text-headline-md text-editorial-sage-light tracking-tight">
+                가상 시나리오별 1년 재무 지표 비교
+              </h2>
+    </div>
+    <span class="font-body-sm text-body-sm text-outline hidden md:block">카드 클릭 시 해당 시나리오 파라미터가 실시간 주입됩니다</span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-space-md"><div class="scenario-card active cursor-pointer bg-surface-architectural p-6 rounded-2xl shadow-lg border-2 border-primary flex flex-col justify-between relative transition-all duration-300 hover:-translate-y-0.5"><div class="flex items-center justify-between mb-4"><span class="font-label-caps text-label-caps text-primary font-bold uppercase tracking-wider">선택된 시나리오</span><span class="material-symbols-outlined text-primary text-[22px]">check_circle</span></div><div><h3 class="font-headline-sm text-headline-sm text-editorial-sage-light font-bold">월 10만원 절감 적금</h3><p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">외식/배달비 삭감액을 연 4.2% 청년적금에 전액 자동 납입</p></div><div class="mt-6 pt-4 border-t border-surface-bright/20 space-y-2"><div class="flex justify-between items-center text-body-sm"><span class="text-outline">순자산 추가 창출</span><span class="font-label-numeric text-label-numeric text-signal-positive font-bold">+122.7만 원 / 1년</span></div><div class="flex justify-between items-center text-body-sm"><span class="text-outline">골든 크로스</span><span class="font-label-numeric text-label-numeric text-editorial-sage-light">2024.08 (2개월 단축)</span></div></div></div><div class="scenario-card cursor-pointer bg-surface-charcoal/80 border border-border-hairline p-6 rounded-2xl shadow-sm flex flex-col justify-between relative transition-all duration-300 hover:bg-surface-architectural hover:-translate-y-0.5"><div class="flex items-center justify-between mb-4"><span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">베이스라인</span><span class="material-symbols-outlined text-outline text-[20px]">radio_button_unchecked</span></div><div><h3 class="font-headline-sm text-headline-sm text-editorial-sage-light">현재 상태 유지</h3><p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">지출 구조 변동 없이 기존 원리금 균등 상환 루틴 유지</p></div><div class="mt-6 pt-4 border-t border-surface-bright/20 space-y-2"><div class="flex justify-between items-center text-body-sm"><span class="text-outline">순자산 추가 창출</span><span class="font-label-numeric text-label-numeric text-editorial-sage-muted">0원 (기준점)</span></div><div class="flex justify-between items-center text-body-sm"><span class="text-outline">골든 크로스</span><span class="font-label-numeric text-label-numeric text-editorial-sage-light">2024.11</span></div></div></div><div class="scenario-card cursor-pointer bg-surface-charcoal/80 border border-border-hairline p-6 rounded-2xl shadow-sm flex flex-col justify-between relative transition-all duration-300 hover:bg-surface-architectural hover:-translate-y-0.5"><div class="flex items-center justify-between mb-4"><span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">원금 집중 상환</span><span class="material-symbols-outlined text-outline text-[20px]">radio_button_unchecked</span></div><div><h3 class="font-headline-sm text-headline-sm text-editorial-sage-light">월 10만원 추가 상환</h3><p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">금리 5.8% 고금리 신용대출 2순위 계좌에 즉시 추가 납입</p></div><div class="mt-6 pt-4 border-t border-surface-bright/20 space-y-2"><div class="flex justify-between items-center text-body-sm"><span class="text-outline">누적 이자 절감</span><span class="font-label-numeric text-label-numeric text-editorial-sage-light font-bold">-18.4만 원</span></div><div class="flex justify-between items-center text-body-sm"><span class="text-outline">완납 시점</span><span class="font-label-numeric text-label-numeric text-editorial-sage-light">3.4개월 조기 완납</span></div></div></div><div class="scenario-card cursor-pointer bg-surface-charcoal/80 border border-border-hairline p-6 rounded-2xl shadow-sm flex flex-col justify-between relative transition-all duration-300 hover:bg-surface-architectural hover:-translate-y-0.5"><div class="flex items-center justify-between mb-4"><span class="font-label-caps text-label-caps text-signal-risk uppercase tracking-wider">스트레스 테스트</span><span class="material-symbols-outlined text-outline text-[20px]">radio_button_unchecked</span></div><div><h3 class="font-headline-sm text-headline-sm text-editorial-sage-light">기준금리 +1.0% 충격</h3><p class="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">변동금리 대출 잔액에 한은 추가 빅스텝 인상 시나리오 적용</p></div><div class="mt-6 pt-4 border-t border-surface-bright/20 space-y-2"><div class="flex justify-between items-center text-body-sm"><span class="text-outline">월 추가 이자 부담</span><span class="font-label-numeric text-label-numeric text-signal-risk font-bold">+4.2만 원 / 월</span></div><div class="flex justify-between items-center text-body-sm"><span class="text-outline">골든 크로스</span><span class="font-label-numeric text-label-numeric text-signal-risk">2025.02 (3개월 지연)</span></div></div></div></div>
+    </div>
+    <!-- AI Optimization Action & Execution Module -->
+    <div class="w-full bg-surface-architectural/90 border border-border-hairline p-space-lg lg:p-space-xl rounded-2xl shadow-xl flex flex-col lg:flex-row items-center justify-between gap-space-xl">
+      <!-- Left: Radial Visual Progress & Insights -->
+      <div class="flex flex-col sm:flex-row items-center gap-space-lg w-full lg:w-auto">
+        <!-- SVG Radial Progress Ring (68%) -->
+        <div class="relative w-28 h-28 shrink-0 flex items-center justify-center">
+          <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" fill="none" r="50" stroke="#252b28" stroke-width="10"></circle>
+            <circle cx="60" cy="60" fill="none" r="50" stroke="#18C77A" stroke-dasharray="314.159" stroke-dashoffset="100.5" stroke-linecap="round" stroke-width="10"></circle>
+          </svg>
+          <div class="absolute flex flex-col items-center justify-center">
+            <span class="font-headline-md text-headline-md text-editorial-sage-light leading-none">68<span class="text-headline-sm text-primary">%</span></span>
+            <span class="font-label-caps text-[10px] text-outline uppercase tracking-wider mt-0.5">목표 진척도</span>
+          </div>
+        </div>
+        <div class="space-y-1 text-center sm:text-left">
+          <div class="font-label-caps text-label-caps text-primary uppercase tracking-wider font-semibold">
+            최적화 제언
+          </div>
+          <h4 class="font-headline-md text-headline-md text-editorial-sage-light">
+            1년 후 순자산 +120만 원 격차 생성
+          </h4>
+          <p class="font-body-md text-body-md text-on-surface-variant max-w-xl">
+            선택된 파이프라인 적용 시 부채 소멸 시점이 2개월 조기 달성되며, 절감된 누적 이자액 14.8만 원이 복리 자산 계좌로 재환류됩니다.
+          </p>
+        </div>
+      </div>
+      <!-- Right: Action CTA Dock -->
+      <div class="flex flex-col sm:flex-row items-center gap-space-md w-full lg:w-auto shrink-0">
+        <a class="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-surface-charcoal hover:bg-surface-container-high border border-border-hairline text-editorial-sage-light font-headline-sm text-[15px] flex items-center justify-center gap-2 transition-all" href="#" id="exportCsvBtn">
+          <span class="material-symbols-outlined text-[18px]">download</span>
+          <span class="">CSV 추출</span>
+        </a>
+        <button class="w-full sm:w-auto px-7 py-3.5 bg-primary text-on-primary rounded-xl font-headline-sm text-[15px] font-bold flex items-center justify-center gap-2 shadow-sm hover:bg-primary-container transition-all" id="applyPlanBtn" type="button">
+          <span class="">이 계획으로 자동이체 설정하기</span>
+          <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+    </div>
+    </div>
+    <script>
+      (function() {
+        // Quick recommendation chips behavior
+        const queryInput = document.getElementById('simulationQueryInput');
+        const clearBtn = document.getElementById('clearInputBtn');
+        const runBtn = document.getElementById('runSimulationBtn');
+        const chips = document.querySelectorAll('.quick-chip');
+        const scenarioCards = document.querySelectorAll('.scenario-card');
+        const timelineTabs = document.querySelectorAll('.scenario-timeline-tab');
+    
+        // Quick chip click
+        chips.forEach(chip => {
+          chip.addEventListener('click', () => {
+            const val = chip.getAttribute('data-val');
+            if (queryInput && val) {
+              queryInput.value = val;
+              queryInput.focus();
+            }
+          });
+        });
+    
+        // Clear input
+        if (clearBtn && queryInput) {
+          clearBtn.addEventListener('click', () => {
+            queryInput.value = '';
+            queryInput.focus();
+          });
+        }
+    
+        // Run trigger animation feedback
+        if (runBtn) {
+          runBtn.addEventListener('click', () => {
+            const originalText = runBtn.innerHTML;
+            runBtn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span><span>연산 중...</span>';
+            runBtn.disabled = true;
+            setTimeout(() => {
+              runBtn.innerHTML = originalText;
+              runBtn.disabled = false;
+            }, 650);
+          });
+        }
+    
+        // Scenario card selection switch
+        scenarioCards.forEach(card => {
+          card.addEventListener('click', () => {
+            scenarioCards.forEach(c => {
+              c.classList.remove('active', 'ring-2', 'ring-primary');
+              const badge = c.querySelector('.material-symbols-outlined');
+              if (badge && !c.classList.contains('active')) {
+                badge.innerText = 'radio_button_unchecked';
+                badge.classList.add('text-outline');
+                badge.classList.remove('text-primary');
+              }
+            });
+    
+            card.classList.add('active', 'ring-2', 'ring-primary');
+            const activeBadge = card.querySelector('.material-symbols-outlined');
+            if (activeBadge) {
+              activeBadge.innerText = 'check_circle';
+              activeBadge.classList.remove('text-outline');
+              activeBadge.classList.add('text-primary');
+            }
+          });
+        });
+    
+        // Timeline toggles
+        timelineTabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            timelineTabs.forEach(t => {
+              t.className = 'scenario-timeline-tab px-4 py-2 rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface transition-all';
+            });
+            tab.className = 'scenario-timeline-tab px-4 py-2 rounded-full font-label-numeric text-label-numeric bg-primary-container text-on-primary-container font-bold shadow-sm';
+          });
+        });
+    
+        // Setup action plan button feedback
+        const applyPlanBtn = document.getElementById('applyPlanBtn');
+        if (applyPlanBtn) {
+          applyPlanBtn.addEventListener('click', () => {
+            applyPlanBtn.innerHTML = '<span class="material-symbols-outlined text-[22px]">task_alt</span><span>자동이체 엔진에 연동됨!</span>';
+            setTimeout(() => {
+              applyPlanBtn.innerHTML = '<span>이 계획으로 자동이체 설정하기</span><span class="material-symbols-outlined text-[22px]">arrow_forward</span>';
+            }, 2200);
+          });
+        }
+      })();
+    </script></main><footer class="w-full bg-surface-charcoal border-t border-border-hairline mt-space-2xl"><div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin py-space-2xl"><div class="grid grid-cols-1 md:grid-cols-4 gap-space-xl mb-space-xl"><div class="md:col-span-2 flex flex-col gap-space-sm"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[20px]">verified_user</span><span class="font-headline-sm text-headline-sm text-editorial-sage-light">KINETIC CAPITAL LABS</span></div><p class="font-body-sm text-body-sm text-on-surface-variant max-w-lg leading-relaxed">자산 형성, 부채 상환 시나리오 및 현금흐름 궤적을 연산하는 실시간 퀀트 AI 재무 의사결정 인터페이스입니다. 최상위 텔레메트리 연산 엔진을 통해 예측 불확실성을 선제적으로 제거합니다.</p><div class="flex items-center gap-3 font-label-caps text-label-caps text-outline"><span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-signal-positive">lock</span>256-BIT QUANT TELEMETRY</span><span class="">•</span><span class="">NODE: SEOUL-EDGE-01</span></div></div><div class="flex flex-col gap-space-xs"><span class="font-label-caps text-label-caps text-editorial-sage-light tracking-wider uppercase mb-1">재무 모듈</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="main-dashboard" href="#">실시간 대시보드</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="debt-analysis" href="#">부채 상환 시나리오</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="financial-simulation" href="#">자산 궤적 시뮬레이터</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="ai-financial-report" href="#">심층 진단 보고서</a></div><div class="flex flex-col gap-space-xs"><span class="font-label-caps text-label-caps text-editorial-sage-light tracking-wider uppercase mb-1">보안 및 규제 준수</span><span class="font-body-sm text-body-sm text-on-surface-variant">ISO/IEC 27001 인증 준수</span><span class="font-body-sm text-body-sm text-on-surface-variant">금융보안원 클라우드 적격성 평가</span><span class="font-body-sm text-body-sm text-on-surface-variant">개인신용정보 보호 아키텍처</span><div class="mt-2 pt-2 border-t border-border-subtle"><a class="font-label-numeric text-label-numeric text-secondary hover:text-primary transition-colors inline-flex items-center gap-1" data-path="login" href="#">인증 콘솔 재접속 <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a></div></div></div><div class="pt-space-md border-t border-border-subtle flex flex-col sm:flex-row items-center justify-between gap-space-sm font-label-caps text-label-caps text-outline"><p class="">© 2025 KINETIC CAPITAL SYSTEMS INC. ALL QUANT RIGHTS RESERVED.</p><div class="flex items-center gap-space-md"><span class="hover:text-on-surface cursor-pointer">개인정보처리방침</span><span class="hover:text-on-surface cursor-pointer">이용약관</span><span class="hover:text-on-surface cursor-pointer">위험고지서</span></div></div></div></footer>
+    
+    </body></html>

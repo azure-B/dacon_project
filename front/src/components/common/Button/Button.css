@@ -1,11 +1,12 @@
 .btn {
   padding: 0.5rem 1.25rem;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-DEFAULT);
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s, opacity 0.2s;
+  transition: background-color var(--ease-tactile), opacity var(--ease-tactile), transform var(--ease-tactile),
+    box-shadow var(--ease-tactile);
 }
 
 .btn:disabled {
@@ -14,20 +15,35 @@
 }
 
 .btn--primary {
-  background-color: #646cff;
-  color: #fff;
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
 }
 
 .btn--primary:hover:not(:disabled) {
-  background-color: #535bf2;
+  background-color: var(--color-primary-container);
 }
 
 .btn--secondary {
   background-color: transparent;
-  color: #646cff;
-  border: 1px solid #646cff;
+  color: var(--color-primary);
+  border: 1px solid var(--color-border-hairline);
 }
 
 .btn--secondary:hover:not(:disabled) {
-  background-color: rgba(100, 108, 255, 0.1);
+  background-color: var(--color-signal-positive-subtle);
+}
+
+.btn-press:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .btn-press {
+    transition: none;
+  }
+
+  .btn-press:active:not(:disabled) {
+    transform: none;
+  }
 }

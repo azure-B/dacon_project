@@ -1,424 +1,460 @@
-<!DOCTYPE html>
-
-<html lang="ko"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>부채 분석 및 지출 내역</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "on-secondary-fixed": "#001c38",
-                      "secondary-container": "#7db6ff",
-                      "tertiary-fixed": "#6ffbbe",
-                      "on-error-container": "#93000a",
-                      "surface-variant": "#d3e4fe",
-                      "on-secondary-container": "#00477f",
-                      "surface-tint": "#455f88",
-                      "surface-bright": "#f8f9ff",
-                      "on-secondary-fixed-variant": "#004881",
-                      "tertiary-container": "#003e28",
-                      "surface": "#f8f9ff",
-                      "on-tertiary": "#ffffff",
-                      "tertiary": "#002617",
-                      "secondary-fixed": "#d3e4ff",
-                      "secondary-fixed-dim": "#a2c9ff",
-                      "primary-fixed-dim": "#adc7f7",
-                      "error-container": "#ffdad6",
-                      "surface-container-high": "#dce9ff",
-                      "inverse-on-surface": "#eaf1ff",
-                      "primary-container": "#1a365d",
-                      "on-secondary": "#ffffff",
-                      "surface-container-low": "#eff4ff",
-                      "error": "#ba1a1a",
-                      "secondary": "#1960a3",
-                      "outline-variant": "#c4c6cf",
-                      "on-primary-container": "#86a0cd",
-                      "tertiary-fixed-dim": "#4edea3",
-                      "on-tertiary-container": "#00b47d",
-                      "on-background": "#0b1c30",
-                      "background": "#f8f9ff",
-                      "primary-fixed": "#d6e3ff",
-                      "on-primary-fixed": "#001b3c",
-                      "on-surface": "#0b1c30",
-                      "primary": "#002045",
-                      "on-tertiary-fixed": "#002113",
-                      "surface-dim": "#cbdbf5",
-                      "surface-container": "#e5eeff",
-                      "on-primary": "#ffffff",
-                      "inverse-primary": "#adc7f7",
-                      "on-surface-variant": "#43474e",
-                      "inverse-surface": "#213145",
-                      "on-primary-fixed-variant": "#2d476f",
-                      "on-tertiary-fixed-variant": "#005236",
-                      "surface-container-lowest": "#ffffff",
-                      "surface-container-highest": "#d3e4fe",
-                      "outline": "#74777f",
-                      "on-error": "#ffffff"
-              },
-              "borderRadius": {
-                      "DEFAULT": "0.125rem",
-                      "lg": "0.25rem",
-                      "xl": "0.5rem",
-                      "full": "0.75rem"
-              },
-              "spacing": {
-                      "gutter": "24px",
-                      "unit": "4px",
-                      "container-max": "1280px",
-                      "xs": "4px",
-                      "sm": "8px",
-                      "md": "16px",
-                      "margin-desktop": "64px",
-                      "margin-mobile": "16px",
-                      "xl": "48px",
-                      "lg": "24px"
-              },
-              "fontFamily": {
-                      "label-sm": [
-                              "Inter", "Noto Sans KR", "sans-serif"
-                      ],
-                      "headline-sm": [
-                              "Inter", "Noto Sans KR", "sans-serif"
-                      ],
-                      "body-md": [
-                              "Noto Sans KR", "sans-serif"
-                      ],
-                      "label-md": [
-                              "Inter", "Noto Sans KR", "sans-serif"
-                      ],
-                      "body-sm": [
-                              "Noto Sans KR", "sans-serif"
-                      ],
-                      "headline-md": [
-                              "Inter", "Noto Sans KR", "sans-serif"
-                      ],
-                      "body-lg": [
-                              "Noto Sans KR", "sans-serif"
-                      ],
-                      "headline-lg-mobile": [
-                              "Inter", "Noto Sans KR", "sans-serif"
-                      ],
-                      "headline-lg": [
-                              "Inter", "Noto Sans KR", "sans-serif"
-                      ],
-                      "display-lg": [
-                              "Inter", "Noto Sans KR", "sans-serif"
-                      ]
-              },
-              "fontSize": {
-                      "label-sm": [
-                              "12px",
-                              {
-                                      "lineHeight": "1",
-                                      "letterSpacing": "0.03em",
-                                      "fontWeight": "500"
-                              }
-                      ],
-                      "headline-sm": [
-                              "20px",
-                              {
-                                      "lineHeight": "1.4",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "body-md": [
-                              "16px",
-                              {
-                                      "lineHeight": "1.6",
-                                      "fontWeight": "400"
-                              }
-                      ],
-                      "label-md": [
-                              "14px",
-                              {
-                                      "lineHeight": "1",
-                                      "letterSpacing": "0.02em",
-                                      "fontWeight": "500"
-                              }
-                      ],
-                      "body-sm": [
-                              "14px",
-                              {
-                                      "lineHeight": "1.5",
-                                      "fontWeight": "400"
-                              }
-                      ],
-                      "headline-md": [
-                              "24px",
-                              {
-                                      "lineHeight": "1.4",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "body-lg": [
-                              "18px",
-                              {
-                                      "lineHeight": "1.6",
-                                      "fontWeight": "400"
-                              }
-                      ],
-                      "headline-lg-mobile": [
-                              "28px",
-                              {
-                                      "lineHeight": "1.3",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "headline-lg": [
-                              "32px",
-                              {
-                                      "lineHeight": "1.3",
-                                      "letterSpacing": "-0.01em",
-                                      "fontWeight": "600"
-                              }
-                      ],
-                      "display-lg": [
-                              "48px",
-                              {
-                                      "lineHeight": "1.2",
-                                      "letterSpacing": "-0.02em",
-                                      "fontWeight": "700"
-                              }
-                      ]
+<!DOCTYPE html><html class="dark" lang="ko"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><title>AI 재무 인터렉티브</title><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+            darkMode: "class",
+            theme: {
+              extend: {
+                "colors": {
+                  "secondary-fixed-dim": "#4edea3",
+                  "on-error-container": "#ffdad6",
+                  "signal-positive-subtle": "rgba(24, 199, 122, 0.14)",
+                  "surface-container-high": "#252b28",
+                  "inverse-on-surface": "#2c322e",
+                  "on-primary": "#00391f",
+                  "surface-card-frosted": "rgba(20, 30, 25, 0.65)",
+                  "tertiary-fixed-dim": "#00e559",
+                  "on-primary-fixed": "#002110",
+                  "inverse-primary": "#006d3f",
+                  "outline-variant": "#3c4a40",
+                  "on-tertiary-fixed-variant": "#00531b",
+                  "surface-charcoal": "#0E1612",
+                  "signal-advisory": "#F5A623",
+                  "error-container": "#93000a",
+                  "signal-positive": "#18C77A",
+                  "on-surface-variant": "#bbcabd",
+                  "tertiary-container": "#00c94d",
+                  "surface-bright": "#343b37",
+                  "border-subtle": "rgba(255, 255, 255, 0.08)",
+                  "surface-container-low": "#171d1a",
+                  "on-tertiary-container": "#004d18",
+                  "primary-fixed": "#66feaa",
+                  "on-primary-container": "#004c2b",
+                  "secondary-fixed": "#6ffbbe",
+                  "surface-tint": "#43e090",
+                  "signal-risk-subtle": "rgba(255, 92, 77, 0.12)",
+                  "on-secondary-fixed-variant": "#005236",
+                  "background": "#0f1512",
+                  "surface-architectural": "#141E19",
+                  "signal-advisory-subtle": "rgba(245, 166, 35, 0.12)",
+                  "secondary-container": "#00a572",
+                  "on-primary-fixed-variant": "#00522f",
+                  "editorial-sage-light": "#E2E8E2",
+                  "on-background": "#dee4de",
+                  "primary-container": "#18c77a",
+                  "on-error": "#690005",
+                  "inverse-surface": "#dee4de",
+                  "outline": "#869488",
+                  "surface-container": "#1b211e",
+                  "primary": "#48e493",
+                  "on-secondary-fixed": "#002113",
+                  "tertiary": "#0ce85b",
+                  "on-tertiary-fixed": "#002106",
+                  "surface-dim": "#0f1512",
+                  "canvas-deep": "#0B110E",
+                  "border-hairline": "rgba(16, 185, 129, 0.15)",
+                  "surface-variant": "#303633",
+                  "secondary": "#4edea3",
+                  "signal-risk": "#FF5C4D",
+                  "tertiary-fixed": "#6cff82",
+                  "on-tertiary": "#003910",
+                  "error": "#ffb4ab",
+                  "on-surface": "#dee4de",
+                  "primary-fixed-dim": "#43e090",
+                  "surface-container-lowest": "#090f0c",
+                  "on-secondary": "#003824",
+                  "surface": "#0f1512",
+                  "surface-container-highest": "#303633",
+                  "editorial-sage-muted": "#D8E0D8",
+                  "on-secondary-container": "#00311f"
+                },
+                "borderRadius": {
+                  "DEFAULT": "1rem",
+                  "lg": "2rem",
+                  "xl": "3rem",
+                  "full": "9999px"
+                },
+                "spacing": {
+                  "space-lg": "1.5rem",
+                  "space-xl": "2rem",
+                  "gutter": "1.5rem",
+                  "margin-mobile": "1.25rem",
+                  "space-2xl": "3rem",
+                  "space-xs": "0.25rem",
+                  "margin": "3rem",
+                  "space-md": "1rem",
+                  "gutter-mobile": "1rem",
+                  "space-sm": "0.5rem"
+                },
+                "fontFamily": {
+                  "headline-lg-mobile": ["Space Grotesk"],
+                  "display-mobile": ["Space Grotesk"],
+                  "body-sm": ["Geist"],
+                  "label-caps": ["Space Grotesk"],
+                  "label-numeric": ["Space Grotesk"],
+                  "headline-sm": ["Space Grotesk"],
+                  "display": ["Space Grotesk"],
+                  "body-md": ["Geist"],
+                  "body-lg": ["Geist"],
+                  "headline-md": ["Space Grotesk"],
+                  "headline-lg": ["Space Grotesk"]
+                },
+                "fontSize": {
+                  "headline-lg-mobile": ["1.875rem", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                  "display-mobile": ["2.5rem", {"lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "700"}],
+                  "body-sm": ["0.8125rem", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+                  "label-caps": ["0.6875rem", {"lineHeight": "1", "letterSpacing": "0.08em", "fontWeight": "700"}],
+                  "label-numeric": ["0.875rem", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                  "headline-sm": ["1.25rem", {"lineHeight": "1.35", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                  "display": ["3.75rem", {"lineHeight": "1.05", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                  "body-md": ["0.9375rem", {"lineHeight": "1.55", "letterSpacing": "-0.005em", "fontWeight": "400"}],
+                  "body-lg": ["1.125rem", {"lineHeight": "1.6", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                  "headline-md": ["1.75rem", {"lineHeight": "1.25", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                  "headline-lg": ["2.5rem", {"lineHeight": "1.15", "letterSpacing": "-0.03em", "fontWeight": "700"}]
+                }
               }
-      },
-          },
-        }
-      </script>
-<style>
-          body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
-          .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-          .card-shadow { box-shadow: 0px 2px 4px rgba(0,0,0,0.05); }
-          .card-hover-shadow:hover { box-shadow: 0px 10px 15px rgba(0,0,0,0.08); transform: translateY(-2px); transition: all 0.3s ease; }
-      </style>
-</head>
-<body class="flex flex-col min-h-screen">
-<!-- Top Navigation Bar -->
-<nav class="sticky top-0 z-50 flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop bg-surface border-b border-outline-variant h-16 shadow-sm">
-<div class="flex items-center gap-md">
-<span class="text-headline-md font-headline-md font-bold text-primary">AI 재무 인터렉티브</span>
-<div class="hidden md:flex gap-md ml-xl">
-<a class="text-on-surface-variant font-label-md text-label-md hover:text-secondary transition-colors" href="#">대시보드</a>
-<a class="text-secondary font-label-md text-label-md font-bold border-b-2 border-secondary pb-1 opacity-80 transition-opacity" href="#">부채 분석</a>
-<a class="text-on-surface-variant font-label-md text-label-md hover:text-secondary transition-colors" href="#">시뮬레이션</a>
-<a class="text-on-surface-variant font-label-md text-label-md hover:text-secondary transition-colors" href="#">AI 피드백</a>
-</div>
-</div>
-<div class="flex items-center gap-sm">
-<button class="p-2 text-on-surface-variant hover:text-secondary transition-colors">
-<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
-</button>
-<button class="p-2 text-on-surface-variant hover:text-secondary transition-colors">
-<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
-</button>
-</div>
-</nav>
-<div class="flex flex-1">
-<!-- Main Content -->
-<main class="flex-1 px-margin-mobile md:px-margin-desktop py-xl">
-<!-- Page Header -->
-<div class="mb-xl">
-<h1 class="text-display-lg font-display-lg text-on-background">부채 분석 및 지출 내역</h1>
-<p class="text-body-lg font-body-lg text-on-surface-variant mt-sm">전문적인 재무 데이터 분석을 통한 부채 최적화 및 지출 관리.</p>
-</div>
-<!-- AI Insight Banner -->
-<div class="bg-primary-container border border-outline-variant rounded-xl p-lg mb-xl flex items-start gap-md card-shadow">
-<span class="material-symbols-outlined text-tertiary-fixed text-headline-lg mt-1" data-icon="tips_and_updates" style="font-variation-settings: 'FILL' 1;">tips_and_updates</span>
-<div>
-<h3 class="text-headline-sm font-headline-sm text-on-primary-container mb-xs">AI 인사이트</h3>
-<p class="text-body-md font-body-md text-inverse-on-surface font-semibold">현재 지출에서 월 최대 약 12만원을 추가 확보할 수 있습니다.</p>
-<p class="text-body-sm font-body-sm text-surface-variant mt-xs">조정 가능한 지출 항목(통신비, 구독서비스)을 최적화하여 부채 상환 재원을 마련하세요.</p>
-</div>
-</div>
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-<!-- Left Column: Debt Overview & Details -->
-<div class="lg:col-span-7 flex flex-col gap-lg">
-<!-- Overall Debt Status -->
-<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg card-shadow">
-<h2 class="text-headline-md font-headline-md text-primary mb-md">총 부채 현황</h2>
-<div class="flex flex-col md:flex-row items-center gap-xl">
-<!-- Donut Chart Placeholder -->
-<div class="relative w-48 h-48 flex-shrink-0">
-<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
-<path class="text-surface-variant" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="4"></path>
-<!-- Segment 1: Mortgage -->
-<path class="text-primary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="60, 100" stroke-width="4"></path>
-<!-- Segment 2: Auto Loan -->
-<path class="text-secondary" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="25, 100" stroke-dashoffset="-60" stroke-width="4"></path>
-<!-- Segment 3: Personal Loan -->
-<path class="text-on-tertiary-container" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="15, 100" stroke-dashoffset="-85" stroke-width="4"></path>
-</svg>
-<div class="absolute inset-0 flex flex-col items-center justify-center">
-<span class="text-label-sm font-label-sm text-on-surface-variant">총 잔액</span>
-<span class="text-headline-sm font-headline-sm text-primary font-bold">₩345,000,000</span>
-</div>
-</div>
-<!-- Legend -->
-<div class="flex-1 w-full space-y-md">
-<div class="flex justify-between items-center border-b border-outline-variant pb-sm">
-<div class="flex items-center gap-sm">
-<div class="w-3 h-3 rounded-full bg-primary"></div>
-<span class="text-body-md font-body-md text-on-surface">주택담보대출</span>
-</div>
-<span class="text-body-md font-body-md font-semibold text-on-surface">₩250,000,000</span>
-</div>
-<div class="flex justify-between items-center border-b border-outline-variant pb-sm">
-<div class="flex items-center gap-sm">
-<div class="w-3 h-3 rounded-full bg-secondary"></div>
-<span class="text-body-md font-body-md text-on-surface">신용대출</span>
-</div>
-<span class="text-body-md font-body-md font-semibold text-on-surface">₩65,000,000</span>
-</div>
-<div class="flex justify-between items-center border-b border-outline-variant pb-sm">
-<div class="flex items-center gap-sm">
-<div class="w-3 h-3 rounded-full bg-on-tertiary-container"></div>
-<span class="text-body-md font-body-md text-on-surface">자동차할부</span>
-</div>
-<span class="text-body-md font-body-md font-semibold text-on-surface">₩30,000,000</span>
-</div>
-</div>
-</div>
-</section>
-<!-- Debt Management Cards -->
-<section class="space-y-md">
-<h3 class="text-headline-sm font-headline-sm text-primary mb-sm">보유 부채 상세</h3>
-<!-- Loan Card 1 -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow card-hover-shadow cursor-pointer group">
-<div class="flex justify-between items-start mb-md">
-<div>
-<h4 class="text-headline-sm font-headline-sm text-on-background group-hover:text-primary transition-colors">KB국민은행 주택담보대출</h4>
-<span class="text-label-sm font-label-sm text-on-surface-variant bg-surface-variant px-2 py-1 rounded mt-xs inline-block">만기일시상환</span>
-</div>
-<div class="text-right">
-<span class="text-headline-md font-headline-md font-bold text-primary">4.2%</span>
-</div>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-sm border-t border-outline-variant pt-md">
-<div>
-<p class="text-label-sm font-label-sm text-on-surface-variant mb-xs">대출 잔액</p>
-<p class="text-body-md font-body-md font-semibold">₩250,000,000</p>
-</div>
-<div>
-<p class="text-label-sm font-label-sm text-on-surface-variant mb-xs">월 상환액</p>
-<p class="text-body-md font-body-md font-semibold text-error">₩875,000</p>
-</div>
-<div class="text-right sm:text-right">
-<p class="text-label-sm font-label-sm text-on-surface-variant mb-xs">잔여 기간</p>
-<p class="text-body-md font-body-md font-semibold">120개월</p>
-</div>
-</div>
-</div>
-<!-- Loan Card 2 -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-md card-shadow card-hover-shadow cursor-pointer group">
-<div class="flex justify-between items-start mb-md">
-<div>
-<h4 class="text-headline-sm font-headline-sm text-on-background group-hover:text-primary transition-colors">신한은행 직장인 신용대출</h4>
-<span class="text-label-sm font-label-sm text-on-surface-variant bg-surface-variant px-2 py-1 rounded mt-xs inline-block">원리금균등상환</span>
-</div>
-<div class="text-right">
-<span class="text-headline-md font-headline-md font-bold text-primary">5.8%</span>
-</div>
-</div>
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-sm border-t border-outline-variant pt-md">
-<div>
-<p class="text-label-sm font-label-sm text-on-surface-variant mb-xs">대출 잔액</p>
-<p class="text-body-md font-body-md font-semibold">₩65,000,000</p>
-</div>
-<div>
-<p class="text-label-sm font-label-sm text-on-surface-variant mb-xs">월 상환액</p>
-<p class="text-body-md font-body-md font-semibold text-error">₩1,245,000</p>
-</div>
-<div class="text-right sm:text-right">
-<p class="text-label-sm font-label-sm text-on-surface-variant mb-xs">잔여 기간</p>
-<p class="text-body-md font-body-md font-semibold">48개월</p>
-</div>
-</div>
-</div>
-</section>
-</div>
-<!-- Right Column: Expense Categorization -->
-<div class="lg:col-span-5">
-<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg card-shadow sticky top-24">
-<h2 class="text-headline-md font-headline-md text-primary mb-md">지출 분류 분석</h2>
-<div class="space-y-lg">
-<!-- Category 1: Required -->
-<div>
-<h3 class="text-body-lg font-body-lg font-semibold text-on-surface mb-sm flex items-center gap-xs">
-<span class="w-2 h-2 rounded-full bg-outline"></span> 필수 지출
-                                </h3>
-<div class="border border-outline-variant rounded-lg divide-y divide-outline-variant bg-surface-bright">
-<div class="flex justify-between items-center p-md hover:bg-surface-container-low transition-colors">
-<div class="flex items-center gap-sm">
-<span class="material-symbols-outlined text-on-surface-variant text-xl" data-icon="directions_car">directions_car</span>
-<span class="text-body-md font-body-md text-on-surface">교통비</span>
-</div>
-<span class="text-body-md font-body-md font-semibold">₩150,000</span>
-</div>
-<div class="flex justify-between items-center p-md hover:bg-surface-container-low transition-colors">
-<div class="flex items-center gap-sm">
-<span class="material-symbols-outlined text-on-surface-variant text-xl" data-icon="shield">shield</span>
-<span class="text-body-md font-body-md text-on-surface">보험료</span>
-</div>
-<span class="text-body-md font-body-md font-semibold">₩320,000</span>
-</div>
-</div>
-</div>
-<!-- Category 2: Adjustable -->
-<div>
-<h3 class="text-body-lg font-body-lg font-semibold text-on-surface mb-sm flex items-center gap-xs">
-<span class="w-2 h-2 rounded-full bg-secondary"></span> 조정 가능한 지출
-                                </h3>
-<div class="border border-outline-variant rounded-lg divide-y divide-outline-variant bg-surface-bright">
-<div class="flex justify-between items-center p-md hover:bg-surface-container-low transition-colors">
-<div class="flex items-center gap-sm">
-<span class="material-symbols-outlined text-on-surface-variant text-xl" data-icon="smartphone">smartphone</span>
-<span class="text-body-md font-body-md text-on-surface">통신비</span>
-</div>
-<div class="text-right">
-<span class="text-body-md font-body-md font-semibold">₩95,000</span>
-<p class="text-label-sm font-label-sm text-secondary">예상 절감: ₩25,000</p>
-</div>
-</div>
-<div class="flex justify-between items-center p-md hover:bg-surface-container-low transition-colors">
-<div class="flex items-center gap-sm">
-<span class="material-symbols-outlined text-on-surface-variant text-xl" data-icon="subscriptions">subscriptions</span>
-<span class="text-body-md font-body-md text-on-surface">구독서비스</span>
-</div>
-<div class="text-right">
-<span class="text-body-md font-body-md font-semibold">₩45,000</span>
-<p class="text-label-sm font-label-sm text-secondary">예상 절감: ₩30,000</p>
-</div>
-</div>
-</div>
-</div>
-<!-- Category 3: High Savings Potential -->
-<div>
-<h3 class="text-body-lg font-body-lg font-semibold text-on-surface mb-sm flex items-center gap-xs">
-<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span> 절감 가능성이 높은 지출
-                                </h3>
-<div class="border border-outline-variant rounded-lg divide-y divide-outline-variant bg-surface-bright">
-<div class="flex justify-between items-center p-md hover:bg-surface-container-low transition-colors">
-<div class="flex items-center gap-sm">
-<span class="material-symbols-outlined text-on-surface-variant text-xl" data-icon="restaurant">restaurant</span>
-<span class="text-body-md font-body-md text-on-surface">외식/카페</span>
-</div>
-<div class="text-right">
-<span class="text-body-md font-body-md font-semibold">₩450,000</span>
-<p class="text-label-sm font-label-sm text-tertiary-fixed-dim font-bold">예상 절감: ₩65,000</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-</div>
-</div>
-</main>
-</div>
-</body></html>
+            }
+          }</script></head><body class="bg-canvas-deep text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 inset-x-0 z-50 bg-surface-dim/85 backdrop-blur-xl border-b border-border-hairline shadow-[0_12px_36px_rgba(0,0,0,0.6)]"><div class="h-20 max-w-[1440px] mx-auto px-margin-mobile lg:px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><div class="w-10 h-10 rounded-DEFAULT bg-surface-architectural border border-border-hairline flex items-center justify-center shadow-[inset_0_1px_2px_rgba(255,255,255,0.1)]"><span class="material-symbols-outlined text-primary text-[22px]">finance_mode</span></div><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-editorial-sage-light tracking-tight">KINETIC CAPITAL</span><span class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase">AI 재무 인터렉티브</span></div></div><nav class="hidden xl:flex items-center gap-space-xs p-1.5 rounded-full bg-surface-charcoal/90 border border-border-hairline shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]" data-active-classes="bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_0_#0D6D43]"><a class="px-space-md py-space-xs rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" data-path="main-dashboard" href="#">대시보드</a><a aria-current="page" class="px-space-md py-space-xs rounded-full transition-all bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_0_#0D6D43]" data-path="debt-analysis" href="#">부채 분석</a><a class="px-space-md py-space-xs rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" data-path="financial-simulation" href="#">시뮬레이션</a><a class="px-space-md py-space-xs rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" data-path="ai-account-book" href="#">AI 가계부</a><a class="px-space-md py-space-xs rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" data-path="ai-financial-report" href="#">AI 리포트</a></nav><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center gap-2 px-space-md py-1.5 rounded-full bg-surface-architectural border border-border-hairline"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-signal-positive"></span></span><span class="font-label-caps text-label-caps text-editorial-sage-muted">AI 엔진 실시간 동기화됨</span></div><div class="flex items-center gap-space-sm pl-space-xs"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-[0_0_12px_rgba(24,199,122,0.35)]"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="w-full pt-20 min-h-screen bg-canvas-deep"><div class="flex flex-col w-full">
+        <!-- Top Ambient Telemetry Grid Container -->
+        <div class="max-w-[1440px] mx-auto w-full px-margin-mobile lg:px-margin pt-space-xl pb-space-2xl flex flex-col gap-space-xl"><!-- Dominant Hero Section: Total Debt & DSR Ratio Aggregation -->
+        <div class="bg-surface-card-frosted backdrop-blur-xl rounded-lg p-space-lg lg:p-space-xl border border-border-hairline shadow-xl flex flex-col gap-space-xl relative overflow-hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-center">
+            <!-- Primary Focal Column: Total Debt Balance (7 cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-space-md">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-outline text-[20px]">account_balance_wallet</span>
+                  <span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">총 보유 부채 잔액</span>
+                </div>
+                <span class="font-body-sm text-body-sm text-on-surface-variant">정상 상환 3건 집계</span>
+              </div>
+              <div class="flex flex-col gap-1">
+                <div class="flex items-baseline gap-2">
+                  <span class="font-headline-md text-headline-md text-outline font-normal">₩</span>
+                  <span class="font-display text-display text-editorial-sage-light tracking-tight select-all">345,000,000</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-space-md font-body-sm text-body-sm text-on-surface-variant pt-1">
+                  <span class="text-editorial-sage-muted">원리금균등 및 만기일시 복합 산출</span>
+                  <span class="text-border-subtle">•</span>
+                  <span class="">전월 대비 <span class="text-editorial-sage-light font-semibold">-₩1,850,000</span></span>
+                  <span class="text-border-subtle">•</span>
+                  <span class="">가중평균 금리 <span class="text-editorial-sage-light font-semibold">4.57%</span></span>
+                </div>
+              </div>
+            </div>
+            <!-- Twin Anchor: DSR & Monthly Cash Outflow (5 cols) -->
+            <div class="lg:col-span-5 grid grid-cols-2 gap-space-md bg-surface-charcoal/80 rounded-DEFAULT p-space-md border border-border-subtle">
+              <div class="flex flex-col justify-between">
+                <div class="flex flex-col gap-1">
+                  <span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">DSR 비율</span>
+                  <div class="flex items-baseline gap-1 mt-1">
+                    <span class="font-display text-headline-lg text-editorial-sage-light tracking-tight">38.4%</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1 mt-2">
+                  <div class="h-1.5 w-full bg-surface-charcoal rounded-full overflow-hidden">
+                    <div class="h-full bg-primary rounded-full" style="width: 38.4%;"></div>
+                  </div>
+                  <span class="font-label-caps text-label-caps text-primary">규제 상한(40%) 이내 안정권</span>
+                </div>
+              </div>
+              <div class="flex flex-col justify-between border-l border-border-subtle pl-space-md">
+                <div class="flex flex-col gap-1">
+                  <span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">월 총 상환액</span>
+                  <div class="flex items-baseline gap-1 mt-1">
+                    <span class="font-headline-sm text-headline-sm text-outline font-normal">₩</span>
+                    <span class="font-headline-md text-headline-md text-editorial-sage-light tracking-tight">1,428,000</span>
+                  </div>
+                </div>
+                <div class="font-body-sm text-body-sm text-on-surface-variant flex flex-col">
+                  <span class="">원금 ₩985,000</span>
+                  <span class="text-signal-risk font-semibold">이자 ₩443,000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Portfolio Composition Bar -->
+          <div class="flex flex-col gap-space-xs pt-space-md border-t border-border-subtle">
+            <div class="flex items-center justify-between font-label-caps text-label-caps text-on-surface-variant">
+              <span class="text-outline uppercase">포트폴리오 구성비</span>
+              <span class="text-editorial-sage-muted">주택담보 72.4% · 신용 18.8% · 차량할부 8.8%</span>
+            </div>
+            <div class="h-2 w-full bg-surface-charcoal rounded-full flex gap-1 overflow-hidden">
+              <div class="h-full rounded-full bg-editorial-sage-light transition-all duration-700" style="width: 72.4%;"></div>
+              <div class="h-full rounded-full bg-signal-risk transition-all duration-700" style="width: 18.8%;"></div>
+              <div class="h-full rounded-full bg-outline transition-all duration-700" style="width: 8.8%;"></div>
+            </div>
+            <div class="flex flex-wrap items-center justify-between text-on-surface-variant font-label-caps text-label-caps pt-1">
+              <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-editorial-sage-light"></span> KB 주택담보 ₩250,000,000</span>
+              <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-signal-risk"></span> 신한 신용대출 ₩65,000,000</span>
+              <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-outline"></span> 현대캐피탈 GV70 ₩30,000,000</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Operational Workspace: Loan Portfolio & 3-Stage Expense Reduction Plan -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start mt-space-md">
+          <!-- Left Column: 보유 대출 상세 내역 (7 cols) -->
+          <div class="lg:col-span-7 flex flex-col gap-space-lg">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-outline text-[20px]">format_list_bulleted</span>
+                <h3 class="font-headline-sm text-headline-sm text-editorial-sage-light">보유 대출 상품 상세 현황</h3>
+              </div>
+              <div class="p-1 rounded-full bg-surface-charcoal flex items-center shadow-inner self-start sm:self-auto">
+                <button class="px-space-md py-1 rounded-full font-label-caps text-label-caps bg-surface-container-high text-editorial-sage-light font-semibold transition-all" id="algo-avalanche">고금리 우선</button>
+                <button class="px-space-md py-1 rounded-full font-label-caps text-label-caps text-on-surface-variant hover:text-editorial-sage-light transition-all" id="algo-snowball">소액 우선</button>
+              </div>
+            </div>
+        
+            <!-- Loan List Cards -->
+            <div class="flex flex-col gap-space-md">
+              <!-- Card 1: KB Mortgage -->
+              <div class="bg-surface-card-frosted backdrop-blur-xl rounded-lg p-space-lg border border-border-subtle flex flex-col gap-space-md">
+                <div class="flex items-start justify-between">
+                  <div class="flex flex-col gap-0.5">
+                    <div class="flex items-center gap-2">
+                      <h4 class="font-headline-sm text-headline-sm text-editorial-sage-light">KB국민은행 주택담보대출</h4>
+                      <span class="font-label-caps text-label-caps text-outline">고정금리 · 원리금균등</span>
+                    </div>
+                    <span class="font-body-sm text-body-sm text-on-surface-variant">만기 2045.02 (잔여 238개월)</span>
+                  </div>
+                  <div class="flex flex-col items-end">
+                    <span class="font-label-caps text-label-caps text-outline uppercase">적용 금리</span>
+                    <span class="font-headline-sm text-headline-sm text-editorial-sage-light font-bold">4.20%</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant">
+                    <span class="">원금 잔액</span>
+                    <span class="font-label-numeric text-label-numeric text-editorial-sage-light">₩ 250,000,000 <span class="text-outline">/ 300,000,000 (16.6% 상환)</span></span>
+                  </div>
+                  <div class="h-1.5 w-full bg-surface-charcoal rounded-full overflow-hidden">
+                    <div class="h-full bg-editorial-sage-light rounded-full" style="width: 16.6%;"></div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-3 gap-space-sm pt-space-xs border-t border-border-subtle font-label-numeric text-label-numeric">
+                  <div><span class="font-label-caps text-label-caps text-outline block">월 원리금</span><span class="text-editorial-sage-light">₩ 910,000</span></div>
+                  <div><span class="font-label-caps text-label-caps text-outline block">월 이자</span><span class="text-editorial-sage-light">₩ 262,500</span></div>
+                  <div><span class="font-label-caps text-label-caps text-outline block">중도상환수수료</span><span class="text-editorial-sage-muted">면제</span></div>
+                </div>
+              </div>
+        
+              <!-- Card 2: Shinhan Credit Loan (High Interest Callout) -->
+              <div class="bg-surface-card-frosted backdrop-blur-xl rounded-lg p-space-lg border border-border-hairline flex flex-col gap-space-md relative overflow-hidden">
+                <div class="flex items-start justify-between">
+                  <div class="flex flex-col gap-0.5">
+                    <div class="flex items-center gap-2">
+                      <h4 class="font-headline-sm text-headline-sm text-editorial-sage-light">신한 쏠편한 직장인 신용대출</h4>
+                      <span class="font-label-caps text-label-caps text-signal-risk font-semibold">변동 · 만기일시</span>
+                    </div>
+                    <span class="font-body-sm text-body-sm text-on-surface-variant">만기 2026.11 (잔여 18개월)</span>
+                  </div>
+                  <div class="flex flex-col items-end">
+                    <span class="font-label-caps text-label-caps text-signal-risk uppercase font-semibold">적용 금리</span>
+                    <span class="font-headline-sm text-headline-sm text-signal-risk font-bold">5.82%</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant">
+                    <span class="">원금 잔액</span>
+                    <span class="font-label-numeric text-label-numeric text-editorial-sage-light">₩ 65,000,000 <span class="text-outline">(만기 일시 상환형)</span></span>
+                  </div>
+                  <div class="h-1.5 w-full bg-surface-charcoal rounded-full overflow-hidden">
+                    <div class="h-full bg-signal-risk rounded-full" style="width: 100%;"></div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-3 gap-space-sm pt-space-xs border-t border-border-subtle font-label-numeric text-label-numeric items-center">
+                  <div><span class="font-label-caps text-label-caps text-outline block">월 순수 이자</span><span class="text-signal-risk font-bold">₩ 315,250</span></div>
+                  <div><span class="font-label-caps text-label-caps text-outline block">누적 예상 이자</span><span class="text-editorial-sage-light">₩ 5,674,500</span></div>
+                  <div class="text-right">
+                    <button class="px-space-md py-1 rounded-full bg-surface-charcoal border border-border-hairline text-editorial-sage-light hover:text-primary transition-all font-label-caps text-label-caps inline-flex items-center gap-1">
+                      <span class="">대환 비교</span>
+                      <span class="material-symbols-outlined text-[14px]">swap_horiz</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+        
+              <!-- Card 3: GV70 Auto Installment -->
+              <div class="bg-surface-card-frosted backdrop-blur-xl rounded-lg p-space-lg border border-border-subtle flex flex-col gap-space-md">
+                <div class="flex items-start justify-between">
+                  <div class="flex flex-col gap-0.5">
+                    <div class="flex items-center gap-2">
+                      <h4 class="font-headline-sm text-headline-sm text-editorial-sage-light">현대캐피탈 GV70 신차할부</h4>
+                      <span class="font-label-caps text-label-caps text-outline">원리금균등</span>
+                    </div>
+                    <span class="font-body-sm text-body-sm text-on-surface-variant">만기 2028.08 (잔여 39개월)</span>
+                  </div>
+                  <div class="flex flex-col items-end">
+                    <span class="font-label-caps text-label-caps text-outline uppercase">적용 금리</span>
+                    <span class="font-headline-sm text-headline-sm text-editorial-sage-light font-bold">4.90%</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                  <div class="flex justify-between font-label-caps text-label-caps text-on-surface-variant">
+                    <span class="">원금 잔액</span>
+                    <span class="font-label-numeric text-label-numeric text-editorial-sage-light">₩ 30,000,000 <span class="text-outline">/ 55,000,000 (45.4% 상환)</span></span>
+                  </div>
+                  <div class="h-1.5 w-full bg-surface-charcoal rounded-full overflow-hidden">
+                    <div class="h-full bg-outline rounded-full" style="width: 45.4%;"></div>
+                  </div>
+                </div>
+                <div class="grid grid-cols-3 gap-space-sm pt-space-xs border-t border-border-subtle font-label-numeric text-label-numeric">
+                  <div><span class="font-label-caps text-label-caps text-outline block">월 원리금</span><span class="text-editorial-sage-light">₩ 518,000</span></div>
+                  <div><span class="font-label-caps text-label-caps text-outline block">월 이자</span><span class="text-editorial-sage-light">₩ 122,500</span></div>
+                  <div><span class="font-label-caps text-label-caps text-outline block">상환 상태</span><span class="text-editorial-sage-muted">양호 순항</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <!-- Right Column: 3단계 지출 절감 플랜 & 습관 챌린지 (5 cols) -->
+          <div class="lg:col-span-5 flex flex-col gap-space-lg">
+            <div class="bg-surface-card-frosted backdrop-blur-xl rounded-lg p-space-lg shadow-xl border border-border-hairline flex flex-col gap-space-lg">
+              <div class="flex items-start justify-between">
+                <div class="flex flex-col">
+                  <span class="font-label-caps text-label-caps text-outline uppercase tracking-wider">지출 구조 최적화</span>
+                  <h3 class="font-headline-sm text-headline-sm text-editorial-sage-light mt-1">3단계 지출 절감 플랜</h3>
+                </div>
+                <div class="text-right">
+                  <span class="font-label-caps text-label-caps text-outline block">목표 절감액</span>
+                  <span class="font-headline-sm text-headline-sm text-editorial-sage-light font-bold">월 ₩ 120,000</span>
+                </div>
+              </div>
+        
+              <div class="flex flex-col gap-space-sm">
+                <div class="p-space-md rounded-DEFAULT bg-surface-charcoal/80 flex flex-col gap-1">
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-numeric text-label-numeric text-editorial-sage-light">1. 필수 고정 지출</span>
+                    <span class="font-label-caps text-label-caps text-outline">방어 완료</span>
+                  </div>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant">통신 결합할인 및 관리비 최적화 반영 (-₩32,000)</p>
+                </div>
+        
+                <div class="p-space-md rounded-DEFAULT bg-surface-charcoal/80 flex flex-col gap-2">
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-numeric text-label-numeric text-editorial-sage-light">2. 생활 변동 지출</span>
+                    <span class="font-label-numeric text-label-numeric text-editorial-sage-light font-bold">-₩ 55,000</span>
+                  </div>
+                  <label class="flex items-center gap-2 cursor-pointer select-none">
+                    <input checked="" class="w-4 h-4 rounded bg-canvas-deep accent-primary text-primary focus:ring-0 cursor-pointer" type="checkbox">
+                    <span class="font-body-sm text-body-sm text-on-surface-variant">밀키트 및 외식 주기 조정 플랜 적용</span>
+                  </label>
+                </div>
+        
+                <div class="p-space-md rounded-DEFAULT bg-surface-charcoal/80 flex flex-col gap-space-sm">
+                  <div class="flex items-center justify-between">
+                    <span class="font-label-numeric text-label-numeric text-editorial-sage-light">3. 즉시 절감 항목</span>
+                    <span class="font-label-numeric text-label-numeric text-editorial-sage-light font-bold">-₩ 65,000</span>
+                  </div>
+                  <div class="flex flex-col gap-1.5">
+                    <label class="flex items-center justify-between p-2 rounded-DEFAULT bg-surface-charcoal cursor-pointer">
+                      <div class="flex items-center gap-2">
+                        <input checked="" class="w-4 h-4 rounded bg-canvas-deep accent-primary text-primary focus:ring-0 cursor-pointer" id="cut-ott" type="checkbox">
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">미사용 OTT 정기구독 정지</span>
+                      </div>
+                      <span class="font-label-numeric text-label-numeric text-outline">-₩27,000</span>
+                    </label>
+                    <label class="flex items-center justify-between p-2 rounded-DEFAULT bg-surface-charcoal cursor-pointer">
+                      <div class="flex items-center gap-2">
+                        <input checked="" class="w-4 h-4 rounded bg-canvas-deep accent-primary text-primary focus:ring-0 cursor-pointer" id="cut-delivery" type="checkbox">
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">야간 배달 주문 월 2회 감축</span>
+                      </div>
+                      <span class="font-label-numeric text-label-numeric text-outline">-₩38,000</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+        
+              <!-- Selective vivid green for confirmed extra payback power -->
+              <div class="p-space-md rounded-DEFAULT bg-surface-architectural border border-border-subtle flex items-center justify-between">
+                <span class="font-label-caps text-label-caps text-outline">확보되는 월 추가 상환 가용액</span>
+                <div class="flex items-baseline gap-1 font-headline-sm text-headline-sm text-signal-positive font-bold">
+                  <span class="">+ ₩</span><span id="calculated-savings" class="">120,000</span>
+                </div>
+              </div>
+        
+              <!-- High-intent Emerald CTA Button -->
+              <button class="w-full py-3.5 rounded-DEFAULT bg-primary font-headline-sm text-body-md font-bold text-on-primary hover:bg-primary-fixed transition-transform active:scale-95 shadow-[0_4px_0_#0D6D43] flex items-center justify-center gap-2" id="execute-plan-btn">
+                <span class="">지출 최적화 플랜 실행하기</span>
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+              </button>
+        
+              <!-- Streak Counter -->
+              <div class="pt-space-md flex flex-col gap-space-xs border-t border-border-subtle">
+                <div class="flex items-center justify-between">
+                  <span class="font-label-numeric text-label-numeric text-editorial-sage-light">지출 통제 챌린지</span>
+                  <span class="font-label-caps text-label-caps text-primary font-semibold">14일 연속 달성 중</span>
+                </div>
+                <div class="grid grid-cols-7 gap-1 mt-2">
+                  <div class="h-6 rounded-sm bg-primary/20 text-primary flex items-center justify-center font-label-caps text-label-caps font-bold">월</div>
+                  <div class="h-6 rounded-sm bg-primary/20 text-primary flex items-center justify-center font-label-caps text-label-caps font-bold">화</div>
+                  <div class="h-6 rounded-sm bg-primary/20 text-primary flex items-center justify-center font-label-caps text-label-caps font-bold">수</div>
+                  <div class="h-6 rounded-sm bg-primary/20 text-primary flex items-center justify-center font-label-caps text-label-caps font-bold">목</div>
+                  <div class="h-6 rounded-sm bg-primary/20 text-primary flex items-center justify-center font-label-caps text-label-caps font-bold">금</div>
+                  <div class="h-6 rounded-sm bg-primary/20 text-primary flex items-center justify-center font-label-caps text-label-caps font-bold">토</div>
+                  <div class="h-6 rounded-sm bg-primary/20 text-primary flex items-center justify-center font-label-caps text-label-caps font-bold">일</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div></div>
+        </div>
+        <script>
+          (function() {
+            const algoAvalanche = document.getElementById('algo-avalanche');
+            const algoSnowball = document.getElementById('algo-snowball');
+            const cutOtt = document.getElementById('cut-ott');
+            const cutDelivery = document.getElementById('cut-delivery');
+            const calculatedSavings = document.getElementById('calculated-savings');
+            const executePlanBtn = document.getElementById('execute-plan-btn');
+            const quickApplyBtn = document.getElementById('quick-apply-btn');
+        
+            // Algorithm Toggle state
+            if (algoAvalanche && algoSnowball) {
+              algoAvalanche.addEventListener('click', () => {
+                algoAvalanche.className = 'px-space-md py-1 rounded-full font-label-caps text-label-caps bg-primary-container text-on-primary-container font-semibold transition-all';
+                algoSnowball.className = 'px-space-md py-1 rounded-full font-label-caps text-label-caps text-on-surface-variant hover:text-editorial-sage-light transition-all';
+              });
+        
+              algoSnowball.addEventListener('click', () => {
+                algoSnowball.className = 'px-space-md py-1 rounded-full font-label-caps text-label-caps bg-primary-container text-on-primary-container font-semibold transition-all';
+                algoAvalanche.className = 'px-space-md py-1 rounded-full font-label-caps text-label-caps text-on-surface-variant hover:text-editorial-sage-light transition-all';
+              });
+            }
+        
+            // Dynamic savings recalculation
+            function updateSavings() {
+              let total = 55000;
+              if (cutOtt && cutOtt.checked) total += 27000;
+              if (cutDelivery && cutDelivery.checked) total += 38000;
+              if (calculatedSavings) {
+                calculatedSavings.textContent = total.toLocaleString('ko-KR');
+              }
+            }
+        
+            if (cutOtt) cutOtt.addEventListener('change', updateSavings);
+            if (cutDelivery) cutDelivery.addEventListener('change', updateSavings);
+        
+            // Tactile execution micro feedback
+            function handleExecution(btn) {
+              const originalText = btn.innerHTML;
+              btn.innerHTML = '<span>최적화 플랜 가동 완료! ⚡</span>';
+              btn.classList.add('scale-95');
+              setTimeout(() => {
+                btn.classList.remove('scale-95');
+                setTimeout(() => {
+                  btn.innerHTML = originalText;
+                }, 2200);
+              }, 180);
+            }
+        
+            if (executePlanBtn) {
+              executePlanBtn.addEventListener('click', () => handleExecution(executePlanBtn));
+            }
+            if (quickApplyBtn) {
+              quickApplyBtn.addEventListener('click', () => handleExecution(quickApplyBtn));
+            }
+          })();
+        </script></main><footer class="w-full bg-surface-charcoal border-t border-border-hairline mt-space-2xl"><div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin py-space-2xl"><div class="grid grid-cols-1 md:grid-cols-4 gap-space-xl mb-space-xl"><div class="md:col-span-2 flex flex-col gap-space-sm"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[20px]">verified_user</span><span class="font-headline-sm text-headline-sm text-editorial-sage-light">KINETIC CAPITAL LABS</span></div><p class="font-body-sm text-body-sm text-on-surface-variant max-w-lg leading-relaxed">자산 형성, 부채 상환 시나리오 및 현금흐름 궤적을 연산하는 실시간 퀀트 AI 재무 의사결정 인터페이스입니다. 최상위 텔레메트리 연산 엔진을 통해 예측 불확실성을 선제적으로 제거합니다.</p><div class="flex items-center gap-3 font-label-caps text-label-caps text-outline"><span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-signal-positive">lock</span>256-BIT QUANT TELEMETRY</span><span class="">•</span><span class="">NODE: SEOUL-EDGE-01</span></div></div><div class="flex flex-col gap-space-xs"><span class="font-label-caps text-label-caps text-editorial-sage-light tracking-wider uppercase mb-1">재무 모듈</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="main-dashboard" href="#">실시간 대시보드</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="debt-analysis" href="#">부채 상환 시나리오</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="financial-simulation" href="#">자산 궤적 시뮬레이터</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="ai-financial-report" href="#">심층 진단 보고서</a></div><div class="flex flex-col gap-space-xs"><span class="font-label-caps text-label-caps text-editorial-sage-light tracking-wider uppercase mb-1">보안 및 규제 준수</span><span class="font-body-sm text-body-sm text-on-surface-variant">ISO/IEC 27001 인증 준수</span><span class="font-body-sm text-body-sm text-on-surface-variant">금융보안원 클라우드 적격성 평가</span><span class="font-body-sm text-body-sm text-on-surface-variant">개인신용정보 보호 아키텍처</span><div class="mt-2 pt-2 border-t border-border-subtle"><a class="font-label-numeric text-label-numeric text-secondary hover:text-primary transition-colors inline-flex items-center gap-1" data-path="login" href="#">인증 콘솔 재접속 <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a></div></div></div><div class="pt-space-md border-t border-border-subtle flex flex-col sm:flex-row items-center justify-between gap-space-sm font-label-caps text-label-caps text-outline"><p class="">© 2025 KINETIC CAPITAL SYSTEMS INC. ALL QUANT RIGHTS RESERVED.</p><div class="flex items-center gap-space-md"><span class="hover:text-on-surface cursor-pointer">개인정보처리방침</span><span class="hover:text-on-surface cursor-pointer">이용약관</span><span class="hover:text-on-surface cursor-pointer">위험고지서</span></div></div></div></footer>
+        
+        </body></html>

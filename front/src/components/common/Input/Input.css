@@ -1,1 +1,9 @@
-/* Input styles are applied via Tailwind in Input.jsx */
+.input-field {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input-field {
+    transition: none;
+  }
+}

@@ -1,6 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, Input, MaterialIcon, WipBadge } from '../../components/common';
+import {
+  Button,
+  Card,
+  Input,
+  MaterialIcon,
+  ProgressBar,
+  SegmentedControl,
+  WipBadge,
+} from '../../components/common';
+import { PageContainer } from '../../components/layout';
+import useCountUp from '../../hooks/useCountUp';
 import { api } from '../../services/api';
 import { getAccessToken, getStoredUser } from '../../services/authStorage';
 import './AiFeedback.css';
@@ -20,27 +30,29 @@ const ACCOUNT_CATEGORIES = {
 };
 
 const SELECT_CLASS =
-  'w-full h-[48px] px-md bg-surface-container-lowest border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-shadow disabled:opacity-50';
+  'w-full h-[48px] px-md bg-surface-charcoal border border-border-hairline rounded-DEFAULT text-body-md font-body-md text-editorial-sage-light focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-shadow disabled:opacity-50';
 
+/** Dark emerald palette: signal-advisory, primary, secondary, outline */
 const CATEGORY_META = {
-  식비: { icon: 'restaurant', color: '#1a365d', wrap: 'bg-primary-container/10 text-primary-container' },
-  교통: { icon: 'directions_car', color: '#00b47d', wrap: 'bg-[#00b47d]/10 text-[#00b47d]' },
-  주거: { icon: 'home', color: '#7db6ff', wrap: 'bg-secondary-container/20 text-on-secondary-container' },
-  쇼핑: { icon: 'shopping_bag', color: '#455f88', wrap: 'bg-surface-variant text-on-surface-variant' },
-  구독: { icon: 'subscriptions', color: '#5b6b8a', wrap: 'bg-surface-tint/10 text-surface-tint' },
-  카페: { icon: 'local_cafe', color: '#cbdbf5', wrap: 'bg-secondary-fixed/40 text-on-secondary-container' },
-  통신: { icon: 'smartphone', color: '#94a3b8', wrap: 'bg-surface-variant text-on-surface-variant' },
-  의료: { icon: 'medical_services', color: '#c4c6cf', wrap: 'bg-surface-variant text-on-surface-variant' },
-  기타: { icon: 'more_horiz', color: '#9aa0a6', wrap: 'bg-surface-variant text-on-surface-variant' },
-  급여: { icon: 'payments', color: '#00b47d', wrap: 'bg-[#00b47d]/10 text-[#00b47d]' },
-  수입: { icon: 'account_balance_wallet', color: '#00b47d', wrap: 'bg-[#00b47d]/10 text-[#00b47d]' },
-  용돈: { icon: 'savings', color: '#7db6ff', wrap: 'bg-secondary-container/20 text-on-secondary-container' },
-  투자수익: { icon: 'trending_up', color: '#1a365d', wrap: 'bg-primary-container/10 text-primary-container' },
-  환급: { icon: 'replay', color: '#455f88', wrap: 'bg-surface-variant text-on-surface-variant' },
-  기타수입: { icon: 'attach_money', color: '#00b47d', wrap: 'bg-[#00b47d]/10 text-[#00b47d]' },
+  식비: { icon: 'restaurant', color: '#F5A623', wrap: 'bg-signal-advisory-subtle text-signal-advisory' },
+  교통: { icon: 'directions_car', color: '#48e493', wrap: 'bg-primary/15 text-primary' },
+  주거: { icon: 'home', color: '#4edea3', wrap: 'bg-secondary/15 text-secondary' },
+  쇼핑: { icon: 'shopping_bag', color: '#869488', wrap: 'bg-surface-container-high text-outline' },
+  구독: { icon: 'subscriptions', color: '#F5A623', wrap: 'bg-signal-advisory-subtle text-signal-advisory' },
+  카페: { icon: 'local_cafe', color: '#48e493', wrap: 'bg-primary/15 text-primary' },
+  통신: { icon: 'smartphone', color: '#4edea3', wrap: 'bg-secondary/15 text-secondary' },
+  의료: { icon: 'medical_services', color: '#869488', wrap: 'bg-surface-container-high text-outline' },
+  기타: { icon: 'more_horiz', color: '#869488', wrap: 'bg-surface-container-high text-outline' },
+  급여: { icon: 'payments', color: '#48e493', wrap: 'bg-primary/15 text-primary' },
+  수입: { icon: 'account_balance_wallet', color: '#48e493', wrap: 'bg-primary/15 text-primary' },
+  용돈: { icon: 'savings', color: '#4edea3', wrap: 'bg-secondary/15 text-secondary' },
+  투자수익: { icon: 'trending_up', color: '#F5A623', wrap: 'bg-signal-advisory-subtle text-signal-advisory' },
+  환급: { icon: 'replay', color: '#869488', wrap: 'bg-surface-container-high text-outline' },
+  기타수입: { icon: 'attach_money', color: '#48e493', wrap: 'bg-primary/15 text-primary' },
 };
 
-const CHART_FALLBACK_COLORS = ['#1a365d', '#7db6ff', '#00b47d', '#cbdbf5', '#455f88', '#c4c6cf', '#94a3b8', '#5b6b8a'];
+const CHART_FALLBACK_COLORS = ['#F5A623', '#48e493', '#4edea3', '#869488', '#18C77A', '#FF5C4D', '#bbcabd', '#00a572'];
+const CONIC_EMPTY = '#252b28';
 
 const CREATE_ERROR_MESSAGES = {
   'type is required': '수입/지출 유형을 선택해주세요.',
@@ -58,6 +70,12 @@ const CREATE_ERROR_MESSAGES = {
   unauthorized: '로그인이 필요합니다. 로그인 후 다시 시도해주세요.',
   'invalid token': '로그인이 만료되었습니다. 다시 로그인해주세요.',
 };
+
+const PERIOD_OPTIONS = [
+  { id: 'day', label: '일간', disabled: true, badge: <WipBadge /> },
+  { id: 'week', label: '주간', disabled: true, badge: <WipBadge /> },
+  { id: 'month', label: '월간' },
+];
 
 function getSeoulYearMonth() {
   const parts = new Intl.DateTimeFormat('en-US', {
@@ -104,8 +122,8 @@ function getCategoryMeta(category) {
   return (
     CATEGORY_META[category] || {
       icon: 'receipt_long',
-      color: '#9aa0a6',
-      wrap: 'bg-surface-variant text-on-surface-variant',
+      color: '#869488',
+      wrap: 'bg-surface-container-high text-outline',
     }
   );
 }
@@ -183,7 +201,7 @@ function transactionToForm(item) {
 }
 
 function buildConicGradient(items) {
-  if (!items.length) return 'conic-gradient(#e5e7eb 0% 100%)';
+  if (!items.length) return `conic-gradient(${CONIC_EMPTY} 0% 100%)`;
   let cursor = 0;
   const stops = items.map((item, index) => {
     const start = cursor;
@@ -193,9 +211,35 @@ function buildConicGradient(items) {
     return `${color} ${start}% ${end}%`;
   });
   if (cursor < 100) {
-    stops.push(`#e5e7eb ${cursor}% 100%`);
+    stops.push(`${CONIC_EMPTY} ${cursor}% 100%`);
   }
   return `conic-gradient(${stops.join(', ')})`;
+}
+
+function buildInsightHeadline({ balance, topExpense, monthLabel }) {
+  const balanceNum = Number(balance);
+  const top = topExpense?.category;
+  if (top) {
+    return (
+      <>
+        {monthLabel ? `${monthLabel} ` : '이번 달 '}
+        지출 1위는 <span className="text-signal-advisory font-bold">{top}</span>
+        입니다
+      </>
+    );
+  }
+  if (Number.isFinite(balanceNum)) {
+    return (
+      <>
+        이번 달 잔액은{' '}
+        <span className={`font-bold ${balanceNum >= 0 ? 'text-signal-positive' : 'text-signal-risk'}`}>
+          {formatWon(balanceNum)}
+        </span>
+        입니다
+      </>
+    );
+  }
+  return '가계부 거래를 등록하면 AI 인사이트가 여기에 모입니다';
 }
 
 export default function AiFeedback() {
@@ -459,10 +503,22 @@ export default function AiFeedback() {
 
   const hasData = (summary?.count ?? 0) > 0 || transactions.length > 0;
   const isBusy = isSubmitting || actionId != null;
+  const dataReady = !isLoading && !errorMessage && !!summary;
+  const totalIncome = Number(summary?.totalIncome) || 0;
+  const totalExpense = Number(summary?.totalExpense) || 0;
+  const budgetRatio =
+    totalIncome > 0 ? Math.min(100, Math.round((totalExpense / totalIncome) * 1000) / 10) : null;
+  const remainingBuffer = totalIncome > 0 ? Math.max(0, totalIncome - totalExpense) : null;
+  const topExpense = expenseCategories[0] || null;
+
+  const incomeDisplay = useCountUp(dataReady ? summary?.totalIncome : null);
+  const expenseDisplay = useCountUp(dataReady ? summary?.totalExpense : null);
+  const balanceDisplay = useCountUp(dataReady ? summary?.balance : null);
+  const countDisplay = useCountUp(dataReady ? summary?.count ?? 0 : null);
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-stretch antialiased page-shell min-w-0">
-      <nav className="hidden md:flex flex-col w-64 shrink-0 self-stretch min-h-[calc(100vh-4rem)] sticky top-16 bg-surface-container-low border-r border-outline-variant py-md gap-sm z-40">
+    <div className="flex min-h-[calc(100vh-4rem)] items-stretch antialiased min-w-0 bg-canvas-deep">
+      <nav className="hidden md:flex flex-col w-64 shrink-0 self-stretch min-h-[calc(100vh-4rem)] sticky top-16 bg-surface-charcoal/90 border-r border-border-hairline py-md gap-sm z-40">
         {SIDE_ITEMS.map((item) => {
           const active = sideTab === item.id;
           return (
@@ -472,8 +528,8 @@ export default function AiFeedback() {
               onClick={() => setSideTab(item.id)}
               className={
                 active
-                  ? 'bg-secondary-container text-on-secondary-container rounded-lg mx-2 my-1 px-md py-sm flex items-center gap-md scale-95 duration-150'
-                  : 'text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg px-md py-sm flex items-center gap-md hover:text-on-surface transition-all group'
+                  ? 'bg-primary-container text-on-primary-container rounded-lg mx-2 my-1 px-md py-sm flex items-center gap-md scale-95 duration-150 shadow-extrude-sm'
+                  : 'text-on-surface-variant hover:bg-surface-architectural mx-2 my-1 rounded-lg px-md py-sm flex items-center gap-md hover:text-editorial-sage-light transition-all group'
               }
             >
               <MaterialIcon name={item.icon} filled={active} className={active ? '' : 'group-hover:text-primary transition-colors'} />
@@ -484,616 +540,645 @@ export default function AiFeedback() {
         })}
         <div className="mt-auto px-md pb-md flex flex-col gap-sm">
           <div className="flex items-center gap-sm">
-            <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-label-sm">
+            <div className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-label-sm">
               {userInitials}
             </div>
             <div>
-              <div className="text-label-md font-label-md font-bold text-on-surface">{user?.name || '가계부'}</div>
+              <div className="text-label-md font-label-md font-bold text-editorial-sage-light">{user?.name || '가계부'}</div>
               <div className="text-label-sm font-label-sm text-on-surface-variant">{monthLabel || '이번 달'}</div>
             </div>
           </div>
-          <Button fullWidth className="py-sm mt-sm" onClick={loadAccountBook} disabled={isLoading}>
+          <Button variant="extruded" fullWidth className="py-sm mt-sm" onClick={loadAccountBook} disabled={isLoading}>
             새로고침
           </Button>
         </div>
       </nav>
 
-      <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex-1 w-full max-w-container-max mx-auto px-3 sm:px-margin-mobile md:px-margin-desktop py-md md:py-lg overflow-x-hidden min-w-0">
-          <nav className="md:hidden flex gap-sm overflow-x-auto hide-scrollbar pb-sm mb-md border-b border-outline-variant -mx-1 px-1">
-            {SIDE_ITEMS.map((item) => {
-              const active = sideTab === item.id;
-              return (
-                <button
-                  key={`mobile-${item.id}`}
-                  type="button"
-                  onClick={() => setSideTab(item.id)}
-                  className={`shrink-0 px-md py-2 rounded-full text-label-sm font-label-md min-h-[44px] ${
-                    active
-                      ? 'bg-secondary-container text-on-secondary-container font-bold'
-                      : 'bg-surface-container-low text-on-surface-variant border border-outline-variant'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              );
-            })}
-          </nav>
+      <PageContainer className="flex-1 gap-space-xl py-md md:py-space-xl">
+        <nav className="md:hidden flex gap-sm overflow-x-auto hide-scrollbar pb-sm border-b border-border-hairline -mx-1 px-1 section-reveal">
+          {SIDE_ITEMS.map((item) => {
+            const active = sideTab === item.id;
+            return (
+              <button
+                key={`mobile-${item.id}`}
+                type="button"
+                onClick={() => setSideTab(item.id)}
+                className={`shrink-0 px-md py-2 rounded-full text-label-sm font-label-md min-h-[44px] inline-flex items-center gap-1 ${
+                  active
+                    ? 'bg-primary-container text-on-primary-container font-bold shadow-extrude-sm'
+                    : 'bg-surface-architectural text-on-surface-variant border border-border-hairline'
+                }`}
+              >
+                {item.label}
+                {item.wip ? <WipBadge /> : null}
+              </button>
+            );
+          })}
+        </nav>
 
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-lg gap-md border-b border-outline-variant pb-md">
-            <div>
-              <h1 className="text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-surface">이번 달 가계부</h1>
-              <p className="text-body-md font-body-md text-on-surface-variant mt-sm">
-                {monthLabel ? `${monthLabel}, 어디에 썼는지 같이 볼까요` : '어디에 썼는지 같이 볼까요'}
-              </p>
-            </div>
-            <div className="flex gap-sm bg-surface-container-low p-1 rounded-lg border border-outline-variant self-stretch sm:self-start md:self-auto overflow-x-auto hide-scrollbar">
-              {[
-                { id: 'day', label: '일간', disabled: true, wip: true },
-                { id: 'week', label: '주간', disabled: true, wip: true },
-                { id: 'month', label: '월간', disabled: false },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  disabled={item.disabled}
-                  onClick={() => !item.disabled && setPeriod(item.id)}
-                  className={`px-md py-xs rounded-md text-label-md font-label-md min-h-[44px] shrink-0 inline-flex items-center gap-1 ${
-                    period === item.id
-                      ? 'bg-surface shadow-sm text-primary font-medium'
-                      : 'text-on-surface-variant hover:bg-surface-variant transition-colors disabled:opacity-40 disabled:cursor-not-allowed'
-                  }`}
-                >
-                  {item.label}
-                  {item.wip ? <WipBadge /> : null}
-                </button>
-              ))}
-            </div>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-md section-reveal">
+          <div>
+            <h1 className="font-display text-[2rem] sm:text-headline-lg text-editorial-sage-light tracking-tight m-0 break-keep">
+              이번 달 가계부
+            </h1>
+            <p className="font-body-md text-body-md text-on-surface-variant mt-sm m-0">
+              {monthLabel ? `${monthLabel}, 어디에 썼는지 같이 볼까요` : '어디에 썼는지 같이 볼까요'}
+            </p>
           </div>
+          <SegmentedControl
+            options={PERIOD_OPTIONS}
+            value={period}
+            onChange={setPeriod}
+            size="sm"
+            className="self-stretch sm:self-start overflow-x-auto"
+          />
+        </div>
 
-          {isLoading ? (
-            <Card className="p-md md:p-lg mb-md flex items-center gap-md">
-              <MaterialIcon name="progress_activity" className="text-primary text-headline-md animate-spin" />
-              <p className="text-body-md font-body-md text-on-surface m-0">가계부 데이터를 불러오는 중…</p>
-            </Card>
-          ) : null}
+        {isLoading ? (
+          <Card variant="architectural" className="p-md md:p-lg section-reveal flex items-center gap-md">
+            <MaterialIcon name="progress_activity" className="text-primary text-headline-md animate-spin" />
+            <p className="text-body-md font-body-md text-editorial-sage-muted m-0">가계부 데이터를 불러오는 중…</p>
+          </Card>
+        ) : null}
 
-          {!isLoading && errorMessage ? (
-            <Card className="p-md md:p-lg mb-md border border-error/20 bg-error-container">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-md">
-                <div className="min-w-0">
-                  <h3 className="text-headline-sm font-headline-sm text-error m-0 mb-xs">가계부를 표시할 수 없습니다</h3>
-                  <p className="text-body-sm font-body-sm text-on-surface m-0 break-keep" role="alert">
-                    {errorMessage}
-                  </p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-sm shrink-0">
-                  {isUnauthorized ? (
-                    <Link to="/login">
-                      <Button variant="secondary" className="h-[44px] px-md w-full sm:w-auto">
-                        로그인하기
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Button variant="secondary" className="h-[44px] px-md" onClick={loadAccountBook}>
-                      다시 시도
+        {!isLoading && errorMessage ? (
+          <Card variant="charcoal" className="p-md md:p-lg section-reveal border border-signal-risk/30">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-md">
+              <div className="min-w-0">
+                <h3 className="font-headline-sm text-headline-sm text-editorial-sage-light m-0 mb-xs">
+                  가계부를 표시할 수 없습니다
+                </h3>
+                <p className="text-body-sm font-body-sm text-signal-risk m-0 break-keep" role="alert">
+                  {errorMessage}
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-sm shrink-0">
+                {isUnauthorized ? (
+                  <Link to="/login">
+                    <Button variant="pill" className="h-[44px] px-md w-full sm:w-auto">
+                      로그인하기
                     </Button>
-                  )}
-                </div>
-              </div>
-            </Card>
-          ) : null}
-
-          {!isLoading && !errorMessage ? (
-            <>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-sm md:gap-md mb-md md:mb-lg">
-                <SummaryCard label="총 수입" value={formatWon(summary?.totalIncome)} />
-                <SummaryCard label="총 지출" value={formatWon(summary?.totalExpense)} />
-                <SummaryCard label="잔액" value={formatWon(summary?.balance)} />
-                <SummaryCard label="거래 건수" value={`${summary?.count ?? 0}건`} />
-              </div>
-
-              <Card className="p-md md:p-lg mb-md md:mb-lg min-w-0">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-sm mb-md">
-                  <h2 className="text-headline-sm font-headline-sm text-on-surface m-0">거래 등록</h2>
-                  <span className="text-label-sm font-label-sm text-on-surface-variant">
-                    오늘 날짜 기본값 · 현재 월 통계에 반영
-                  </span>
-                </div>
-
-                {formError ? (
-                  <p
-                    className="text-body-sm font-body-sm text-error mb-md px-sm py-xs bg-error-container rounded-lg border border-error/20"
-                    role="alert"
-                  >
-                    {formError}
-                    {isUnauthorized ? (
-                      <>
-                        {' '}
-                        <Link className="text-secondary font-medium underline" to="/login">
-                          로그인하기
-                        </Link>
-                      </>
-                    ) : null}
-                  </p>
-                ) : null}
-                {formSuccess ? (
-                  <p className="text-body-sm font-body-sm text-on-tertiary-container mb-md px-sm py-xs bg-tertiary-fixed/20 rounded-lg m-0">
-                    {formSuccess}
-                  </p>
-                ) : null}
-
-                <form className="space-y-md" onSubmit={handleCreate}>
-                  <div className="flex flex-col sm:flex-row gap-sm">
-                    {[
-                      { id: 'expense', label: '지출' },
-                      { id: 'income', label: '수입' },
-                    ].map((item) => (
-                      <button
-                        key={item.id}
-                        type="button"
-                        disabled={isBusy}
-                        onClick={() => updateForm('type', item.id)}
-                        className={`flex-1 min-h-[44px] rounded-lg text-label-sm font-label-md border ${
-                          form.type === item.id
-                            ? 'bg-secondary-container text-on-secondary-container border-secondary'
-                            : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant'
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm md:gap-md">
-                    <Input
-                      id="account-amount"
-                      label="금액 (원)"
-                      type="number"
-                      min="1"
-                      step="1"
-                      placeholder="15000"
-                      icon="payments"
-                      required
-                      value={form.amount}
-                      onChange={(e) => updateForm('amount', e.target.value)}
-                      disabled={isBusy}
-                    />
-                    <div className="flex flex-col gap-xs">
-                      <label className="text-label-md font-label-md text-on-surface" htmlFor="account-category">
-                        카테고리
-                      </label>
-                      <select
-                        id="account-category"
-                        className={SELECT_CLASS}
-                        value={form.category}
-                        onChange={(e) => updateForm('category', e.target.value)}
-                        disabled={isBusy}
-                        required
-                      >
-                        {categoryOptions.map((category) => (
-                          <option key={category} value={category}>
-                            {category}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <Input
-                      id="account-date"
-                      label="날짜"
-                      type="date"
-                      required
-                      value={form.date}
-                      onChange={(e) => updateForm('date', e.target.value)}
-                      disabled={isBusy}
-                    />
-                    <Input
-                      id="account-memo"
-                      label="메모 (선택)"
-                      type="text"
-                      placeholder="예: 점심 식사"
-                      icon="edit_note"
-                      value={form.memo}
-                      onChange={(e) => updateForm('memo', e.target.value)}
-                      disabled={isBusy}
-                      hint="최대 200자"
-                    />
-                  </div>
-
-                  <Button type="submit" variant="secondary" className="h-[48px] w-full sm:w-auto px-lg" disabled={isBusy}>
-                    {isSubmitting ? '등록 중…' : '거래 등록'}
+                  </Link>
+                ) : (
+                  <Button variant="secondary" className="h-[44px] px-md" onClick={loadAccountBook}>
+                    다시 시도
                   </Button>
-                </form>
-              </Card>
+                )}
+              </div>
+            </div>
+          </Card>
+        ) : null}
 
-              {!hasData ? (
-                <Card className="p-md md:p-lg mb-md">
-                  <p className="text-body-md font-body-md text-on-surface-variant m-0 break-keep">
-                    {monthLabel}에 등록된 거래가 없습니다. 위에서 거래를 추가해보세요.
-                  </p>
-                </Card>
-              ) : null}
-
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-md md:gap-gutter min-w-0">
-                <Card className="col-span-1 lg:col-span-4 bg-gradient-to-br from-surface to-surface-container-low p-md md:p-lg flex flex-col relative overflow-hidden min-w-0">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-secondary-container rounded-full blur-3xl opacity-20 -mr-10 -mt-10 pointer-events-none" />
-                  <div className="flex items-center gap-sm mb-md z-10">
-                    <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
-                      <MaterialIcon name="smart_toy" className="text-[18px]" />
-                    </div>
-                    <h2 className="text-headline-sm font-headline-sm text-on-surface">월간 요약 인사이트</h2>
-                  </div>
-                  <div className="flex flex-col gap-sm flex-1 z-10">
-                    <div className="bg-surface-bright rounded-lg p-md border border-outline-variant/50 shadow-sm flex items-start gap-md">
-                      <MaterialIcon
-                        name={Number(summary?.balance) >= 0 ? 'savings' : 'trending_down'}
-                        className={`mt-xs ${Number(summary?.balance) >= 0 ? 'text-on-tertiary-container' : 'text-error'}`}
-                      />
-                      <div>
-                        <p className="text-body-md font-body-md text-on-surface leading-snug m-0">
-                          이번 달 잔액은{' '}
-                          <span className={`font-bold ${Number(summary?.balance) >= 0 ? 'text-on-tertiary-container' : 'text-error'}`}>
-                            {formatWon(summary?.balance)}
-                          </span>
-                          입니다.
-                        </p>
-                        <p className="text-label-sm font-label-sm text-on-surface-variant mt-xs m-0">
-                          수입 {formatWon(summary?.totalIncome)} · 지출 {formatWon(summary?.totalExpense)}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="bg-surface-bright rounded-lg p-md border border-outline-variant/50 shadow-sm flex items-start gap-md">
-                      <MaterialIcon name="category" className="text-primary mt-xs" />
-                      <div>
-                        <p className="text-body-md font-body-md text-on-surface leading-snug m-0">
-                          {expenseCategories[0] ? (
-                            <>
-                              지출 1위는 <span className="font-bold text-primary">{expenseCategories[0].category}</span>
-                              으로 {formatWon(expenseCategories[0].amount)} ({expenseCategories[0].ratio}%)입니다.
-                            </>
-                          ) : (
-                            '이번 달 지출 카테고리 데이터가 없습니다.'
-                          )}
-                        </p>
-                        <p className="text-label-sm font-label-sm text-on-surface-variant mt-xs m-0">
-                          총 {summary?.count ?? 0}건의 거래를 집계했습니다.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <Button
-                    variant="outline"
-                    fullWidth
-                    className="mt-md py-sm z-10 bg-surface-container-high hover:bg-surface-variant min-h-[44px]"
-                    onClick={loadAccountBook}
-                    disabled={isLoading}
-                  >
-                    데이터 새로고침
-                  </Button>
-                </Card>
-
-                <Card className="col-span-1 lg:col-span-8 p-md md:p-lg flex flex-col min-w-0">
-                  <div className="flex justify-between items-center mb-md md:mb-lg gap-sm">
-                    <h2 className="text-headline-sm font-headline-sm text-on-surface">카테고리별 지출</h2>
-                    <span className="text-label-sm font-label-sm text-on-surface-variant shrink-0">{monthLabel}</span>
-                  </div>
-                  {expenseCategories.length === 0 ? (
-                    <p className="text-body-sm font-body-sm text-on-surface-variant m-0 py-xl text-center">표시할 지출 카테고리가 없습니다.</p>
-                  ) : (
-                    <div className="relative w-full pt-8 sm:pt-10 chart-responsive">
-                      <div className="absolute inset-x-0 top-8 sm:top-10 bottom-8 flex flex-col justify-between pointer-events-none">
-                        <div className="w-full border-t border-outline-variant/30" />
-                        <div className="w-full border-t border-outline-variant/30" />
-                        <div className="w-full border-t border-outline-variant/30" />
-                        <div className="w-full border-t border-outline-variant/30" />
-                        <div className="w-full border-t border-outline-variant/30" />
-                      </div>
-                      <div className="relative z-10 flex items-end justify-between gap-1 sm:gap-sm md:gap-md h-[180px] sm:h-[220px] w-full">
-                        {expenseCategories.slice(0, 8).map((item, index) => {
-                          const heightPct =
-                            maxExpenseAmount > 0
-                              ? Math.max(8, Math.round((Number(item.amount) / maxExpenseAmount) * 100))
-                              : 8;
-                          const isTop = index === 0;
-                          return (
-                            <div
-                              key={`${item.category}-${item.type}`}
-                              className="flex-1 min-w-0 h-full flex flex-col items-center justify-end gap-xs group"
-                            >
-                              <div className="w-full flex-1 flex items-end justify-center relative min-h-0">
-                                <div
-                                  className={`absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] py-0.5 px-1.5 rounded font-bold whitespace-nowrap z-20 ${
-                                    isTop
-                                      ? 'bg-primary text-on-primary'
-                                      : 'bg-surface-container-high text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity'
-                                  }`}
-                                >
-                                  {item.ratio}%
-                                </div>
-                                <div
-                                  className={`w-full max-w-[36px] sm:max-w-[44px] rounded-t-sm ${
-                                    isTop
-                                      ? 'bg-primary shadow-sm'
-                                      : 'bg-secondary-container group-hover:bg-secondary transition-colors'
-                                  }`}
-                                  style={{ height: `${heightPct}%` }}
-                                  title={`${item.category}: ${formatWon(item.amount)} (${item.ratio}%)`}
-                                />
-                              </div>
-                              <span
-                                className={`text-label-sm font-label-sm truncate max-w-full shrink-0 ${
-                                  isTop ? 'text-primary font-bold' : 'text-on-surface-variant'
-                                }`}
-                              >
-                                {item.category}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </Card>
-
-                <Card className="col-span-1 lg:col-span-5 p-md md:p-lg flex flex-col min-w-0">
-                  <h2 className="text-headline-sm font-headline-sm text-on-surface mb-md">카테고리별 분포</h2>
-                  <div className="flex-1 flex flex-col items-center justify-center py-md">
-                    <div
-                      className="relative w-36 h-36 sm:w-48 sm:h-48 rounded-full mb-lg chart-responsive chart-responsive--clip"
-                      style={{ background: buildConicGradient(expenseCategories) }}
-                    >
-                      <div className="absolute inset-3 sm:inset-4 bg-surface rounded-full flex flex-col items-center justify-center shadow-inner px-2 text-center">
-                        <span className="text-label-sm font-label-sm text-on-surface-variant">총 지출</span>
-                        <span className="text-headline-sm font-headline-sm font-bold text-on-surface financial-value break-words">
-                          {formatWon(summary?.totalExpense ?? categorySummary?.totalExpense)}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap justify-center gap-md px-sm">
-                      {expenseCategories.length === 0 ? (
-                        <span className="text-label-sm font-label-sm text-on-surface-variant">지출 카테고리 없음</span>
-                      ) : (
-                        expenseCategories.slice(0, 6).map((item) => (
-                          <div key={`legend-${item.category}`} className="flex items-center gap-xs">
-                            <div
-                              className="w-3 h-3 rounded-full shrink-0"
-                              style={{ backgroundColor: getCategoryMeta(item.category).color }}
-                            />
-                            <span className="text-label-sm font-label-sm">
-                              {item.category} ({item.ratio}%)
-                            </span>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                    {incomeCategories.length > 0 ? (
-                      <div className="mt-md w-full border-t border-outline-variant pt-md">
-                        <p className="text-label-sm font-label-sm text-on-surface-variant m-0 mb-sm text-center">수입 카테고리</p>
-                        <div className="flex flex-wrap justify-center gap-sm">
-                          {incomeCategories.map((item) => (
-                            <span
-                              key={`income-${item.category}`}
-                              className="text-label-sm font-label-sm bg-surface-container-low px-sm py-xs rounded"
-                            >
-                              {item.category} {formatWon(item.amount)} ({item.ratio}%)
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    ) : null}
-                  </div>
-                </Card>
-
-                <Card className="col-span-1 lg:col-span-7 p-0 flex flex-col overflow-hidden min-w-0">
-                  <div className="p-md md:p-lg border-b border-outline-variant flex justify-between items-center gap-sm bg-surface-container-lowest">
-                    <h2 className="text-headline-sm font-headline-sm text-on-surface">상세 거래 내역</h2>
-                    <span className="text-label-md font-label-md text-on-surface-variant shrink-0">
-                      {transactions.length}건
+        {!isLoading && !errorMessage ? (
+          <>
+            <Card variant="charcoal" className="p-space-lg lg:p-space-xl section-reveal relative overflow-hidden" hoverLift>
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg">
+                <div className="flex flex-col gap-space-xs max-w-3xl min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="w-2 h-2 rounded-full bg-signal-advisory" />
+                    <span className="font-label-caps text-label-caps text-signal-advisory uppercase tracking-wider">
+                      AI 지출 진단
+                    </span>
+                    <span className="text-outline text-body-sm">•</span>
+                    <span className="font-label-caps text-label-caps text-on-surface-variant">
+                      {monthLabel || '이번 달'} 분석
                     </span>
                   </div>
-                  {listActionError ? (
-                    <p className="mx-md mt-md text-body-sm font-body-sm text-error px-sm py-xs bg-error-container rounded-lg border border-error/20" role="alert">
-                      {listActionError}
-                    </p>
-                  ) : null}
-                  {listActionSuccess ? (
-                    <p className="mx-md mt-md text-body-sm font-body-sm text-on-tertiary-container px-sm py-xs bg-tertiary-fixed/20 rounded-lg m-0">
-                      {listActionSuccess}
-                    </p>
-                  ) : null}
-                  <div className="flex-1 overflow-y-auto max-h-[520px]">
-                    {transactions.length === 0 ? (
-                      <p className="p-md text-body-sm font-body-sm text-on-surface-variant m-0">표시할 거래가 없습니다.</p>
-                    ) : (
-                      transactions.map((item, index) => {
-                        const meta = getCategoryMeta(item.category);
-                        const isIncome = item.type === 'income';
-                        const isEditing = editingId === item.id;
-                        const rowBusy = actionId === item.id;
+                  <h2 className="font-headline-md md:font-headline-lg text-headline-md md:text-headline-lg text-editorial-sage-light tracking-tight m-0 break-keep">
+                    {buildInsightHeadline({
+                      balance: summary?.balance,
+                      topExpense,
+                      monthLabel,
+                    })}
+                  </h2>
+                  <p className="font-body-md text-body-md text-editorial-sage-muted leading-relaxed m-0">
+                    잔액 {formatWon(summary?.balance)} · 수입 {formatWon(summary?.totalIncome)} · 지출{' '}
+                    {formatWon(summary?.totalExpense)}
+                    {topExpense
+                      ? ` · ${topExpense.category} ${formatWon(topExpense.amount)} (${topExpense.ratio}%)`
+                      : ''}
+                    . 총 {summary?.count ?? 0}건을 집계했습니다.
+                  </p>
+                </div>
+                <Button
+                  variant="extruded"
+                  className="px-space-lg py-space-sm shrink-0 self-end lg:self-center"
+                  onClick={loadAccountBook}
+                  disabled={isLoading}
+                >
+                  데이터 새로고침
+                  <MaterialIcon name="refresh" className="text-[18px]" />
+                </Button>
+              </div>
+            </Card>
 
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-sm md:gap-md section-reveal section-reveal-delay-1">
+              <SummaryCard label="총 수입" value={formatWon(incomeDisplay)} />
+              <SummaryCard label="총 지출" value={formatWon(expenseDisplay)} />
+              <SummaryCard label="잔액" value={formatWon(balanceDisplay)} />
+              <SummaryCard
+                label="거래 건수"
+                value={countDisplay != null ? `${Math.round(countDisplay)}건` : '-'}
+              />
+            </div>
+
+            <Card variant="architectural" className="p-space-lg lg:p-space-xl section-reveal section-reveal-delay-1 flex flex-col gap-space-md" hoverLift>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs">
+                <div className="flex items-center gap-2">
+                  <MaterialIcon name="account_balance_wallet" className="text-primary text-[20px]" />
+                  <span className="font-label-caps text-label-caps text-editorial-sage-light uppercase tracking-wider">
+                    {monthLabel || '이번 달'} 총 지출 현황
+                  </span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-numeric text-label-numeric">
+                  {budgetRatio != null ? `수입 대비 ${budgetRatio}%` : '수입 데이터 대기'}
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <span className="font-label-caps text-label-caps text-outline">KRW</span>
+                  <span className="font-display text-[2rem] sm:text-headline-lg text-editorial-sage-light tracking-tight font-bold financial-value">
+                    {formatWon(expenseDisplay)}
+                  </span>
+                </div>
+                <span className="font-body-sm text-body-sm text-outline">
+                  월 수입(예산 기준){' '}
+                  <span className="text-editorial-sage-light font-label-numeric font-semibold">
+                    {formatWon(incomeDisplay)}
+                  </span>
+                </span>
+              </div>
+              <ProgressBar
+                value={budgetRatio ?? 0}
+                heightClass="h-3"
+                barClassName="progress-bar-gradient"
+                animate={dataReady && budgetRatio != null}
+              />
+              <div className="flex justify-between items-center font-label-numeric text-label-numeric flex-wrap gap-2">
+                <span className="text-on-surface-variant">집행 {formatWon(totalExpense)}</span>
+                <span className="text-signal-advisory flex items-center gap-1 font-semibold">
+                  <MaterialIcon name="shield" className="text-[16px]" />
+                  잔여 버퍼: {remainingBuffer != null ? formatWon(remainingBuffer) : '-'}
+                </span>
+              </div>
+            </Card>
+
+            <Card variant="architectural" className="p-md md:p-lg section-reveal min-w-0" hoverLift>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-sm mb-md">
+                <h2 className="font-headline-sm text-headline-sm text-editorial-sage-light m-0">거래 등록</h2>
+                <span className="text-label-sm font-label-sm text-on-surface-variant">
+                  오늘 날짜 기본값 · 현재 월 통계에 반영
+                </span>
+              </div>
+
+              {formError ? (
+                <p
+                  className="text-body-sm font-body-sm text-signal-risk mb-md px-sm py-xs bg-signal-risk-subtle rounded-lg border border-signal-risk/20"
+                  role="alert"
+                >
+                  {formError}
+                  {isUnauthorized ? (
+                    <>
+                      {' '}
+                      <Link className="text-secondary font-medium underline" to="/login">
+                        로그인하기
+                      </Link>
+                    </>
+                  ) : null}
+                </p>
+              ) : null}
+              {formSuccess ? (
+                <p className="text-body-sm font-body-sm text-signal-positive mb-md px-sm py-xs bg-signal-positive-subtle rounded-lg m-0">
+                  {formSuccess}
+                </p>
+              ) : null}
+
+              <form className="space-y-md" onSubmit={handleCreate}>
+                <div className="flex flex-col sm:flex-row gap-sm">
+                  {[
+                    { id: 'expense', label: '지출' },
+                    { id: 'income', label: '수입' },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      disabled={isBusy}
+                      onClick={() => updateForm('type', item.id)}
+                      className={`flex-1 min-h-[44px] rounded-full text-label-sm font-label-md border transition-all ${
+                        form.type === item.id
+                          ? 'bg-primary-container text-on-primary-container border-primary shadow-extrude-sm'
+                          : 'bg-surface-charcoal text-on-surface-variant border-border-hairline'
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm md:gap-md">
+                  <Input
+                    id="account-amount"
+                    label="금액 (원)"
+                    type="number"
+                    min="1"
+                    step="1"
+                    placeholder="15000"
+                    icon="payments"
+                    required
+                    value={form.amount}
+                    onChange={(e) => updateForm('amount', e.target.value)}
+                    disabled={isBusy}
+                  />
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-label-caps text-label-caps tracking-wider text-editorial-sage-muted" htmlFor="account-category">
+                      카테고리 <span className="text-signal-risk">*</span>
+                    </label>
+                    <select
+                      id="account-category"
+                      className={SELECT_CLASS}
+                      value={form.category}
+                      onChange={(e) => updateForm('category', e.target.value)}
+                      disabled={isBusy}
+                      required
+                    >
+                      {categoryOptions.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <Input
+                    id="account-date"
+                    label="날짜"
+                    type="date"
+                    required
+                    value={form.date}
+                    onChange={(e) => updateForm('date', e.target.value)}
+                    disabled={isBusy}
+                  />
+                  <Input
+                    id="account-memo"
+                    label="메모 (선택)"
+                    type="text"
+                    placeholder="예: 점심 식사"
+                    icon="edit_note"
+                    value={form.memo}
+                    onChange={(e) => updateForm('memo', e.target.value)}
+                    disabled={isBusy}
+                    hint="최대 200자"
+                  />
+                </div>
+
+                <Button type="submit" variant="extruded" className="h-[48px] w-full sm:w-auto px-lg" disabled={isBusy}>
+                  {isSubmitting ? '등록 중…' : '거래 등록'}
+                </Button>
+              </form>
+            </Card>
+
+            {!hasData ? (
+              <Card variant="charcoal" className="p-md md:p-lg section-reveal">
+                <p className="text-body-md font-body-md text-on-surface-variant m-0 break-keep">
+                  {monthLabel}에 등록된 거래가 없습니다. 위에서 거래를 추가해보세요.
+                </p>
+              </Card>
+            ) : null}
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-md md:gap-space-xl min-w-0 section-reveal section-reveal-delay-2">
+              <Card variant="architectural" className="col-span-1 lg:col-span-8 p-md md:p-lg flex flex-col min-w-0" hoverLift>
+                <div className="flex justify-between items-center mb-md md:mb-lg gap-sm">
+                  <h2 className="font-headline-sm text-headline-sm text-editorial-sage-light m-0">카테고리별 지출</h2>
+                  <span className="text-label-sm font-label-sm text-on-surface-variant shrink-0">{monthLabel}</span>
+                </div>
+                {expenseCategories.length === 0 ? (
+                  <p className="text-body-sm font-body-sm text-on-surface-variant m-0 py-xl text-center">
+                    표시할 지출 카테고리가 없습니다.
+                  </p>
+                ) : (
+                  <div className="relative w-full pt-8 sm:pt-10">
+                    <div className="absolute inset-x-0 top-8 sm:top-10 bottom-8 flex flex-col justify-between pointer-events-none opacity-30">
+                      <div className="w-full border-t border-border-subtle" />
+                      <div className="w-full border-t border-border-subtle" />
+                      <div className="w-full border-t border-border-subtle" />
+                      <div className="w-full border-t border-border-subtle" />
+                      <div className="w-full border-t border-border-subtle" />
+                    </div>
+                    <div className="relative z-10 flex items-end justify-between gap-1 sm:gap-sm md:gap-md h-[180px] sm:h-[220px] w-full">
+                      {expenseCategories.slice(0, 8).map((item, index) => {
+                        const heightPct =
+                          maxExpenseAmount > 0
+                            ? Math.max(8, Math.round((Number(item.amount) / maxExpenseAmount) * 100))
+                            : 8;
+                        const isTop = index === 0;
                         return (
                           <div
-                            key={item.id || `${item.date}-${index}`}
-                            className={`${index === transactions.length - 1 ? '' : 'border-b border-outline-variant/50'}`}
+                            key={`${item.category}-${item.type}`}
+                            className="flex-1 min-w-0 h-full flex flex-col items-center justify-end gap-xs group"
                           >
-                            <div className="flex flex-col gap-sm p-md hover:bg-surface-container-low transition-colors min-w-0">
-                              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-sm min-w-0">
-                                <div className="flex items-center gap-md min-w-0">
-                                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${meta.wrap}`}>
-                                    <MaterialIcon name={meta.icon} />
-                                  </div>
-                                  <div className="min-w-0">
-                                    <div className="text-body-md font-body-md text-on-surface font-medium truncate">
-                                      {item.category}
-                                      <span className="ml-sm text-label-sm font-label-sm text-on-surface-variant">
-                                        {isIncome ? '수입' : '지출'}
-                                      </span>
-                                    </div>
-                                    <div className="text-label-sm font-label-sm text-on-surface-variant truncate">
-                                      {formatDate(item.date)}
-                                      {item.memo ? ` · ${item.memo}` : ''}
-                                    </div>
-                                  </div>
+                            <div className="w-full flex-1 flex items-end justify-center relative min-h-0">
+                              <div
+                                className={`absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] py-0.5 px-1.5 rounded font-bold whitespace-nowrap z-20 ${
+                                  isTop
+                                    ? 'bg-primary text-on-primary'
+                                    : 'bg-surface-container-high text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity'
+                                }`}
+                              >
+                                {item.ratio}%
+                              </div>
+                              <div
+                                className={`ai-feedback__bar w-full max-w-[36px] sm:max-w-[44px] rounded-t-sm ${
+                                  isTop ? 'bg-primary' : 'bg-surface-container-high group-hover:bg-secondary transition-colors'
+                                }`}
+                                style={{ height: `${heightPct}%`, animationDelay: `${index * 60}ms` }}
+                                title={`${item.category}: ${formatWon(item.amount)} (${item.ratio}%)`}
+                              />
+                            </div>
+                            <span
+                              className={`text-label-sm font-label-sm truncate max-w-full shrink-0 ${
+                                isTop ? 'text-primary font-bold' : 'text-on-surface-variant'
+                              }`}
+                            >
+                              {item.category}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </Card>
+
+              <Card variant="architectural" className="col-span-1 lg:col-span-4 p-md md:p-lg flex flex-col min-w-0" hoverLift>
+                <h2 className="font-headline-sm text-headline-sm text-editorial-sage-light mb-md m-0">카테고리별 분포</h2>
+                <div className="flex-1 flex flex-col items-center justify-center py-md">
+                  <div
+                    className="ai-feedback__donut relative w-36 h-36 sm:w-48 sm:h-48 rounded-full mb-lg"
+                    style={{ background: buildConicGradient(expenseCategories) }}
+                  >
+                    <div className="absolute inset-3 sm:inset-4 bg-surface-architectural rounded-full flex flex-col items-center justify-center shadow-inner px-2 text-center border border-border-hairline">
+                      <span className="text-label-sm font-label-sm text-on-surface-variant">총 지출</span>
+                      <span className="text-headline-sm font-headline-sm font-bold text-editorial-sage-light financial-value break-words">
+                        {formatWon(summary?.totalExpense ?? categorySummary?.totalExpense)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap justify-center gap-md px-sm">
+                    {expenseCategories.length === 0 ? (
+                      <span className="text-label-sm font-label-sm text-on-surface-variant">지출 카테고리 없음</span>
+                    ) : (
+                      expenseCategories.slice(0, 6).map((item) => (
+                        <div key={`legend-${item.category}`} className="flex items-center gap-xs">
+                          <div
+                            className="w-3 h-3 rounded-full shrink-0"
+                            style={{ backgroundColor: getCategoryMeta(item.category).color }}
+                          />
+                          <span className="text-label-sm font-label-sm text-editorial-sage-muted">
+                            {item.category} ({item.ratio}%)
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  {incomeCategories.length > 0 ? (
+                    <div className="mt-md w-full border-t border-border-subtle pt-md">
+                      <p className="text-label-sm font-label-sm text-on-surface-variant m-0 mb-sm text-center">수입 카테고리</p>
+                      <div className="flex flex-wrap justify-center gap-sm">
+                        {incomeCategories.map((item) => (
+                          <span
+                            key={`income-${item.category}`}
+                            className="text-label-sm font-label-sm bg-surface-charcoal px-sm py-xs rounded border border-border-subtle"
+                          >
+                            {item.category} {formatWon(item.amount)} ({item.ratio}%)
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              </Card>
+
+              <Card variant="charcoal" className="col-span-1 lg:col-span-12 p-0 flex flex-col overflow-hidden min-w-0 section-reveal section-reveal-delay-3">
+                <div className="p-md md:p-lg border-b border-border-hairline flex justify-between items-center gap-sm bg-surface-architectural/50">
+                  <div className="flex items-center gap-sm min-w-0">
+                    <div className="w-10 h-10 rounded-DEFAULT bg-surface-architectural border border-border-subtle flex items-center justify-center text-primary shrink-0">
+                      <MaterialIcon name="receipt_long" className="text-[22px]" />
+                    </div>
+                    <div className="min-w-0">
+                      <h2 className="font-headline-sm text-headline-sm text-editorial-sage-light m-0">상세 거래 내역</h2>
+                      <span className="font-label-caps text-label-caps text-outline tracking-wider uppercase">
+                        최근 등록된 거래 피드
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-label-md font-label-md text-on-surface-variant shrink-0">{transactions.length}건</span>
+                </div>
+                {listActionError ? (
+                  <p
+                    className="mx-md mt-md text-body-sm font-body-sm text-signal-risk px-sm py-xs bg-signal-risk-subtle rounded-lg border border-signal-risk/20"
+                    role="alert"
+                  >
+                    {listActionError}
+                  </p>
+                ) : null}
+                {listActionSuccess ? (
+                  <p className="mx-md mt-md text-body-sm font-body-sm text-signal-positive px-sm py-xs bg-signal-positive-subtle rounded-lg m-0">
+                    {listActionSuccess}
+                  </p>
+                ) : null}
+                <div className="flex-1 overflow-y-auto max-h-[520px]">
+                  {transactions.length === 0 ? (
+                    <p className="p-md text-body-sm font-body-sm text-on-surface-variant m-0">표시할 거래가 없습니다.</p>
+                  ) : (
+                    transactions.map((item, index) => {
+                      const meta = getCategoryMeta(item.category);
+                      const isIncome = item.type === 'income';
+                      const isEditing = editingId === item.id;
+                      const rowBusy = actionId === item.id;
+
+                      return (
+                        <div
+                          key={item.id || `${item.date}-${index}`}
+                          className={`${index === transactions.length - 1 ? '' : 'border-b border-border-subtle'}`}
+                        >
+                          <div className="ai-feedback__tx-row flex flex-col gap-sm p-md hover:bg-surface-container min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-sm min-w-0">
+                              <div className="flex items-center gap-md min-w-0">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${meta.wrap}`}>
+                                  <MaterialIcon name={meta.icon} />
                                 </div>
-                                <div className="flex flex-col sm:flex-row sm:items-center gap-sm pl-[52px] sm:pl-0 shrink-0">
-                                  <div className="text-left sm:text-right">
-                                    <div
-                                      className={`text-body-md font-body-md font-semibold financial-value ${
-                                        isIncome ? 'text-on-tertiary-container' : 'text-on-surface'
-                                      }`}
-                                    >
-                                      {isIncome ? '+' : '-'}
-                                      {formatWon(item.amount)}
-                                    </div>
-                                    <div className="text-label-sm font-label-sm text-on-surface-variant">{item.type}</div>
+                                <div className="min-w-0">
+                                  <div className="text-body-md font-body-md text-editorial-sage-light font-medium truncate">
+                                    {item.category}
+                                    <span className="ml-sm text-label-sm font-label-sm text-on-surface-variant">
+                                      {isIncome ? '수입' : '지출'}
+                                    </span>
                                   </div>
-                                  <div className="flex gap-sm">
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      className="h-[44px] px-md"
-                                      disabled={isBusy}
-                                      onClick={() => (isEditing ? cancelEdit() : startEdit(item))}
-                                    >
-                                      {isEditing ? '닫기' : '수정'}
-                                    </Button>
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      className="h-[44px] px-md text-error border-error/40"
-                                      disabled={isBusy}
-                                      onClick={() => handleDelete(item)}
-                                    >
-                                      {rowBusy ? '삭제 중…' : '삭제'}
-                                    </Button>
+                                  <div className="text-label-sm font-label-sm text-on-surface-variant truncate">
+                                    {formatDate(item.date)}
+                                    {item.memo ? ` · ${item.memo}` : ''}
                                   </div>
                                 </div>
                               </div>
-
-                              {isEditing && editForm ? (
-                                <form
-                                  className="rounded-lg border border-outline-variant bg-surface-container-lowest p-md space-y-md"
-                                  onSubmit={handleUpdate}
-                                >
-                                  {editError ? (
-                                    <p
-                                      className="text-body-sm font-body-sm text-error m-0 px-sm py-xs bg-error-container rounded-lg border border-error/20"
-                                      role="alert"
-                                    >
-                                      {editError}
-                                    </p>
-                                  ) : null}
-                                  <div className="flex flex-col sm:flex-row gap-sm">
-                                    {[
-                                      { id: 'expense', label: '지출' },
-                                      { id: 'income', label: '수입' },
-                                    ].map((option) => (
-                                      <button
-                                        key={option.id}
-                                        type="button"
-                                        disabled={rowBusy}
-                                        onClick={() => updateEditForm('type', option.id)}
-                                        className={`flex-1 min-h-[44px] rounded-lg text-label-sm font-label-md border ${
-                                          editForm.type === option.id
-                                            ? 'bg-secondary-container text-on-secondary-container border-secondary'
-                                            : 'bg-surface text-on-surface-variant border-outline-variant'
-                                        }`}
-                                      >
-                                        {option.label}
-                                      </button>
-                                    ))}
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-sm pl-[52px] sm:pl-0 shrink-0">
+                                <div className="text-left sm:text-right">
+                                  <div
+                                    className={`text-body-md font-body-md font-semibold financial-value ${
+                                      isIncome ? 'text-signal-positive' : 'text-editorial-sage-light'
+                                    }`}
+                                  >
+                                    {isIncome ? '+' : '-'}
+                                    {formatWon(item.amount)}
                                   </div>
-                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
-                                    <Input
-                                      id={`edit-amount-${item.id}`}
-                                      label="금액 (원)"
-                                      type="number"
-                                      placeholder="15000"
-                                      icon="payments"
-                                      required
-                                      value={editForm.amount}
-                                      onChange={(e) => updateEditForm('amount', e.target.value)}
-                                      disabled={rowBusy}
-                                    />
-                                    <div className="flex flex-col gap-xs">
-                                      <label
-                                        className="text-label-md font-label-md text-on-surface"
-                                        htmlFor={`edit-category-${item.id}`}
-                                      >
-                                        카테고리
-                                      </label>
-                                      <select
-                                        id={`edit-category-${item.id}`}
-                                        className={SELECT_CLASS}
-                                        value={editForm.category}
-                                        onChange={(e) => updateEditForm('category', e.target.value)}
-                                        disabled={rowBusy}
-                                        required
-                                      >
-                                        {editCategoryOptions.map((category) => (
-                                          <option key={category} value={category}>
-                                            {category}
-                                          </option>
-                                        ))}
-                                      </select>
-                                    </div>
-                                    <Input
-                                      id={`edit-date-${item.id}`}
-                                      label="날짜"
-                                      type="date"
-                                      required
-                                      value={editForm.date}
-                                      onChange={(e) => updateEditForm('date', e.target.value)}
-                                      disabled={rowBusy}
-                                    />
-                                    <Input
-                                      id={`edit-memo-${item.id}`}
-                                      label="메모 (선택)"
-                                      type="text"
-                                      placeholder="예: 점심 식사"
-                                      icon="edit_note"
-                                      value={editForm.memo}
-                                      onChange={(e) => updateEditForm('memo', e.target.value)}
-                                      disabled={rowBusy}
-                                    />
-                                  </div>
-                                  <div className="flex flex-col-reverse sm:flex-row gap-sm">
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      className="h-[44px] px-md"
-                                      disabled={rowBusy}
-                                      onClick={cancelEdit}
-                                    >
-                                      취소
-                                    </Button>
-                                    <Button type="submit" variant="secondary" className="h-[44px] px-md" disabled={rowBusy}>
-                                      {rowBusy ? '저장 중…' : '수정 저장'}
-                                    </Button>
-                                  </div>
-                                </form>
-                              ) : null}
+                                  <div className="text-label-sm font-label-sm text-on-surface-variant">{item.type}</div>
+                                </div>
+                                <div className="flex gap-sm">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="h-[44px] px-md rounded-full"
+                                    disabled={isBusy}
+                                    onClick={() => (isEditing ? cancelEdit() : startEdit(item))}
+                                  >
+                                    {isEditing ? '닫기' : '수정'}
+                                  </Button>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="h-[44px] px-md rounded-full text-signal-risk border-signal-risk/40"
+                                    disabled={isBusy}
+                                    onClick={() => handleDelete(item)}
+                                  >
+                                    {rowBusy ? '삭제 중…' : '삭제'}
+                                  </Button>
+                                </div>
+                              </div>
                             </div>
+
+                            {isEditing && editForm ? (
+                              <form
+                                className="rounded-lg border border-border-hairline bg-surface-architectural p-md space-y-md"
+                                onSubmit={handleUpdate}
+                              >
+                                {editError ? (
+                                  <p
+                                    className="text-body-sm font-body-sm text-signal-risk m-0 px-sm py-xs bg-signal-risk-subtle rounded-lg border border-signal-risk/20"
+                                    role="alert"
+                                  >
+                                    {editError}
+                                  </p>
+                                ) : null}
+                                <div className="flex flex-col sm:flex-row gap-sm">
+                                  {[
+                                    { id: 'expense', label: '지출' },
+                                    { id: 'income', label: '수입' },
+                                  ].map((option) => (
+                                    <button
+                                      key={option.id}
+                                      type="button"
+                                      disabled={rowBusy}
+                                      onClick={() => updateEditForm('type', option.id)}
+                                      className={`flex-1 min-h-[44px] rounded-full text-label-sm font-label-md border ${
+                                        editForm.type === option.id
+                                          ? 'bg-primary-container text-on-primary-container border-primary'
+                                          : 'bg-surface-charcoal text-on-surface-variant border-border-hairline'
+                                      }`}
+                                    >
+                                      {option.label}
+                                    </button>
+                                  ))}
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-sm">
+                                  <Input
+                                    id={`edit-amount-${item.id}`}
+                                    label="금액 (원)"
+                                    type="number"
+                                    placeholder="15000"
+                                    icon="payments"
+                                    required
+                                    value={editForm.amount}
+                                    onChange={(e) => updateEditForm('amount', e.target.value)}
+                                    disabled={rowBusy}
+                                  />
+                                  <div className="flex flex-col gap-1.5">
+                                    <label
+                                      className="font-label-caps text-label-caps tracking-wider text-editorial-sage-muted"
+                                      htmlFor={`edit-category-${item.id}`}
+                                    >
+                                      카테고리
+                                    </label>
+                                    <select
+                                      id={`edit-category-${item.id}`}
+                                      className={SELECT_CLASS}
+                                      value={editForm.category}
+                                      onChange={(e) => updateEditForm('category', e.target.value)}
+                                      disabled={rowBusy}
+                                      required
+                                    >
+                                      {editCategoryOptions.map((category) => (
+                                        <option key={category} value={category}>
+                                          {category}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                  <Input
+                                    id={`edit-date-${item.id}`}
+                                    label="날짜"
+                                    type="date"
+                                    required
+                                    value={editForm.date}
+                                    onChange={(e) => updateEditForm('date', e.target.value)}
+                                    disabled={rowBusy}
+                                  />
+                                  <Input
+                                    id={`edit-memo-${item.id}`}
+                                    label="메모 (선택)"
+                                    type="text"
+                                    placeholder="예: 점심 식사"
+                                    icon="edit_note"
+                                    value={editForm.memo}
+                                    onChange={(e) => updateEditForm('memo', e.target.value)}
+                                    disabled={rowBusy}
+                                  />
+                                </div>
+                                <div className="flex flex-col-reverse sm:flex-row gap-sm">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="h-[44px] px-md rounded-full"
+                                    disabled={rowBusy}
+                                    onClick={cancelEdit}
+                                  >
+                                    취소
+                                  </Button>
+                                  <Button type="submit" variant="extruded" className="h-[44px] px-md" disabled={rowBusy}>
+                                    {rowBusy ? '저장 중…' : '수정 저장'}
+                                  </Button>
+                                </div>
+                              </form>
+                            ) : null}
                           </div>
-                        );
-                      })
-                    )}
-                  </div>
-                </Card>
-              </div>
-            </>
-          ) : null}
-        </div>
-      </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </Card>
+            </div>
+          </>
+        ) : null}
+      </PageContainer>
     </div>
   );
 }
 
 function SummaryCard({ label, value }) {
   return (
-    <Card className="p-md min-w-0">
-      <p className="text-label-sm font-label-sm text-on-surface-variant m-0 mb-xs">{label}</p>
-      <p className="text-body-md md:text-headline-sm font-headline-sm text-primary financial-value m-0 break-words">{value}</p>
+    <Card variant="architectural" className="p-md min-w-0" hoverLift>
+      <p className="font-label-caps text-label-caps text-on-surface-variant m-0 mb-xs tracking-wider">{label}</p>
+      <p className="text-body-md md:text-headline-sm font-headline-sm text-primary financial-value m-0 break-words">
+        {value}
+      </p>
     </Card>
   );
 }

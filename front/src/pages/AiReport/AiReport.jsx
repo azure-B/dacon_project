@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, MaterialIcon, WipBadge } from '../../components/common';
+import { Button, Card, MaterialIcon, ProgressBar, WipBadge } from '../../components/common';
+import { PageContainer } from '../../components/layout';
+import useCountUp from '../../hooks/useCountUp';
 import { api } from '../../services/api';
 import { getAccessToken } from '../../services/authStorage';
 import './AiReport.css';
@@ -11,15 +13,6 @@ const SIDE_ITEMS = [
   { id: 'risk', icon: 'settings_applications', label: '조심할 점', wip: true },
   { id: 'audit', icon: 'history', label: '지난 기록', wip: true },
   { id: 'security', icon: 'shield', label: '보안', wip: true },
-];
-
-const CHART_MONTHS = [
-  { label: '4월', segments: [{ height: '38%' }, { height: '28%' }, { height: '12%' }] },
-  { label: '5월', segments: [{ height: '40%' }, { height: '26%' }, { height: '14%' }] },
-  { label: '6월', segments: [{ height: '42%' }, { height: '30%' }, { height: '10%' }] },
-  { label: '7월', segments: [{ height: '41%' }, { height: '29%' }, { height: '13%' }] },
-  { label: '8월', segments: [{ height: '44%' }, { height: '31%' }, { height: '16%' }], current: true },
-  { label: '9월', segments: [{ height: '40%' }, { height: '27%' }, { height: '11%' }] },
 ];
 
 const CATEGORY_ICONS = {
@@ -41,8 +34,10 @@ function formatWon(value) {
 }
 
 function difficultyClass(label) {
-  if (label === '어려움' || label === '보통') return 'bg-surface-variant text-on-surface-variant';
-  return 'bg-tertiary-fixed-dim/20 text-on-tertiary-container';
+  if (label === '어려움' || label === '보통') {
+    return 'bg-signal-advisory-subtle text-signal-advisory';
+  }
+  return 'bg-signal-positive-subtle text-primary';
 }
 
 function mapSavingsRows(recommendations = []) {
@@ -62,24 +57,78 @@ function mapProblems(evaluation) {
   const tops = evaluation?.summary?.topCategories || [];
   if (tops.length > 0) {
     return tops.slice(0, 3).map((item, index) => ({
-      number: String(index + 1),
+      number: String(index + 1).padStart(2, '0'),
       title: `${item.category} 지출 점검`,
       desc: `${item.category}에 ${Number(item.amount || 0).toLocaleString('ko-KR')}원을 썼어요.`,
-      variant: index === 0 ? 'error' : 'default',
+      variant: index === 0 ? 'risk' : index === 1 ? 'advisory' : 'default',
+      badge: index === 0 ? '위험' : index === 1 ? '경고' : '권고',
     }));
   }
   if (evaluation?.insight) {
     return [
       {
-        number: '1',
+        number: '01',
         title: '한눈에 본 포인트',
         desc: evaluation.insight,
-        variant: 'error',
+        variant: 'advisory',
+        badge: '권고',
       },
     ];
   }
   return [];
 }
+
+/** Build chart bars from evaluation categories or recommendation savings — never fake months. */
+function buildChartBars(evaluation, recommendations = []) {
+  const tops = evaluation?.summary?.topCategories || [];
+  if (tops.length > 0) {
+    const max = Math.max(...tops.map((t) => Number(t.amount) || 0), 1);
+    return tops.slice(0, 6).map((item, index) => {
+      const amount = Number(item.amount) || 0;
+      return {
+        key: `cat-${item.category}-${index}`,
+        label: item.category || `항목 ${index + 1}`,
+        amount,
+        heightPct: Math.max(10, Math.round((amount / max) * 100)),
+        highlight: index === 0,
+      };
+    });
+  }
+
+  if (recommendations.length > 0) {
+    const max = Math.max(...recommendations.map((r) => Number(r.estimatedMonthlySaving) || 0), 1);
+    return recommendations.slice(0, 6).map((item, index) => {
+      const amount = Number(item.estimatedMonthlySaving) || 0;
+      return {
+        key: `rec-${item.category || item.title}-${index}`,
+        label: item.category || item.title || `권고 ${index + 1}`,
+        amount,
+        heightPct: Math.max(10, Math.round((amount / max) * 100)),
+        highlight: index === 0,
+      };
+    });
+  }
+
+  return [];
+}
+
+const PROBLEM_STYLES = {
+  risk: {
+    border: 'hover:border-signal-risk/40',
+    badge: 'bg-signal-risk-subtle text-signal-risk',
+    num: 'bg-signal-risk/15 text-signal-risk',
+  },
+  advisory: {
+    border: 'hover:border-signal-advisory/40',
+    badge: 'bg-signal-advisory-subtle text-signal-advisory',
+    num: 'bg-signal-advisory/15 text-signal-advisory',
+  },
+  default: {
+    border: 'hover:border-secondary/40',
+    badge: 'bg-secondary/15 text-secondary',
+    num: 'bg-secondary/15 text-secondary',
+  },
+};
 
 function SavingsTableBody({ isLoading, errorMessage, savingsRows, onRetry }) {
   if (isLoading) {
@@ -103,7 +152,7 @@ function SavingsTableBody({ isLoading, errorMessage, savingsRows, onRetry }) {
             로그인하면 이번 달 절감 가능 항목을 볼 수 있어요.
           </p>
           <Link to="/login">
-            <Button variant="secondary" className="h-[44px] px-md">
+            <Button variant="extruded" className="h-[44px] px-md">
               로그인하기
             </Button>
           </Link>
@@ -116,7 +165,7 @@ function SavingsTableBody({ isLoading, errorMessage, savingsRows, onRetry }) {
     return (
       <tr>
         <td colSpan={4} className="py-10 px-md text-center">
-          <p className="text-body-sm font-body-sm text-error m-0 mb-md break-keep" role="alert">
+          <p className="text-body-sm font-body-sm text-signal-risk m-0 mb-md break-keep" role="alert">
             {errorMessage}
           </p>
           <Button variant="secondary" className="h-[44px] px-md" onClick={onRetry}>
@@ -138,17 +187,22 @@ function SavingsTableBody({ isLoading, errorMessage, savingsRows, onRetry }) {
   }
 
   return savingsRows.map((row) => (
-    <tr key={row.key} className="border-b border-surface-variant last:border-b-0 hover:bg-surface transition-colors">
+    <tr
+      key={row.key}
+      className="border-b border-border-subtle last:border-b-0 hover:bg-surface-container/40 transition-colors"
+    >
       <td className="py-4 px-md">
         <div className="flex items-center gap-2">
           <MaterialIcon name={row.icon} className="text-[18px] text-secondary" />
-          {row.category}
+          <span className="text-editorial-sage-light">{row.category}</span>
         </div>
       </td>
       <td className="py-4 px-md text-on-surface-variant">{row.detail}</td>
-      <td className="py-4 px-md text-right font-bold text-primary">{row.amount}</td>
+      <td className="py-4 px-md text-right font-bold text-primary financial-value">{row.amount}</td>
       <td className="py-4 px-md text-center">
-        <span className={`inline-block px-2 py-1 text-xs rounded ${row.difficultyClass}`}>{row.difficulty}</span>
+        <span className={`inline-block px-2 py-1 text-xs rounded font-label-caps ${row.difficultyClass}`}>
+          {row.difficulty}
+        </span>
       </td>
     </tr>
   ));
@@ -159,6 +213,8 @@ export default function AiReport() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
   const [evaluation, setEvaluation] = useState(null);
+  const [pdfFeedback, setPdfFeedback] = useState('');
+  const [shareFeedback, setShareFeedback] = useState('');
 
   const loadEvaluation = useCallback(async () => {
     setErrorMessage('');
@@ -194,19 +250,36 @@ export default function AiReport() {
   const savingsRows = mapSavingsRows(evaluation?.recommendations || []);
   const totalSaving = savingsRows.reduce((sum, row) => sum + row.saving, 0);
   const problems = mapProblems(evaluation);
+  const chartBars = buildChartBars(evaluation, evaluation?.recommendations || []);
   const hasLoggedInData = !isLoading && errorMessage !== 'login' && !errorMessage;
+  const savingDisplay = useCountUp(hasLoggedInData ? totalSaving : null);
+
+  const handlePdfClick = () => {
+    setPdfFeedback('준비 중');
+    window.setTimeout(() => setPdfFeedback(''), 1800);
+  };
+
+  const handleShareClick = () => {
+    setShareFeedback('준비 중');
+    window.setTimeout(() => setShareFeedback(''), 1800);
+  };
+
+  const reportPeriodLabel = (() => {
+    const now = new Date();
+    return `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}`;
+  })();
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-stretch antialiased page-shell min-w-0">
-      <aside className="hidden md:flex flex-col w-64 shrink-0 self-stretch min-h-[calc(100vh-4rem)] sticky top-16 bg-surface-container-low border-r border-outline-variant py-md gap-sm z-40">
+    <div className="flex min-h-[calc(100vh-4rem)] items-stretch antialiased min-w-0 bg-canvas-deep">
+      <aside className="hidden md:flex flex-col w-64 shrink-0 self-stretch min-h-[calc(100vh-4rem)] sticky top-16 bg-surface-charcoal/90 border-r border-border-hairline py-md gap-sm z-40">
         <div className="px-md mb-md">
           <div className="flex items-center gap-sm mb-xs">
-            <div className="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+            <div className="w-8 h-8 rounded-DEFAULT bg-surface-architectural border border-border-hairline flex items-center justify-center text-primary">
               <MaterialIcon name="summarize" className="text-[20px]" />
             </div>
             <div>
-              <h2 className="text-label-md font-label-md font-bold text-on-surface">한 장 요약</h2>
-              <p className="text-label-sm font-label-sm text-on-surface-variant">이번 달 돈 흐름</p>
+              <h2 className="font-label-caps text-label-caps text-editorial-sage-light tracking-wider">한 장 요약</h2>
+              <p className="text-label-sm font-label-sm text-on-surface-variant m-0">이번 달 돈 흐름</p>
             </div>
           </div>
         </div>
@@ -221,8 +294,8 @@ export default function AiReport() {
                 onClick={() => !item.wip && setSideTab(item.id)}
                 className={
                   active
-                    ? 'flex items-center gap-md px-md py-3 text-label-md font-label-md bg-secondary-container text-on-secondary-container rounded-lg mx-2 my-1 scale-95 duration-150 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100'
-                    : 'flex items-center gap-md px-md py-3 text-label-md font-label-md text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed'
+                    ? 'flex items-center gap-md px-md py-3 text-label-numeric font-label-numeric bg-primary-container text-on-primary-container rounded-lg mx-2 my-1 shadow-[0_2px_0_#0D6D43] disabled:opacity-50 disabled:cursor-not-allowed'
+                    : 'flex items-center gap-md px-md py-3 text-label-numeric font-label-numeric text-on-surface-variant hover:bg-surface-architectural hover:text-editorial-sage-light mx-2 my-1 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed'
                 }
               >
                 <MaterialIcon name={item.icon} filled={active} />
@@ -241,8 +314,8 @@ export default function AiReport() {
         </div>
       </aside>
 
-      <main className="flex-1 md:ml-0 w-full max-w-container-max mx-auto px-3 sm:px-margin-mobile md:px-margin-desktop py-md md:py-xl min-w-0 overflow-x-hidden">
-        <nav className="md:hidden flex gap-sm overflow-x-auto hide-scrollbar pb-sm mb-md border-b border-outline-variant -mx-1 px-1">
+      <PageContainer className="flex-1 gap-space-xl py-md md:py-space-xl">
+        <nav className="md:hidden flex gap-sm overflow-x-auto hide-scrollbar pb-sm border-b border-border-hairline -mx-1 px-1 section-reveal">
           {SIDE_ITEMS.map((item) => {
             const active = sideTab === item.id;
             return (
@@ -253,8 +326,8 @@ export default function AiReport() {
                 onClick={() => !item.wip && setSideTab(item.id)}
                 className={`shrink-0 px-md py-2 rounded-full text-label-sm font-label-md min-h-[44px] inline-flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed ${
                   active
-                    ? 'bg-secondary-container text-on-secondary-container font-bold'
-                    : 'bg-surface-container-low text-on-surface-variant border border-outline-variant'
+                    ? 'bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_0_#0D6D43]'
+                    : 'bg-surface-architectural text-on-surface-variant border border-border-hairline'
                 }`}
               >
                 {item.label}
@@ -264,191 +337,379 @@ export default function AiReport() {
           })}
         </nav>
 
-        <div className="mb-lg md:mb-xl flex flex-col md:flex-row justify-between items-start md:items-end gap-md">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-surface-container-high rounded-full mb-4">
-              <span className="w-2 h-2 rounded-full bg-secondary" />
-              <span className="text-label-sm font-label-sm text-on-surface-variant tracking-wider uppercase">이번 달 분석</span>
+        {/* Meta bar + editorial title */}
+        <header className="section-reveal flex flex-col gap-space-md">
+          <div className="flex flex-wrap items-center justify-between gap-space-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-architectural border border-border-hairline">
+              <span className="w-2 h-2 rounded-full bg-primary" />
+              <span className="font-label-caps text-label-caps text-editorial-sage-light tracking-wider uppercase">
+                VOL. · 정밀 재무 진단 리포트 ({reportPeriodLabel})
+              </span>
             </div>
-            <h1 className="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-primary mb-2 break-keep">
-              한 장 요약 보고서
-            </h1>
-            <p className="text-body-sm md:text-body-lg font-body-lg text-on-surface-variant break-keep">
-              {evaluation?.insight || '가계부를 바탕으로 절감 포인트와 문제점을 정리했어요.'}
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row flex-wrap gap-sm w-full md:w-auto">
-            <Button variant="outline" className="px-4 py-2 h-12 sm:h-auto w-full sm:w-auto inline-flex items-center justify-center gap-1" disabled>
-              <MaterialIcon name="download" className="text-[18px]" />
-              PDF 다운로드
-              <WipBadge />
-            </Button>
-            <Button variant="secondary" className="px-4 py-2 h-12 sm:h-auto w-full sm:w-auto inline-flex items-center justify-center gap-1" disabled>
-              <MaterialIcon name="share" className="text-[18px]" />
-              보고서 공유
-              <WipBadge />
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-md md:gap-lg min-w-0">
-          <div className="col-span-1 md:col-span-12 grid grid-cols-1 md:grid-cols-2 gap-md md:gap-lg mb-4">
-            <Card className="p-md md:p-lg flex flex-col justify-center relative overflow-hidden group hover:shadow-level-2 transition-shadow border-0 min-w-0">
-              <div className="absolute -right-12 -top-12 w-48 h-48 bg-secondary-container rounded-full opacity-10 group-hover:scale-110 transition-transform duration-500" />
-              <div className="flex items-center gap-sm mb-md text-secondary">
-                <MaterialIcon name="savings" />
-                <h3 className="text-headline-sm font-headline-sm">예상 절감액 (월간)</h3>
-              </div>
-              <div className="flex flex-wrap items-end gap-sm">
-                <span className="text-headline-lg-mobile md:text-display-lg font-display-lg text-primary tracking-tight financial-value break-words">
-                  {isLoading ? '…' : hasLoggedInData ? formatWon(totalSaving) : '-'}
-                </span>
-                <span className="text-body-md font-body-md text-on-surface-variant mb-1 sm:mb-2">/ 월</span>
-              </div>
-              <div className="mt-sm flex items-center gap-2 text-on-surface-variant">
-                <MaterialIcon name="info" className="text-[16px]" />
-                <span className="text-label-md font-label-md break-keep">
-                  {hasLoggedInData && savingsRows.length > 0
-                    ? `추천 ${savingsRows.length}개 항목 합계예요`
-                    : '절감 항목 표를 확인해보세요'}
-                </span>
-              </div>
-            </Card>
-
-            <Card className="p-md md:p-lg flex flex-col justify-center relative overflow-hidden group hover:shadow-level-2 transition-shadow border-0 min-w-0">
-              <div className="absolute -right-12 -bottom-12 w-48 h-48 bg-tertiary-container rounded-full opacity-5 group-hover:scale-110 transition-transform duration-500" />
-              <div className="flex items-center gap-sm mb-md text-tertiary-container">
-                <MaterialIcon name="flag" />
-                <h3 className="text-headline-sm font-headline-sm flex items-center gap-1 flex-wrap">
-                  목표 달성 예상 기간
-                  <WipBadge />
-                </h3>
-              </div>
-              <div className="flex items-end gap-sm">
-                <span className="text-headline-lg-mobile md:text-display-lg font-display-lg text-primary tracking-tight break-words">14개월 단축</span>
-              </div>
-              <div className="mt-sm">
-                <div className="w-full bg-surface-variant rounded-full h-2.5 mb-2">
-                  <div className="bg-tertiary-fixed-dim h-2.5 rounded-full" style={{ width: '75%' }} />
-                </div>
-                <div className="flex flex-col sm:flex-row justify-between gap-1 sm:gap-2 text-label-sm font-label-sm text-on-surface-variant">
-                  <span className="break-keep">기존 예상: 60개월</span>
-                  <span className="text-primary font-bold break-keep">조금만 손보면: 46개월</span>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          <Card className="col-span-1 md:col-span-8 flex flex-col hover:shadow-level-2 transition-shadow border-0 overflow-hidden min-w-0">
-            <div className="p-md md:p-lg border-b border-outline-variant flex flex-col sm:flex-row justify-between items-start sm:items-center gap-sm">
-              <div className="flex items-center gap-sm">
-                <MaterialIcon name="query_stats" className="text-secondary" />
-                <h3 className="text-headline-sm font-headline-sm text-primary flex items-center gap-1 flex-wrap">
-                  주요 분석: 현금 흐름 및 지출 패턴
-                  <WipBadge />
-                </h3>
-              </div>
-              <span className="px-2 py-1 bg-surface-variant text-on-surface-variant text-label-sm font-label-sm rounded">6개월</span>
+            <div className="flex flex-wrap items-center gap-space-sm">
+              <Button
+                variant="outline"
+                className="px-space-md py-1.5 h-auto rounded-full inline-flex items-center gap-1.5"
+                disabled
+                onClick={handleShareClick}
+              >
+                <MaterialIcon name="share" className="text-[16px]" />
+                {shareFeedback || '보고서 공유'}
+                <WipBadge />
+              </Button>
+              <Button
+                variant="extruded"
+                className="px-space-md py-1.5 h-auto rounded-full inline-flex items-center gap-1.5"
+                disabled
+                onClick={handlePdfClick}
+              >
+                <MaterialIcon name={pdfFeedback ? 'sync' : 'download'} className={`text-[16px] ${pdfFeedback ? 'animate-spin' : ''}`} />
+                {pdfFeedback || 'PDF 다운로드'}
+                <WipBadge />
+              </Button>
             </div>
-            <div className="p-md md:p-lg flex-1 flex flex-col min-w-0 overflow-hidden">
-              <p className="text-body-sm font-body-sm text-on-surface-variant mb-md break-keep">
-                지난 6개월간의 데이터를 분석한 결과, 고정비 지출이 권장 수준(수입의 40%)을 초과하여 52%에 달하고 있습니다. 특히 이자
-                비용과 구독 서비스 항목에서 비효율성이 두드러집니다.
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-end pb-space-md border-b border-border-subtle">
+            <div className="lg:col-span-8 flex flex-col gap-space-xs min-w-0">
+              <span className="font-label-caps text-label-caps text-primary tracking-[0.2em] uppercase">
+                QUANT ACTUARIAL AUDIT
+              </span>
+              <h1 className="font-display text-headline-lg lg:text-display text-editorial-sage-light tracking-tight font-bold m-0 break-keep">
+                AI 심층 재무 보고서
+                <span className="block text-on-surface-variant text-headline-md font-headline-md font-normal mt-1">
+                  Actuarial Intelligence &amp; Cash Velocity Dossier
+                </span>
+              </h1>
+            </div>
+            <div className="lg:col-span-4 pb-1 min-w-0">
+              <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed m-0 break-keep">
+                {evaluation?.insight ||
+                  '가계 수지 분석이 지출 행동·고정 대출·금리 위험을 교차 검증해 도출한 맞춤형 전략 보고서입니다.'}
               </p>
-              <div className="w-full flex-1 min-h-[220px] flex items-stretch gap-2 sm:gap-3 overflow-hidden">
-                {CHART_MONTHS.map((month) => (
-                  <div key={month.label} className="flex-1 min-w-0 flex flex-col items-center gap-2 group">
-                    <div className="w-full flex-1 min-h-0 flex items-end justify-center rounded-t-md bg-surface-container px-1 pt-2 overflow-hidden">
-                      <div className="w-[72%] max-w-[52px] h-full flex flex-col-reverse rounded-t-sm overflow-hidden">
-                        <div
-                          className="w-full bg-primary-container group-hover:bg-primary transition-colors"
-                          style={{ height: month.segments[0].height }}
-                        />
-                        <div className="w-full bg-secondary-container" style={{ height: month.segments[1].height }} />
-                        <div className="w-full bg-error-container rounded-t-sm" style={{ height: month.segments[2].height }} />
-                        <div className="flex-1 min-h-0" />
-                      </div>
-                    </div>
-                    <span
-                      className={`text-label-sm font-label-sm shrink-0 ${
-                        month.current ? 'text-primary font-bold' : 'text-on-surface-variant'
-                      }`}
-                    >
-                      {month.label}
-                    </span>
-                  </div>
-                ))}
+            </div>
+          </div>
+        </header>
+
+        {/* Focal KPI + WIP goal */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg section-reveal section-reveal-delay-1">
+          <Card
+            variant="frosted"
+            className="lg:col-span-6 p-space-xl relative overflow-hidden flex flex-col justify-between"
+            hoverLift
+          >
+            <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+            <div>
+              <div className="flex items-center justify-between gap-2 mb-space-md flex-wrap">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-charcoal border border-border-hairline font-label-caps text-label-caps text-editorial-sage-light">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                  월간 최적화 여력
+                </span>
+                {hasLoggedInData && savingsRows.length > 0 ? (
+                  <span className="font-label-numeric text-label-numeric text-primary font-semibold">
+                    추천 {savingsRows.length}개 항목
+                  </span>
+                ) : null}
               </div>
-              <div className="flex flex-wrap justify-center gap-md mt-md pt-md border-t border-surface-variant shrink-0">
-                <div className="flex items-center gap-xs">
-                  <div className="w-3 h-3 rounded-full bg-primary-container" />
-                  <span className="text-label-sm font-label-sm text-on-surface-variant">필수 생활비</span>
+              <p className="font-label-caps text-label-caps text-on-surface-variant mb-1 m-0">월 예상 절감 가능 유동성</p>
+              <div className="flex items-baseline gap-2 mb-space-sm flex-wrap">
+                <span className="font-display text-headline-lg lg:text-display text-primary tracking-tight font-bold financial-value">
+                  {isLoading ? '…' : hasLoggedInData ? formatWon(savingDisplay) : '-'}
+                </span>
+                <span className="font-body-sm text-body-sm text-editorial-sage-muted">/ 월간 추가 잉여액</span>
+              </div>
+              <p className="font-body-md text-body-md text-on-surface-variant mb-space-lg leading-relaxed m-0 break-keep">
+                {hasLoggedInData && savingsRows.length > 0
+                  ? '권고 프로토콜을 따르면 단기 현금 흐름을 개선할 수 있어요. 아래 절감 표를 확인해 보세요.'
+                  : '절감 항목 표와 문제점 진단을 확인하면 실행 우선순위가 보여요.'}
+              </p>
+            </div>
+            <div className="pt-space-md border-t border-border-subtle flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-space-md">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-surface-charcoal border border-border-hairline flex items-center justify-center">
+                  <MaterialIcon name="tune" className="text-secondary text-[20px]" />
                 </div>
-                <div className="flex items-center gap-xs">
-                  <div className="w-3 h-3 rounded-full bg-secondary-container" />
-                  <span className="text-label-sm font-label-sm text-on-surface-variant">고정 부채/구독</span>
-                </div>
-                <div className="flex items-center gap-xs">
-                  <div className="w-3 h-3 rounded-full bg-error-container" />
-                  <span className="text-label-sm font-label-sm text-on-surface-variant">비효율 지출</span>
+                <div className="flex flex-col">
+                  <span className="font-label-caps text-label-caps text-outline">시뮬레이션</span>
+                  <span className="font-label-numeric text-label-numeric text-editorial-sage-light font-medium">
+                    세부 조정으로 이동
+                  </span>
                 </div>
               </div>
+              <Link to="/simulation" className="shrink-0">
+                <Button variant="extruded" className="px-space-lg py-3 h-auto w-full sm:w-auto">
+                  시뮬레이터 실행
+                  <MaterialIcon name="arrow_forward" className="text-[20px]" />
+                </Button>
+              </Link>
             </div>
           </Card>
 
-          <div className="col-span-1 md:col-span-4 flex flex-col gap-md min-w-0">
-            <Card className="p-md md:p-lg h-full hover:shadow-level-2 transition-shadow border-0 min-w-0">
-              <div className="flex items-center gap-sm mb-lg">
-                <MaterialIcon name="warning" className="text-error" />
-                <h3 className="text-headline-sm font-headline-sm text-primary">현재 문제점</h3>
+          <Card
+            variant="frosted"
+            className="lg:col-span-6 p-space-xl relative overflow-hidden flex flex-col justify-between"
+            hoverLift
+          >
+            <div className="absolute -right-12 -bottom-12 w-64 h-64 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+            <div>
+              <div className="flex items-center justify-between gap-2 mb-space-md flex-wrap">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-charcoal border border-border-hairline font-label-caps text-label-caps text-editorial-sage-light">
+                  <MaterialIcon name="rocket_launch" className="text-[14px] text-primary" />
+                  순자산 가속 궤적
+                </span>
+                <WipBadge />
               </div>
-              <div className="flex flex-col gap-md">
-                {isLoading ? (
-                  <div className="flex items-center gap-sm text-on-surface-variant py-md">
-                    <MaterialIcon name="progress_activity" className="text-primary animate-spin" />
-                    <span className="text-body-sm font-body-sm">분석 내용을 불러오는 중…</span>
+              <div className="flex flex-col gap-1 mb-space-sm">
+                <span className="font-label-caps text-label-caps text-on-surface-variant">목표 달성 로드맵</span>
+                <div className="flex items-baseline gap-3 flex-wrap">
+                  <span className="font-display text-headline-lg lg:text-display text-editorial-sage-light tracking-tight font-bold">
+                    —
+                  </span>
+                  <span className="font-label-numeric text-label-numeric text-outline">목표 연동 준비 중</span>
+                </div>
+              </div>
+              <div className="my-space-md p-space-md rounded-DEFAULT bg-surface-charcoal border border-border-hairline">
+                <div className="flex items-center justify-between font-label-caps text-label-caps text-outline mb-2 gap-2 flex-wrap">
+                  <span>현재</span>
+                  <span className="text-editorial-sage-muted font-semibold">1차 목표</span>
+                  <span className="text-primary font-semibold">최종 도달</span>
+                </div>
+                <ProgressBar value={0} heightClass="h-3" barClassName="progress-bar-gradient" animate={false} />
+              </div>
+              <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed m-0 break-keep">
+                목표·순자산 궤적 산출은 곧 연동될 예정이에요. 지금은 절감 권고와 문제점 진단을 우선 활용해 주세요.
+              </p>
+            </div>
+            <div className="pt-space-md border-t border-border-subtle flex items-center justify-between text-body-sm font-body-sm text-editorial-sage-muted gap-2 flex-wrap">
+              <div className="flex items-center gap-2">
+                <MaterialIcon name="hourglass_empty" className="text-outline text-[18px]" />
+                <span>목표 모듈 WIP</span>
+              </div>
+              <WipBadge />
+            </div>
+          </Card>
+        </section>
+
+        {/* Chart + problems */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start section-reveal section-reveal-delay-2">
+          <Card variant="frosted" className="lg:col-span-7 p-space-xl shadow-card" hoverLift>
+            <div className="flex flex-wrap items-center justify-between gap-space-sm mb-space-lg">
+              <div>
+                <span className="font-label-caps text-label-caps text-secondary tracking-wider uppercase">
+                  CASH FLOW DYNAMICS
+                </span>
+                <h2 className="font-headline-md text-headline-md text-editorial-sage-light tracking-tight font-bold mt-1 m-0">
+                  지출 구성 · 절감 여력
+                </h2>
+              </div>
+              <div className="flex items-center gap-3 flex-wrap">
+                <div className="flex items-center gap-1.5 font-label-caps text-label-caps text-outline">
+                  <span className="w-2.5 h-2.5 rounded-sm bg-primary" /> 상대 규모
+                </div>
+              </div>
+            </div>
+
+            {isLoading ? (
+              <div className="flex items-center gap-sm text-on-surface-variant py-space-xl justify-center">
+                <MaterialIcon name="progress_activity" className="text-primary animate-spin" />
+                <span className="text-body-sm font-body-sm">차트 데이터를 불러오는 중…</span>
+              </div>
+            ) : chartBars.length === 0 ? (
+              <div className="rounded-DEFAULT bg-surface-charcoal border border-border-hairline p-space-lg text-center">
+                <MaterialIcon name="bar_chart" className="text-outline text-[32px] mb-sm" />
+                <p className="font-body-sm text-body-sm text-on-surface-variant m-0 break-keep">
+                  {errorMessage === 'login'
+                    ? '로그인하면 카테고리·권고 기반 차트를 볼 수 있어요.'
+                    : '표시할 지출·권고 데이터가 아직 없어요. 가계부를 더 기록해 주세요.'}
+                </p>
+              </div>
+            ) : (
+              <div className="w-full bg-surface-container-lowest/70 rounded-DEFAULT p-space-md border border-border-subtle ai-report__chart-bars">
+                <div className="h-64 w-full flex items-end justify-between gap-3 pt-6 pb-2 px-2 relative">
+                  <div className="absolute inset-x-2 inset-y-6 flex flex-col justify-between pointer-events-none opacity-20">
+                    <div className="w-full border-b border-outline" />
+                    <div className="w-full border-b border-outline" />
+                    <div className="w-full border-b border-outline" />
+                    <div className="w-full border-b border-outline" />
                   </div>
-                ) : errorMessage === 'login' ? (
-                  <p className="text-body-sm font-body-sm text-on-surface-variant m-0 break-keep">
-                    로그인하면 이번 달 지출 문제점을 볼 수 있어요.
-                  </p>
-                ) : problems.length === 0 ? (
-                  <p className="text-body-sm font-body-sm text-on-surface-variant m-0 break-keep">
-                    {errorMessage || '아직 짚을 문제점이 없어요. 가계부 기록을 더 쌓아보세요.'}
-                  </p>
-                ) : (
-                  problems.map((problem) => (
+                  {chartBars.map((bar, index) => (
                     <div
-                      key={problem.number}
-                      className={`flex gap-md items-start p-md rounded-lg border ${
-                        problem.variant === 'error'
-                          ? 'bg-error-container/30 border-error-container/50'
-                          : 'bg-surface-container border-outline-variant'
-                      }`}
+                      key={bar.key}
+                      className="flex-1 flex flex-col items-center gap-2 group cursor-default h-full justify-end z-10 min-w-0"
                     >
                       <div
-                        className={`w-8 h-8 rounded-full flex justify-center items-center shrink-0 ${
-                          problem.variant === 'error' ? 'bg-error text-on-error' : 'bg-surface-tint text-on-primary'
+                        className={`text-label-caps font-label-caps transition-opacity ${
+                          bar.highlight ? 'text-primary font-bold opacity-100' : 'text-on-surface-variant opacity-0 group-hover:opacity-100'
                         }`}
                       >
-                        <span className="text-label-md font-label-md font-bold">{problem.number}</span>
+                        {formatWon(bar.amount)}
                       </div>
-                      <div>
-                        <h4 className="text-label-md font-label-md font-bold text-on-background mb-1">{problem.title}</h4>
-                        <p className="text-body-sm font-body-sm text-on-surface-variant">{problem.desc}</p>
+                      <div
+                        className={`w-full max-w-[48px] flex flex-col justify-end rounded-t overflow-hidden shadow-md ai-report__bar-seg ${
+                          bar.highlight ? 'border border-primary/40 shadow-[0_0_16px_rgba(24,199,122,0.4)]' : ''
+                        }`}
+                        style={{ animationDelay: `${index * 60}ms` }}
+                      >
+                        <div
+                          className={`${bar.highlight ? 'bg-primary' : 'bg-primary/70'} group-hover:brightness-125 transition-all`}
+                          style={{ height: `${Math.round((bar.heightPct / 100) * 180)}px` }}
+                        />
                       </div>
+                      <span
+                        className={`font-label-caps text-label-caps truncate max-w-full ${
+                          bar.highlight ? 'text-primary font-bold' : 'text-outline'
+                        }`}
+                        title={bar.label}
+                      >
+                        {bar.label}
+                      </span>
                     </div>
-                  ))
-                )}
+                  ))}
+                </div>
               </div>
-            </Card>
-          </div>
+            )}
 
-          <Card className="col-span-1 md:col-span-7 hover:shadow-level-2 transition-shadow border-0 overflow-hidden min-w-0">
-            <div className="p-md md:p-lg border-b border-outline-variant flex flex-col sm:flex-row sm:items-center sm:justify-between gap-sm">
+            {hasLoggedInData && evaluation?.insight ? (
+              <div className="mt-space-md p-space-md rounded-DEFAULT bg-surface-architectural border border-border-hairline flex items-start gap-space-sm">
+                <MaterialIcon name="insights" className="text-signal-positive text-[22px] shrink-0 mt-0.5" />
+                <p className="font-body-sm text-body-sm text-editorial-sage-muted leading-relaxed m-0 break-keep">
+                  <strong className="text-editorial-sage-light">AI 궤적 판별:</strong> {evaluation.insight}
+                </p>
+              </div>
+            ) : null}
+          </Card>
+
+          <Card variant="frosted" className="lg:col-span-5 p-space-xl flex flex-col" hoverLift>
+            <div className="flex items-center justify-between mb-space-lg gap-sm flex-wrap">
+              <div>
+                <span className="font-label-caps text-label-caps text-outline tracking-wider uppercase">
+                  ACTUARIAL ANOMALY AUDIT
+                </span>
+                <h2 className="font-headline-md text-headline-md text-editorial-sage-light tracking-tight font-bold mt-1 m-0">
+                  핵심 재무 문제점 진단
+                </h2>
+              </div>
+              {problems.length > 0 ? (
+                <span className="px-2.5 py-1 rounded-full bg-surface-charcoal border border-border-hairline font-label-caps text-label-caps text-editorial-sage-muted">
+                  {problems.length}개 과제
+                </span>
+              ) : null}
+            </div>
+
+            <div className="flex flex-col gap-space-md flex-1">
+              {isLoading ? (
+                <div className="flex items-center gap-sm text-on-surface-variant py-md">
+                  <MaterialIcon name="progress_activity" className="text-primary animate-spin" />
+                  <span className="text-body-sm font-body-sm">분석 내용을 불러오는 중…</span>
+                </div>
+              ) : errorMessage === 'login' ? (
+                <p className="text-body-sm font-body-sm text-on-surface-variant m-0 break-keep">
+                  로그인하면 이번 달 지출 문제점을 볼 수 있어요.
+                </p>
+              ) : problems.length === 0 ? (
+                <p className="text-body-sm font-body-sm text-on-surface-variant m-0 break-keep">
+                  {errorMessage || '아직 짚을 문제점이 없어요. 가계부 기록을 더 쌓아보세요.'}
+                </p>
+              ) : (
+                problems.map((problem) => {
+                  const style = PROBLEM_STYLES[problem.variant] || PROBLEM_STYLES.default;
+                  return (
+                    <div
+                      key={problem.number}
+                      className={`p-space-md rounded-DEFAULT bg-surface-charcoal border border-border-hairline transition-all flex flex-col gap-2 ${style.border}`}
+                    >
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span
+                            className={`w-6 h-6 rounded-full flex items-center justify-center font-label-numeric text-[12px] font-bold shrink-0 ${style.num}`}
+                          >
+                            {problem.number}
+                          </span>
+                          <span className="font-headline-sm text-body-lg text-editorial-sage-light font-medium truncate">
+                            {problem.title}
+                          </span>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full font-label-caps text-label-caps font-bold ${style.badge}`}>
+                          {problem.badge}
+                        </span>
+                      </div>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed m-0 break-keep">
+                        {problem.desc}
+                      </p>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </Card>
+        </section>
+
+        {/* Recommendation protocols + table */}
+        <section className="section-reveal section-reveal-delay-3">
+          <Card variant="architectural" className="p-space-xl shadow-card">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md pb-space-md border-b border-border-subtle mb-space-lg">
+              <div>
+                <span className="font-label-caps text-label-caps text-outline tracking-wider uppercase mb-1 block">
+                  TACTICAL RECOMMENDATIONS
+                </span>
+                <h2 className="font-headline-lg text-headline-lg text-editorial-sage-light tracking-tight font-bold m-0">
+                  즉시 실행 권고안 및 절감액
+                </h2>
+                <p className="font-body-md text-body-md text-on-surface-variant mt-1 m-0 break-keep">
+                  권고 프로토콜을 따르면 월 현금 흐름을 방어할 수 있어요.
+                </p>
+              </div>
+              <div className="px-space-lg py-space-sm rounded-DEFAULT bg-surface-charcoal border border-border-hairline flex flex-col items-start md:items-end shrink-0">
+                <span className="font-label-caps text-label-caps text-outline uppercase">총 절감 가능 잉여액</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="font-headline-md text-headline-md text-primary font-bold financial-value">
+                    {hasLoggedInData ? `월 +${formatWon(savingDisplay).replace('₩', '')}` : '—'}
+                  </span>
+                </div>
+                {hasLoggedInData && totalSaving > 0 ? (
+                  <span className="font-label-numeric text-label-numeric text-on-surface-variant">
+                    (연간 {formatWon(totalSaving * 12)} 확보)
+                  </span>
+                ) : null}
+              </div>
+            </div>
+
+            {savingsRows.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-space-lg mb-space-xl">
+                {savingsRows.slice(0, 3).map((row, index) => (
+                  <div
+                    key={row.key}
+                    className="rounded-DEFAULT bg-surface-charcoal p-space-lg border border-border-subtle hover:border-primary/50 transition-all flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-space-sm gap-2">
+                        <span className="font-label-caps text-label-caps text-primary font-bold">
+                          권고 {String(index + 1).padStart(2, '0')}
+                        </span>
+                        <span className="font-label-caps text-label-caps text-outline truncate">{row.category}</span>
+                      </div>
+                      <h3 className="font-headline-sm text-headline-sm text-editorial-sage-light font-bold mb-2 m-0 break-keep">
+                        {row.detail || row.category}
+                      </h3>
+                      <p className="font-body-sm text-body-sm text-on-surface-variant mb-space-md leading-relaxed m-0 break-keep">
+                        실행 난이도: {row.difficulty}
+                      </p>
+                    </div>
+                    <div className="p-space-sm rounded bg-surface-container-high border border-border-hairline">
+                      <span className="font-label-caps text-label-caps text-outline block mb-0.5">월 절감 효과</span>
+                      <span className="font-headline-sm text-headline-sm text-primary font-bold financial-value">
+                        + {row.amount} /월
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-sm mb-md">
               <div className="flex items-center gap-sm">
                 <MaterialIcon name="tune" className="text-tertiary-fixed-dim" />
-                <h3 className="text-headline-sm font-headline-sm text-primary">절감 가능한 항목 세부내역</h3>
+                <h3 className="font-headline-sm text-headline-sm text-editorial-sage-light m-0">절감 가능한 항목 세부내역</h3>
               </div>
               <Button
                 variant="outline"
@@ -460,17 +721,18 @@ export default function AiReport() {
                 {isLoading ? '불러오는 중…' : '새로고침'}
               </Button>
             </div>
-            <div className="table-scroll">
+
+            <div className="table-scroll rounded-DEFAULT border border-border-hairline overflow-hidden">
               <table className="w-full text-left border-collapse min-w-[640px]">
                 <thead>
-                  <tr className="bg-surface-container-low text-label-sm font-label-sm text-on-surface-variant border-b border-outline-variant">
+                  <tr className="bg-surface-charcoal text-label-sm font-label-sm text-on-surface-variant border-b border-border-subtle">
                     <th className="py-3 px-md font-medium">카테고리</th>
                     <th className="py-3 px-md font-medium">상세 내용</th>
                     <th className="py-3 px-md font-medium text-right">예상 절감액 (월)</th>
                     <th className="py-3 px-md font-medium text-center">실행 난이도</th>
                   </tr>
                 </thead>
-                <tbody className="text-body-sm font-body-sm text-on-background">
+                <tbody className="text-body-sm font-body-sm text-on-background bg-surface-architectural/40">
                   <SavingsTableBody
                     isLoading={isLoading}
                     errorMessage={errorMessage}
@@ -480,50 +742,37 @@ export default function AiReport() {
                 </tbody>
               </table>
             </div>
-          </Card>
 
-          <Card className="col-span-1 md:col-span-5 p-md md:p-lg hover:shadow-level-2 transition-shadow border-0 flex flex-col min-w-0">
-            <div className="flex items-center gap-sm mb-lg">
-              <MaterialIcon name="assistant_direction" className="text-secondary" />
-              <h3 className="text-headline-sm font-headline-sm text-primary">추천 행동</h3>
-            </div>
-            <div className="flex flex-col gap-md flex-1">
-              <div className="border border-outline-variant rounded-lg p-md hover:border-secondary transition-colors group flex flex-col justify-between bg-surface">
-                <div>
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="text-label-md font-label-md font-bold text-on-background">구독 서비스 한 번에 정리</h4>
-                    <MaterialIcon name="arrow_forward" className="text-outline group-hover:text-secondary transition-colors" />
-                  </div>
-                  <p className="text-body-sm font-body-sm text-on-surface-variant mb-4">
-                    안 쓰는 구독이 있는지 확인하고 정리해서, 매달 나가는 돈을 조금 줄여보세요.
+            <div className="mt-space-lg p-space-md rounded-DEFAULT bg-surface-charcoal border border-border-hairline flex flex-col sm:flex-row items-center justify-between gap-space-md">
+              <div className="flex items-center gap-space-sm min-w-0">
+                <div className="w-10 h-10 rounded-DEFAULT bg-surface-container-high border border-border-hairline flex items-center justify-center shrink-0">
+                  <MaterialIcon name="security" className="text-primary text-[20px]" />
+                </div>
+                <div className="min-w-0">
+                  <h4 className="font-headline-sm text-body-lg text-editorial-sage-light font-bold m-0">다음 실행</h4>
+                  <p className="font-body-sm text-body-sm text-on-surface-variant m-0 break-keep">
+                    가계부·부채 분석으로 이어가며 권고를 실행해 보세요.
                   </p>
                 </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-space-sm w-full sm:w-auto justify-end">
                 <Link to="/">
-                  <Button variant="secondary" fullWidth className="py-2 min-h-[44px]">
+                  <Button variant="secondary" className="px-space-md py-2.5 h-auto">
+                    <MaterialIcon name="home" className="text-[18px]" />
                     홈으로
                   </Button>
                 </Link>
-              </div>
-              <div className="border border-outline-variant rounded-lg p-md hover:border-secondary transition-colors group flex flex-col justify-between bg-surface">
-                <div>
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="text-label-md font-label-md font-bold text-on-background">나에게 맞는 대환 대출 찾기</h4>
-                    <MaterialIcon name="arrow_forward" className="text-outline group-hover:text-secondary transition-colors" />
-                  </div>
-                  <p className="text-body-sm font-body-sm text-on-surface-variant mb-4">
-                    지금 쓰고 있는 고금리 대출을, 승인 가능성이 높은 저금리 상품으로 바꿀 수 있는지 비교해봐요.
-                  </p>
-                </div>
                 <Link to="/debt-analysis">
-                  <Button variant="outline" fullWidth className="py-2 border-secondary text-secondary hover:bg-surface-variant min-h-[44px]">
+                  <Button variant="extruded" className="px-space-lg py-2.5 h-auto">
+                    <MaterialIcon name="bolt" className="text-[18px]" />
                     빚 정리로 가기
                   </Button>
                 </Link>
               </div>
             </div>
           </Card>
-        </div>
-      </main>
+        </section>
+      </PageContainer>
     </div>
   );
 }

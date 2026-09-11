@@ -1,432 +1,132 @@
-<!DOCTYPE html><html lang="ko"><head>
-<meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>AI 가계부 피드백</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
-<script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                      "on-secondary-fixed": "#001c38",
-                      "secondary-container": "#7db6ff",
-                      "tertiary-fixed": "#6ffbbe",
-                      "on-error-container": "#93000a",
-                      "surface-variant": "#d3e4fe",
-                      "on-secondary-container": "#00477f",
-                      "surface-tint": "#455f88",
-                      "surface-bright": "#f8f9ff",
-                      "on-secondary-fixed-variant": "#004881",
-                      "tertiary-container": "#003e28",
-                      "surface": "#f8f9ff",
-                      "on-tertiary": "#ffffff",
-                      "tertiary": "#002617",
-                      "secondary-fixed": "#d3e4ff",
-                      "secondary-fixed-dim": "#a2c9ff",
-                      "primary-fixed-dim": "#adc7f7",
-                      "error-container": "#ffdad6",
-                      "surface-container-high": "#dce9ff",
-                      "inverse-on-surface": "#eaf1ff",
-                      "primary-container": "#1a365d",
-                      "on-secondary": "#ffffff",
-                      "surface-container-low": "#eff4ff",
-                      "error": "#ba1a1a",
-                      "secondary": "#1960a3",
-                      "outline-variant": "#c4c6cf",
-                      "on-primary-container": "#86a0cd",
-                      "tertiary-fixed-dim": "#4edea3",
-                      "on-tertiary-container": "#00b47d",
-                      "on-background": "#0b1c30",
-                      "background": "#f8f9ff",
-                      "primary-fixed": "#d6e3ff",
-                      "on-primary-fixed": "#001b3c",
-                      "on-surface": "#0b1c30",
-                      "primary": "#002045",
-                      "on-tertiary-fixed": "#002113",
-                      "surface-dim": "#cbdbf5",
-                      "surface-container": "#e5eeff",
-                      "on-primary": "#ffffff",
-                      "inverse-primary": "#adc7f7",
-                      "on-surface-variant": "#43474e",
-                      "inverse-surface": "#213145",
-                      "on-primary-fixed-variant": "#2d476f",
-                      "on-tertiary-fixed-variant": "#005236",
-                      "surface-container-lowest": "#ffffff",
-                      "surface-container-highest": "#d3e4fe",
-                      "outline": "#74777f",
-                      "on-error": "#ffffff"
-              },
-              "borderRadius": {
-                      "DEFAULT": "0.125rem",
-                      "lg": "0.25rem",
-                      "xl": "0.5rem",
-                      "full": "0.75rem"
-              },
-              "spacing": {
-                      "gutter": "24px",
-                      "unit": "4px",
-                      "container-max": "1280px",
-                      "xs": "4px",
-                      "sm": "8px",
-                      "md": "16px",
-                      "margin-desktop": "64px",
-                      "margin-mobile": "16px",
-                      "xl": "48px",
-                      "lg": "24px"
-              },
-              "fontFamily": {
-                      "label-sm": ["Inter", "sans-serif"],
-                      "headline-sm": ["Inter", "sans-serif"],
-                      "body-md": ["Noto Sans KR", "sans-serif"],
-                      "label-md": ["Inter", "sans-serif"],
-                      "body-sm": ["Noto Sans KR", "sans-serif"],
-                      "headline-md": ["Inter", "sans-serif"],
-                      "body-lg": ["Noto Sans KR", "sans-serif"],
-                      "headline-lg-mobile": ["Inter", "sans-serif"],
-                      "headline-lg": ["Inter", "sans-serif"],
-                      "display-lg": ["Inter", "sans-serif"]
-              },
-              "fontSize": {
-                      "label-sm": ["12px", { "lineHeight": "1", "letterSpacing": "0.03em", "fontWeight": "500" }],
-                      "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
-                      "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
-                      "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500" }],
-                      "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
-                      "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
-                      "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
-                      "headline-lg-mobile": ["28px", { "lineHeight": "1.3", "fontWeight": "600" }],
-                      "headline-lg": ["32px", { "lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600" }],
-                      "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }]
-              }
+<!DOCTYPE html><html class="dark" lang="ko" style=""><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><title>AI 재무 인터렉티브</title><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+              "secondary-fixed-dim": "#4edea3",
+              "on-error-container": "#ffdad6",
+              "signal-positive-subtle": "rgba(24, 199, 122, 0.14)",
+              "surface-container-high": "#252b28",
+              "inverse-on-surface": "#2c322e",
+              "on-primary": "#00391f",
+              "surface-card-frosted": "rgba(20, 30, 25, 0.65)",
+              "tertiary-fixed-dim": "#00e559",
+              "on-primary-fixed": "#002110",
+              "inverse-primary": "#006d3f",
+              "outline-variant": "#3c4a40",
+              "on-tertiary-fixed-variant": "#00531b",
+              "surface-charcoal": "#0E1612",
+              "signal-advisory": "#F5A623",
+              "error-container": "#93000a",
+              "signal-positive": "#18C77A",
+              "on-surface-variant": "#bbcabd",
+              "tertiary-container": "#00c94d",
+              "surface-bright": "#343b37",
+              "border-subtle": "rgba(255, 255, 255, 0.08)",
+              "surface-container-low": "#171d1a",
+              "on-tertiary-container": "#004d18",
+              "primary-fixed": "#66feaa",
+              "on-primary-container": "#004c2b",
+              "secondary-fixed": "#6ffbbe",
+              "surface-tint": "#43e090",
+              "signal-risk-subtle": "rgba(255, 92, 77, 0.12)",
+              "on-secondary-fixed-variant": "#005236",
+              "background": "#0f1512",
+              "surface-architectural": "#141E19",
+              "signal-advisory-subtle": "rgba(245, 166, 35, 0.12)",
+              "secondary-container": "#00a572",
+              "on-primary-fixed-variant": "#00522f",
+              "editorial-sage-light": "#E2E8E2",
+              "on-background": "#dee4de",
+              "primary-container": "#18c77a",
+              "on-error": "#690005",
+              "inverse-surface": "#dee4de",
+              "outline": "#869488",
+              "surface-container": "#1b211e",
+              "primary": "#48e493",
+              "on-secondary-fixed": "#002113",
+              "tertiary": "#0ce85b",
+              "on-tertiary-fixed": "#002106",
+              "surface-dim": "#0f1512",
+              "canvas-deep": "#0B110E",
+              "border-hairline": "rgba(16, 185, 129, 0.15)",
+              "surface-variant": "#303633",
+              "secondary": "#4edea3",
+              "signal-risk": "#FF5C4D",
+              "tertiary-fixed": "#6cff82",
+              "on-tertiary": "#003910",
+              "error": "#ffb4ab",
+              "on-surface": "#dee4de",
+              "primary-fixed-dim": "#43e090",
+              "surface-container-lowest": "#090f0c",
+              "on-secondary": "#003824",
+              "surface": "#0f1512",
+              "surface-container-highest": "#303633",
+              "editorial-sage-muted": "#D8E0D8",
+              "on-secondary-container": "#00311f"
             },
+            "borderRadius": {
+              "DEFAULT": "1rem",
+              "lg": "2rem",
+              "xl": "3rem",
+              "full": "9999px"
+            },
+            "spacing": {
+              "space-lg": "1.5rem",
+              "space-xl": "2rem",
+              "gutter": "1.5rem",
+              "margin-mobile": "1.25rem",
+              "space-2xl": "3rem",
+              "space-xs": "0.25rem",
+              "margin": "3rem",
+              "space-md": "1rem",
+              "gutter-mobile": "1rem",
+              "space-sm": "0.5rem"
+            },
+            "fontFamily": {
+              "headline-lg-mobile": ["Space Grotesk"],
+              "display-mobile": ["Space Grotesk"],
+              "body-sm": ["Geist"],
+              "label-caps": ["Space Grotesk"],
+              "label-numeric": ["Space Grotesk"],
+              "headline-sm": ["Space Grotesk"],
+              "display": ["Space Grotesk"],
+              "body-md": ["Geist"],
+              "body-lg": ["Geist"],
+              "headline-md": ["Space Grotesk"],
+              "headline-lg": ["Space Grotesk"]
+            },
+            "fontSize": {
+              "headline-lg-mobile": ["1.875rem", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+              "display-mobile": ["2.5rem", {"lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "700"}],
+              "body-sm": ["0.8125rem", {"lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "400"}],
+              "label-caps": ["0.6875rem", {"lineHeight": "1", "letterSpacing": "0.08em", "fontWeight": "700"}],
+              "label-numeric": ["0.875rem", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "600"}],
+              "headline-sm": ["1.25rem", {"lineHeight": "1.35", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+              "display": ["3.75rem", {"lineHeight": "1.05", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+              "body-md": ["0.9375rem", {"lineHeight": "1.55", "letterSpacing": "-0.005em", "fontWeight": "400"}],
+              "body-lg": ["1.125rem", {"lineHeight": "1.6", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+              "headline-md": ["1.75rem", {"lineHeight": "1.25", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+              "headline-lg": ["2.5rem", {"lineHeight": "1.15", "letterSpacing": "-0.03em", "fontWeight": "700"}]
+            }
           }
         }
-    </script>
-<style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-        }
-        .icon-fill {
-            font-variation-settings: 'FILL' 1;
-        }
-        /* Custom scrollbar for main canvas */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background-color: #c4c6cf;
-            border-radius: 4px;
-        }
-    </style>
-</head>
-<body class="bg-background text-on-background font-body-md min-h-screen flex antialiased">
-<!-- SideNavBar -->
-<nav class="h-screen w-64 fixed left-0 top-16 bg-surface-container-low border-r border-outline-variant flex flex-col py-md gap-sm z-40 hidden md:flex">
-<!-- Tab: Overview (Active based on context fallback) -->
-<a class="bg-secondary-container text-on-secondary-container rounded-lg mx-2 my-1 px-md py-sm flex items-center gap-md scale-95 duration-150 group cursor-default" href="#">
-<span class="material-symbols-outlined icon-fill">analytics</span>
-<span class="text-label-md font-label-md">개요</span>
-</a>
-<!-- Tab: Portfolio Reports -->
-<a class="text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg px-md py-sm flex items-center gap-md hover:text-on-surface transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary transition-colors">description</span>
-<span class="text-label-md font-label-md">포트폴리오 보고서</span>
-</a>
-<!-- Tab: Risk Settings -->
-<a class="text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg px-md py-sm flex items-center gap-md hover:text-on-surface transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary transition-colors">settings_applications</span>
-<span class="text-label-md font-label-md">리스크 설정</span>
-</a>
-<!-- Tab: Audit Log -->
-<a class="text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg px-md py-sm flex items-center gap-md hover:text-on-surface transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary transition-colors">history</span>
-<span class="text-label-md font-label-md">감사 로그</span>
-</a>
-<!-- Tab: Security -->
-<a class="text-on-surface-variant hover:bg-surface-variant mx-2 my-1 rounded-lg px-md py-sm flex items-center gap-md hover:text-on-surface transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary transition-colors">shield</span>
-<span class="text-label-md font-label-md">보안</span>
-</a>
-<div class="mt-auto px-md pb-md flex flex-col gap-sm">
-<div class="flex items-center gap-sm">
-<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-label-sm">
-                    UW
-                </div>
-<div>
-<div class="text-label-md font-label-md font-bold text-on-surface">심층 분석</div>
-<div class="text-label-sm font-label-sm text-on-surface-variant">기관 등급</div>
-</div>
-</div>
-<button class="w-full bg-primary text-on-primary hover:bg-on-primary-fixed-variant transition-colors py-sm rounded-lg text-label-md font-label-md font-medium mt-sm shadow-sm hover:shadow-md flex justify-center items-center gap-xs">
-                보고서 생성
-            </button>
-</div>
-</nav>
-<!-- Main Content Wrapper -->
-<div class="flex-1 flex flex-col md:ml-64 min-w-0">
-<!-- TopNavBar -->
-<header class="sticky top-0 z-50 flex justify-between items-center w-full px-margin-desktop bg-surface h-16 border-b border-outline-variant shadow-sm">
-<!-- Brand -->
-<div class="flex items-center gap-md">
-<div class="text-headline-md font-headline-md font-bold text-primary tracking-tight">AI 재무 인터렉티브</div>
-</div>
-<!-- Navigation Links (Web) -->
-<nav class="hidden lg:flex items-center gap-lg h-full">
-<a class="text-on-surface-variant hover:text-secondary transition-colors text-label-md font-label-md h-full flex items-center" href="#">대시보드</a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors text-label-md font-label-md h-full flex items-center" href="#">부채 분석</a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors text-label-md font-label-md h-full flex items-center" href="#">시뮬레이션</a>
-<!-- Active Link -->
-<a class="text-secondary font-bold border-b-2 border-secondary pb-1 h-full flex items-center mt-1 opacity-80 transition-opacity text-label-md font-label-md" href="#">AI 피드백</a>
-</nav>
-<!-- Trailing Icons -->
-<div class="flex items-center gap-sm">
-<button class="w-10 h-10 rounded-full hover:bg-surface-variant flex items-center justify-center text-on-surface-variant transition-colors">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-<button class="w-10 h-10 rounded-full hover:bg-surface-variant flex items-center justify-center text-on-surface-variant transition-colors">
-<span class="material-symbols-outlined">account_circle</span>
-</button>
-</div>
-</header>
-<!-- Canvas -->
-<main class="flex-1 w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-lg overflow-x-hidden">
-<!-- Page Header & Tabs -->
-<div class="flex flex-col md:flex-row md:items-end justify-between mb-lg gap-md border-b border-outline-variant pb-md">
-<div>
-<h1 class="text-headline-lg font-headline-lg text-on-surface hidden md:block">AI 가계부 분석</h1>
-<h1 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface block md:hidden">AI 가계부 분석</h1>
-<p class="text-body-md font-body-md text-on-surface-variant mt-sm">인공지능 기반 지출 패턴 분석 및 최적화 제안</p>
-</div>
-<div class="flex gap-sm bg-surface-container-low p-1 rounded-lg border border-outline-variant self-start md:self-auto">
-<button class="px-md py-xs rounded-md text-label-md font-label-md text-on-surface-variant hover:bg-surface-variant transition-colors">일간</button>
-<button class="px-md py-xs rounded-md text-label-md font-label-md text-on-surface-variant hover:bg-surface-variant transition-colors">주간</button>
-<button class="px-md py-xs rounded-md text-label-md font-label-md bg-surface shadow-sm text-primary font-medium">월간</button>
-</div>
-</div>
-<!-- Bento Grid Layout -->
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-<!-- AI Feedback Card (Premium/Glassmorphism inspired) -->
-<div class="col-span-1 lg:col-span-4 bg-gradient-to-br from-surface to-surface-container-low border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col relative overflow-hidden">
-<div class="absolute top-0 right-0 w-32 h-32 bg-secondary-container rounded-full blur-3xl opacity-20 -mr-10 -mt-10 pointer-events-none"></div>
-<div class="flex items-center gap-sm mb-md z-10">
-<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center">
-<span class="material-symbols-outlined text-[18px]">smart_toy</span>
-</div>
-<h2 class="text-headline-sm font-headline-sm text-on-surface">AI 인사이트</h2>
-</div>
-<div class="flex flex-col gap-sm flex-1 z-10">
-<!-- Insight 1 -->
-<div class="bg-surface-bright rounded-lg p-md border border-outline-variant/50 shadow-sm flex items-start gap-md">
-<span class="material-symbols-outlined text-error mt-xs">trending_up</span>
-<div>
-<p class="text-body-md font-body-md text-on-surface leading-snug">이번 달 <span class="font-bold text-error">식비</span>가 지난달보다 <span class="font-bold">12% 증가</span>했습니다.</p>
-<p class="text-label-sm font-label-sm text-on-surface-variant mt-xs">외식 비중이 30% 증가한 것이 주요 원인입니다.</p>
-</div>
-</div>
-<!-- Insight 2 -->
-<div class="bg-surface-bright rounded-lg p-md border border-outline-variant/50 shadow-sm flex items-start gap-md">
-<span class="material-symbols-outlined text-on-tertiary-container mt-xs">savings</span>
-<div>
-<p class="text-body-md font-body-md text-on-surface leading-snug">사용하지 않는 구독서비스를 정리하면 월 <span class="font-bold text-on-tertiary-container">19,000원을 절약</span>할 수 있습니다.</p>
-<p class="text-label-sm font-label-sm text-on-surface-variant mt-xs">최근 3개월간 미사용: '스트리밍 A', '디지털 매거진'</p>
-</div>
-</div>
-</div>
-<button class="mt-md w-full py-sm bg-surface-container-high text-on-surface hover:bg-surface-variant transition-colors rounded-lg text-label-md font-label-md font-medium border border-outline-variant z-10">
-                        상세 분석 보기
-                    </button>
-</div>
-<!-- Monthly Spending Chart (Bar) -->
-<div class="col-span-1 lg:col-span-8 bg-surface border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col">
-<div class="flex justify-between items-center mb-lg">
-<h2 class="text-headline-sm font-headline-sm text-on-surface">월별 지출 추이</h2>
-<button class="text-on-surface-variant hover:text-primary">
-<span class="material-symbols-outlined">more_vert</span>
-</button>
-</div>
-<!-- Chart Canvas area (Simulated with HTML/CSS for structural demonstration) -->
-<div class="flex-1 flex items-end justify-between gap-sm md:gap-md pt-xl relative min-h-[240px]">
-<!-- Grid lines -->
-<div class="absolute inset-0 flex flex-col justify-between pointer-events-none pb-8">
-<div class="w-full border-t border-outline-variant/30"></div>
-<div class="w-full border-t border-outline-variant/30"></div>
-<div class="w-full border-t border-outline-variant/30"></div>
-<div class="w-full border-t border-outline-variant/30"></div>
-<div class="w-full border-t border-outline-variant/30"></div>
-</div>
-<!-- Bars -->
-<div class="flex flex-col items-center gap-xs z-10 group w-full">
-<div class="w-full max-w-[40px] bg-secondary-fixed-dim rounded-t-sm h-[40%] group-hover:bg-secondary-container transition-colors"></div>
-<span class="text-label-sm font-label-sm text-on-surface-variant">3월</span>
-</div>
-<div class="flex flex-col items-center gap-xs z-10 group w-full">
-<div class="w-full max-w-[40px] bg-secondary-fixed-dim rounded-t-sm h-[55%] group-hover:bg-secondary-container transition-colors"></div>
-<span class="text-label-sm font-label-sm text-on-surface-variant">4월</span>
-</div>
-<div class="flex flex-col items-center gap-xs z-10 group w-full">
-<div class="w-full max-w-[40px] bg-secondary-fixed-dim rounded-t-sm h-[45%] group-hover:bg-secondary-container transition-colors"></div>
-<span class="text-label-sm font-label-sm text-on-surface-variant">5월</span>
-</div>
-<div class="flex flex-col items-center gap-xs z-10 group w-full">
-<div class="w-full max-w-[40px] bg-secondary-fixed-dim rounded-t-sm h-[60%] group-hover:bg-secondary-container transition-colors"></div>
-<span class="text-label-sm font-label-sm text-on-surface-variant">6월</span>
-</div>
-<div class="flex flex-col items-center gap-xs z-10 group w-full">
-<div class="w-full max-w-[40px] bg-secondary-fixed-dim rounded-t-sm h-[50%] group-hover:bg-secondary-container transition-colors"></div>
-<span class="text-label-sm font-label-sm text-on-surface-variant">7월</span>
-</div>
-<div class="flex flex-col items-center gap-xs z-10 group w-full relative">
-<!-- Current Month Indicator -->
-<div class="absolute -top-8 bg-primary text-on-primary text-[10px] py-1 px-2 rounded font-bold whitespace-nowrap">예상 달성</div>
-<div class="w-full max-w-[40px] bg-primary rounded-t-sm h-[75%] shadow-sm"></div>
-<span class="text-label-sm font-label-sm text-primary font-bold">8월</span>
-</div>
-</div>
-</div>
-<!-- Category Distribution Chart (Donut) -->
-<div class="col-span-1 lg:col-span-5 bg-surface border border-outline-variant rounded-xl p-lg shadow-sm flex flex-col">
-<h2 class="text-headline-sm font-headline-sm text-on-surface mb-md">카테고리별 분포</h2>
-<div class="flex-1 flex flex-col items-center justify-center py-md">
-<!-- Simulated Donut Chart using Conic Gradient -->
-<div class="relative w-48 h-48 rounded-full mb-lg" style="background: conic-gradient(
-                            #1a365d 0% 35%,     /* 식비 35% */
-                            #7db6ff 35% 55%,    /* 주거 20% */
-                            #00b47d 55% 70%,    /* 교통 15% */
-                            #cbdbf5 70% 82%,    /* 쇼핑 12% */
-                            #455f88 82% 90%,    /* 구독 8% */
-                            #c4c6cf 90% 100%    /* 기타 10% */
-                        );">
-<!-- Inner Circle for Donut effect -->
-<div class="absolute inset-4 bg-surface rounded-full flex flex-col items-center justify-center shadow-inner">
-<span class="text-label-sm font-label-sm text-on-surface-variant">총 지출</span>
-<span class="text-headline-sm font-headline-sm font-bold text-on-surface">₩3,450,000</span>
-</div>
-</div>
-<!-- Mini Legend inline for space -->
-<div class="flex flex-wrap justify-center gap-md px-sm">
-<div class="flex items-center gap-xs"><div class="w-3 h-3 rounded-full bg-primary-container"></div><span class="text-label-sm font-label-sm">식비 (35%)</span></div>
-<div class="flex items-center gap-xs"><div class="w-3 h-3 rounded-full bg-secondary-container"></div><span class="text-label-sm font-label-sm">주거 (20%)</span></div>
-<div class="flex items-center gap-xs"><div class="w-3 h-3 rounded-full bg-[#00b47d]"></div><span class="text-label-sm font-label-sm">교통 (15%)</span></div>
-</div>
-</div>
-</div>
-<!-- Categorized Spending List -->
-<div class="col-span-1 lg:col-span-7 bg-surface border border-outline-variant rounded-xl p-0 shadow-sm flex flex-col overflow-hidden">
-<div class="p-lg border-b border-outline-variant flex justify-between items-center bg-surface-container-lowest">
-<h2 class="text-headline-sm font-headline-sm text-on-surface">상세 지출 내역</h2>
-<button class="text-label-md font-label-md text-primary hover:underline">전체보기</button>
-</div>
-<div class="flex-1 overflow-y-auto max-h-[400px]">
-<!-- List Items -->
-<div class="flex items-center justify-between p-md border-b border-outline-variant/50 hover:bg-surface-container-low transition-colors">
-<div class="flex items-center gap-md">
-<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-primary-container">
-<span class="material-symbols-outlined">restaurant</span>
-</div>
-<div>
-<div class="text-body-md font-body-md text-on-surface font-medium">식비</div>
-<div class="text-label-sm font-label-sm text-on-surface-variant">외식, 식자재, 커피 등</div>
-</div>
-</div>
-<div class="text-right">
-<div class="text-body-md font-body-md text-on-surface font-semibold">₩1,207,500</div>
-<div class="text-label-sm font-label-sm text-error flex items-center justify-end gap-xs">
-<span class="material-symbols-outlined text-[14px]">arrow_upward</span> 12%
-                                </div>
-</div>
-</div>
-<div class="flex items-center justify-between p-md border-b border-outline-variant/50 hover:bg-surface-container-low transition-colors">
-<div class="flex items-center gap-md">
-<div class="w-10 h-10 rounded-full bg-secondary-container/20 flex items-center justify-center text-on-secondary-container">
-<span class="material-symbols-outlined">home</span>
-</div>
-<div>
-<div class="text-body-md font-body-md text-on-surface font-medium">주거/통신</div>
-<div class="text-label-sm font-label-sm text-on-surface-variant">월세, 관리비, 통신비 등</div>
-</div>
-</div>
-<div class="text-right">
-<div class="text-body-md font-body-md text-on-surface font-semibold">₩690,000</div>
-<div class="text-label-sm font-label-sm text-on-surface-variant flex items-center justify-end gap-xs">
-<span class="material-symbols-outlined text-[14px]">horizontal_rule</span> 변동없음
-                                </div>
-</div>
-</div>
-<div class="flex items-center justify-between p-md border-b border-outline-variant/50 hover:bg-surface-container-low transition-colors">
-<div class="flex items-center gap-md">
-<div class="w-10 h-10 rounded-full bg-[#00b47d]/10 flex items-center justify-center text-[#00b47d]">
-<span class="material-symbols-outlined">directions_car</span>
-</div>
-<div>
-<div class="text-body-md font-body-md text-on-surface font-medium">교통/차량</div>
-<div class="text-label-sm font-label-sm text-on-surface-variant">대중교통, 주유, 택시</div>
-</div>
-</div>
-<div class="text-right">
-<div class="text-body-md font-body-md text-on-surface font-semibold">₩517,500</div>
-<div class="text-label-sm font-label-sm text-[#00b47d] flex items-center justify-end gap-xs">
-<span class="material-symbols-outlined text-[14px]">arrow_downward</span> 5%
-                                </div>
-</div>
-</div>
-<div class="flex items-center justify-between p-md border-b border-outline-variant/50 hover:bg-surface-container-low transition-colors">
-<div class="flex items-center gap-md">
-<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
-<span class="material-symbols-outlined">shopping_bag</span>
-</div>
-<div>
-<div class="text-body-md font-body-md text-on-surface font-medium">쇼핑</div>
-<div class="text-label-sm font-label-sm text-on-surface-variant">의류, 잡화, 온라인 쇼핑</div>
-</div>
-</div>
-<div class="text-right">
-<div class="text-body-md font-body-md text-on-surface font-semibold">₩414,000</div>
-<div class="text-label-sm font-label-sm text-error flex items-center justify-end gap-xs">
-<span class="material-symbols-outlined text-[14px]">arrow_upward</span> 2%
-                                </div>
-</div>
-</div>
-<div class="flex items-center justify-between p-md hover:bg-surface-container-low transition-colors">
-<div class="flex items-center gap-md">
-<div class="w-10 h-10 rounded-full bg-surface-tint/10 flex items-center justify-center text-surface-tint">
-<span class="material-symbols-outlined">subscriptions</span>
-</div>
-<div>
-<div class="text-body-md font-body-md text-on-surface font-medium">구독</div>
-<div class="text-label-sm font-label-sm text-on-surface-variant">OTT, 소프트웨어, 멤버십</div>
-</div>
-</div>
-<div class="text-right">
-<div class="text-body-md font-body-md text-on-surface font-semibold">₩276,000</div>
-<div class="text-label-sm font-label-sm text-error flex items-center justify-end gap-xs font-bold">
-                                    AI 경고 
-                                </div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</main>
-<!-- Footer -->
-<footer class="w-full mt-xl border-t border-outline-variant bg-surface-container-lowest flex flex-col md:flex-row justify-between items-center px-margin-desktop py-lg">
-<div class="text-label-sm font-label-sm font-semibold text-on-surface-variant mb-md md:mb-0">
-                © 2024 기관 인텔리전스. 모든 권리 보유.
-            </div>
-<div class="flex flex-wrap gap-md md:gap-lg justify-center">
-<a class="text-on-surface-variant hover:text-secondary transition-colors text-body-sm font-body-sm" href="#">이용약관</a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors text-body-sm font-body-sm" href="#">개인정보처리방침</a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors text-body-sm font-body-sm" href="#">고객 지원</a>
-<a class="text-on-surface-variant hover:text-secondary transition-colors text-body-sm font-body-sm" href="#">규제 공시</a>
-</div>
-</footer>
-</div>
-
-
-</body></html>
+      }</script></head><body class="bg-canvas-deep text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 inset-x-0 z-50 bg-surface-dim/85 backdrop-blur-xl border-b border-border-hairline shadow-[0_12px_36px_rgba(0,0,0,0.6)]"><div class="h-20 max-w-[1440px] mx-auto px-margin-mobile lg:px-margin flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-sm"><div class="w-10 h-10 rounded-DEFAULT bg-surface-architectural border border-border-hairline flex items-center justify-center shadow-[inset_0_1px_2px_rgba(255,255,255,0.1)]"><span class="material-symbols-outlined text-primary text-[22px]">finance_mode</span></div><div class="flex flex-col"><span class="font-headline-sm text-headline-sm text-editorial-sage-light tracking-tight">KINETIC CAPITAL</span><span class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase">AI 재무 인터렉티브</span></div></div><nav class="hidden xl:flex items-center gap-space-xs p-1.5 rounded-full bg-surface-charcoal/90 border border-border-hairline shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]" data-active-classes="bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_0_#0D6D43]"><a class="px-space-md py-space-xs rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" data-path="main-dashboard" href="#">대시보드</a><a class="px-space-md py-space-xs rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" data-path="debt-analysis" href="#">부채 분석</a><a class="px-space-md py-space-xs rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" data-path="financial-simulation" href="#">시뮬레이션</a><a aria-current="page" class="px-space-md py-space-xs rounded-full transition-all bg-primary-container text-on-primary-container font-semibold shadow-[0_2px_0_#0D6D43]" data-path="ai-account-book" href="#">AI 가계부</a><a class="px-space-md py-space-xs rounded-full font-label-numeric text-label-numeric text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-all" data-path="ai-financial-report" href="#">AI 리포트</a></nav><div class="flex items-center gap-space-md"><div class="hidden md:flex items-center gap-2 px-space-md py-1.5 rounded-full bg-surface-architectural border border-border-hairline"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-signal-positive"></span></span><span class="font-label-caps text-label-caps text-editorial-sage-muted">AI 엔진 실시간 동기화됨</span></div><div class="flex items-center gap-space-sm pl-space-xs"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-[0_0_12px_rgba(24,199,122,0.35)]"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="w-full pt-20 min-h-screen bg-canvas-deep"><div class="flex flex-col w-full">
+    <!-- Interactive & Amortization Container bounded strictly within 1440px -->
+    <div class="max-w-[1440px] w-full mx-auto px-margin-mobile lg:px-margin py-space-xl flex flex-col gap-space-xl">
+    <!-- 1. Editorial AI Diagnostic Briefing Banner -->
+    <section class="relative overflow-hidden rounded-xl bg-surface-charcoal/90 border border-border-hairline p-space-lg lg:p-space-xl shadow-xl"><div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg"><div class="flex flex-col gap-space-xs max-w-3xl"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-signal-advisory"></span><span class="font-label-caps text-label-caps text-signal-advisory uppercase tracking-wider">AI 지출 진단 리포트</span><span class="text-outline text-body-sm">•</span><span class="font-label-caps text-label-caps text-on-surface-variant">10월 정밀 분석</span></div><h1 class="font-headline-lg text-headline-lg text-editorial-sage-light tracking-tight mt-1">이번 달 식비가 전월 대비 <span class="text-signal-advisory font-bold">12% 증가</span>했습니다</h1><p class="font-body-md text-body-md text-editorial-sage-muted leading-relaxed">심야 배달 및 외식 빈도가 평월 대비 4회 늘었습니다. 식재료 소분 구매와 식단 정비로 월 최대 14만원을 방어할 수 있습니다.</p></div><div class="flex items-center gap-space-sm w-full sm:w-auto self-end lg:self-center flex-shrink-0"><button class="w-full sm:w-auto px-space-lg py-space-sm rounded-full bg-primary text-on-primary font-headline-sm text-headline-sm flex items-center justify-center gap-2 shadow-[0_4px_0_#0D6D43,0_8px_16px_rgba(24,199,122,0.25)] hover:translate-y-[-2px] active:translate-y-[2px] transition-all" type="button"><span class="">추천 식단 가이드 보기</span><span class="material-symbols-outlined text-[20px]">arrow_forward</span></button></div></div></section>
+    <!-- 2. Asymmetric Two-Column Grid (7:5 Split) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
+    <!-- LEFT COLUMN (7 Cols): Spending Progress, Bar Waterfall, Streak Card -->
+    <div class="lg:col-span-7 flex flex-col gap-space-xl"><div class="rounded-xl bg-surface-charcoal/90 border border-border-hairline p-space-lg lg:p-space-xl shadow-xl flex flex-col gap-space-lg"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-xs"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">account_balance_wallet</span><span class="font-label-caps text-label-caps text-editorial-sage-light uppercase tracking-wider">10월 총 지출 현황</span></div><div class="flex items-center gap-1.5 px-space-sm py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-numeric text-label-numeric"><span class="">예산 대비 94.1%</span></div></div><div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2"><div class="flex items-baseline gap-2"><span class="font-label-caps text-label-caps text-outline">KRW</span><span class="font-display text-display text-editorial-sage-light tracking-tight font-bold">₩ 2,540,000</span></div><div class="flex items-center gap-2 text-right"><span class="font-body-sm text-body-sm text-outline">월 권장 예산 <span class="text-editorial-sage-light font-label-numeric font-semibold">₩2,700,000</span></span></div></div><div class="flex flex-col gap-space-xs"><div class="w-full h-3 rounded-full bg-surface-container-high p-0.5 relative overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-primary via-secondary to-signal-advisory transition-all duration-700" style="width: 94.1%;"></div></div><div class="flex justify-between items-center font-label-numeric text-label-numeric pt-0.5"><span class="text-on-surface-variant">집행 ₩2,540,000</span><span class="text-signal-advisory flex items-center gap-1 font-semibold"><span class="material-symbols-outlined text-[16px]">shield</span>잔여 안전 버퍼: ₩160,000</span></div></div><div class="mt-space-sm pt-space-md bg-surface-architectural/50 border border-border-subtle rounded-DEFAULT p-space-md"><div class="flex items-center justify-between mb-space-md"><span class="font-headline-sm text-headline-sm text-editorial-sage-light">월별 지출 추이</span><span class="font-label-caps text-label-caps text-outline">단위: 만원</span></div><div class="grid grid-cols-4 gap-space-md items-end h-44 px-space-xs pt-4"><div class="flex flex-col items-center gap-2 h-full justify-end group"><span class="font-label-numeric text-label-numeric text-on-surface-variant group-hover:text-editorial-sage-light transition-colors">210만</span><div class="w-full max-w-[48px] bg-surface-container-high rounded-t-DEFAULT transition-all group-hover:bg-surface-bright" style="height: 65%;"></div><span class="font-label-caps text-label-caps text-outline">7월</span></div><div class="flex flex-col items-center gap-2 h-full justify-end group"><span class="font-label-numeric text-label-numeric text-on-surface-variant group-hover:text-editorial-sage-light transition-colors">232만</span><div class="w-full max-w-[48px] bg-surface-container-high rounded-t-DEFAULT transition-all group-hover:bg-surface-bright" style="height: 74%;"></div><span class="font-label-caps text-label-caps text-outline">8월</span></div><div class="flex flex-col items-center gap-2 h-full justify-end group"><span class="font-label-numeric text-label-numeric text-on-surface-variant group-hover:text-editorial-sage-light transition-colors">226만</span><div class="w-full max-w-[48px] bg-surface-container-high rounded-t-DEFAULT transition-all group-hover:bg-surface-bright" style="height: 71%;"></div><span class="font-label-caps text-label-caps text-outline">9월</span></div><div class="flex flex-col items-center gap-2 h-full justify-end group"><span class="font-label-numeric text-label-numeric text-primary font-bold">254만</span><div class="w-full max-w-[48px] bg-primary rounded-t-DEFAULT relative shadow-[0_0_12px_rgba(24,199,122,0.35)]" style="height: 86%;"><div class="absolute -top-2 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-white"></div></div><span class="font-label-caps text-label-caps text-primary font-bold">10월 (현재)</span></div></div></div></div><div class="rounded-xl bg-surface-charcoal/90 border border-border-hairline p-space-lg shadow-xl relative overflow-hidden"><div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-md"><div class="flex items-center gap-space-md"><div class="w-12 h-12 rounded-DEFAULT bg-surface-architectural border border-border-subtle flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[26px]">check_circle</span></div><div class="flex flex-col"><div class="flex items-center gap-2"><span class="font-headline-sm text-headline-sm text-editorial-sage-light">무지출 챌린지 5일 연속 달성</span><span class="px-2 py-0.5 rounded-full bg-primary-container/20 text-primary font-label-caps text-label-caps font-semibold">연속 5일차</span></div><p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">불필요 소비 억제 목표를 안정적으로 유지하고 있습니다.</p></div></div><div class="flex flex-col items-start sm:items-end bg-surface-architectural border border-border-subtle px-space-md py-space-sm rounded-DEFAULT"><span class="font-label-caps text-label-caps text-outline">이번 주 절약액</span><span class="font-headline-md text-headline-md text-primary font-bold tracking-tight">+₩ 64,000</span></div></div><div class="grid grid-cols-7 gap-2 mt-space-md pt-space-md bg-surface-architectural/40 rounded-DEFAULT p-space-sm"><div class="flex flex-col items-center gap-1"><span class="font-label-caps text-label-caps text-outline">월</span><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-label-numeric text-label-numeric"><span class="material-symbols-outlined text-[16px]">check</span></div></div><div class="flex flex-col items-center gap-1"><span class="font-label-caps text-label-caps text-outline">화</span><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-label-numeric text-label-numeric"><span class="material-symbols-outlined text-[16px]">check</span></div></div><div class="flex flex-col items-center gap-1"><span class="font-label-caps text-label-caps text-outline">수</span><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-label-numeric text-label-numeric"><span class="material-symbols-outlined text-[16px]">check</span></div></div><div class="flex flex-col items-center gap-1"><span class="font-label-caps text-label-caps text-outline">목</span><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-label-numeric text-label-numeric"><span class="material-symbols-outlined text-[16px]">check</span></div></div><div class="flex flex-col items-center gap-1"><span class="font-label-caps text-label-caps text-outline">금</span><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-label-numeric text-label-numeric"><span class="material-symbols-outlined text-[16px]">check</span></div></div><div class="flex flex-col items-center gap-1"><span class="font-label-caps text-label-caps text-outline">토</span><div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-outline font-label-numeric text-label-numeric"><span class="w-2 h-2 rounded-full bg-outline"></span></div></div><div class="flex flex-col items-center gap-1"><span class="font-label-caps text-label-caps text-outline">일</span><div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-outline font-label-numeric text-label-numeric"><span class="w-2 h-2 rounded-full bg-outline"></span></div></div></div></div></div>
+    <!-- RIGHT COLUMN (5 Cols): Category Distribution & AI Leakage Defense -->
+    <div class="lg:col-span-5 flex flex-col gap-space-xl"><div class="rounded-xl bg-surface-charcoal/90 border border-border-hairline p-space-lg shadow-xl flex flex-col gap-space-md"><div class="flex items-center justify-between"><div class="flex flex-col"><span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">지출 포트폴리오</span><h2 class="font-headline-sm text-headline-sm text-editorial-sage-light">카테고리별 비중</h2></div><span class="px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-caps text-label-caps">10월 집계</span></div><div class="flex flex-col sm:flex-row items-center justify-around gap-space-md my-space-sm"><div class="relative w-44 h-44 flex items-center justify-center"><svg class="w-full h-full -rotate-90 transform" viewBox="0 0 100 100"><circle class="text-surface-container fill-none" cx="50" cy="50" r="40" stroke="currentColor" stroke-width="12"></circle><circle class="text-signal-advisory fill-none" cx="50" cy="50" r="40" stroke="currentColor" stroke-dasharray="113.04 251.2" stroke-dashoffset="0" stroke-width="12"></circle><circle class="text-primary fill-none" cx="50" cy="50" r="40" stroke="currentColor" stroke-dasharray="75.36 251.2" stroke-dashoffset="-113.04" stroke-width="12"></circle><circle class="text-secondary-fixed-dim fill-none" cx="50" cy="50" r="40" stroke="currentColor" stroke-dasharray="37.68 251.2" stroke-dashoffset="-188.4" stroke-width="12"></circle><circle class="text-surface-bright fill-none" cx="50" cy="50" r="40" stroke="currentColor" stroke-dasharray="25.12 251.2" stroke-dashoffset="-226.08" stroke-width="12"></circle></svg><div class="absolute inset-0 flex flex-col items-center justify-center text-center"><span class="font-label-caps text-label-caps text-outline uppercase">최대 비중</span><span class="font-headline-sm text-headline-sm text-signal-advisory font-bold">식비 45%</span></div></div><div class="flex flex-col gap-space-xs w-full sm:w-auto"><div class="flex items-center justify-between sm:justify-start gap-3 bg-surface-architectural/50 p-2 rounded-DEFAULT border border-border-subtle"><div class="w-3 h-3 rounded-full bg-signal-advisory flex-shrink-0"></div><div class="flex flex-col"><span class="font-label-numeric text-label-numeric text-editorial-sage-light">식음료 (45%)</span><span class="font-body-sm text-body-sm text-on-surface-variant">₩ 1,143,000</span></div></div><div class="flex items-center justify-between sm:justify-start gap-3 bg-surface-architectural/50 p-2 rounded-DEFAULT border border-border-subtle"><div class="w-3 h-3 rounded-full bg-primary flex-shrink-0"></div><div class="flex flex-col"><span class="font-label-numeric text-label-numeric text-editorial-sage-light">주거·통신 (30%)</span><span class="font-body-sm text-body-sm text-on-surface-variant">₩ 762,000</span></div></div><div class="flex items-center justify-between sm:justify-start gap-3 bg-surface-architectural/50 p-2 rounded-DEFAULT border border-border-subtle"><div class="w-3 h-3 rounded-full bg-secondary-fixed-dim flex-shrink-0"></div><div class="flex flex-col"><span class="font-label-numeric text-label-numeric text-editorial-sage-light">교통비 (15%)</span><span class="font-body-sm text-body-sm text-on-surface-variant">₩ 381,000</span></div></div><div class="flex items-center justify-between sm:justify-start gap-3 bg-surface-architectural/50 p-2 rounded-DEFAULT border border-border-subtle"><div class="w-3 h-3 rounded-full bg-surface-bright flex-shrink-0"></div><div class="flex flex-col"><span class="font-label-numeric text-label-numeric text-editorial-sage-light">기타 생활 (10%)</span><span class="font-body-sm text-body-sm text-on-surface-variant">₩ 254,000</span></div></div></div></div></div><div class="rounded-xl bg-surface-charcoal/90 border border-border-hairline p-space-lg shadow-xl relative overflow-hidden"><div class="flex items-center justify-between mb-space-sm"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-signal-advisory"></span><span class="font-label-caps text-label-caps text-signal-advisory uppercase tracking-wider">지출 절감 제안</span></div><span class="font-label-caps text-label-caps text-outline">소비 패턴 감지</span></div><div class="flex items-start gap-space-md"><div class="w-10 h-10 rounded-DEFAULT bg-surface-architectural border border-border-subtle flex items-center justify-center text-signal-advisory flex-shrink-0"><span class="material-symbols-outlined text-[22px]">coffee</span></div><div class="flex flex-col gap-1"><h3 class="font-headline-sm text-headline-sm text-editorial-sage-light">카페인 지출 과밀집 현상 감지</h3><p class="font-body-sm text-body-sm text-editorial-sage-muted leading-relaxed">당월 테이크아웃 카페 결제가 <strong class="text-signal-advisory font-semibold">총 18회</strong> 집계되었습니다. 텀블러 할인 및 주 2회 사내 머신 전환 시 예상 효과:</p></div></div><div class="mt-space-md p-space-md rounded-DEFAULT bg-surface-architectural border border-border-subtle grid grid-cols-2 gap-space-sm"><div class="flex flex-col"><span class="font-label-caps text-label-caps text-outline">월간 예상 절감</span><span class="font-headline-sm text-headline-sm text-primary font-bold">+ ₩ 28,000</span></div><div class="flex flex-col"><span class="font-label-caps text-label-caps text-outline">연환산 재투자 효과</span><span class="font-headline-sm text-headline-sm text-primary font-bold">+ ₩ 336,000</span></div></div></div></div>
+    </div>
+    <!-- 3. Realtime High-Contrast Ledger Feed Table & Action Bar -->
+    <section class="flex flex-col gap-space-md rounded-xl bg-surface-charcoal/90 border border-border-hairline backdrop-blur-xl p-space-lg lg:p-space-xl shadow-xl"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md pb-space-sm"><div class="flex items-center gap-space-sm"><div class="w-10 h-10 rounded-DEFAULT bg-surface-architectural border border-border-subtle flex items-center justify-center text-primary"><span class="material-symbols-outlined text-[22px]">receipt_long</span></div><div class="flex flex-col"><h2 class="font-headline-md text-headline-md text-editorial-sage-light">최근 지출 내역</h2><span class="font-label-caps text-label-caps text-outline tracking-wider uppercase">최근 등록된 거래 피드</span></div></div><div class="flex items-center gap-space-sm self-start sm:self-center"><button class="px-space-md py-space-xs rounded-full bg-surface-architectural border border-border-subtle text-editorial-sage-light font-label-numeric text-label-numeric hover:bg-surface-container-high transition-all flex items-center gap-1.5" type="button"><span class="material-symbols-outlined text-[16px]">ios_share</span><span class="">내보내기</span></button><button class="px-space-md py-space-xs rounded-full bg-primary text-on-primary font-label-numeric text-label-numeric font-semibold shadow-[0_3px_0_#0D6D43] hover:translate-y-[-1px] active:translate-y-[1px] transition-all flex items-center gap-1.5" type="button"><span class="material-symbols-outlined text-[16px]">bolt</span><span class="">예산안 최적화</span></button></div></div><div class="flex flex-col gap-2"><div class="flex flex-col md:flex-row md:items-center justify-between p-space-md rounded-DEFAULT bg-surface-architectural/50 border border-border-subtle hover:bg-surface-container transition-all gap-space-sm"><div class="flex items-center gap-space-md"><div class="w-10 h-10 rounded-full bg-surface-charcoal flex items-center justify-center text-outline"><span class="material-symbols-outlined text-[20px]">restaurant</span></div><div class="flex flex-col"><div class="flex items-center gap-2"><span class="font-headline-sm text-headline-sm text-editorial-sage-light">맛있는 식당 (광화문점)</span><span class="text-outline font-label-caps text-label-caps">외식/다이닝</span></div><span class="font-body-sm text-body-sm text-outline">10.28 12:42 · 현대카드</span></div></div><div class="flex items-center justify-between md:justify-end gap-space-lg"><span class="font-headline-sm text-headline-sm text-editorial-sage-light font-semibold">- ₩ 12,000</span></div></div><div class="flex flex-col md:flex-row md:items-center justify-between p-space-md rounded-DEFAULT bg-surface-architectural/50 border border-border-subtle hover:bg-surface-container transition-all gap-space-sm"><div class="flex items-center gap-space-md"><div class="w-10 h-10 rounded-full bg-surface-charcoal flex items-center justify-center text-outline"><span class="material-symbols-outlined text-[20px]">directions_subway</span></div><div class="flex flex-col"><div class="flex items-center gap-2"><span class="font-headline-sm text-headline-sm text-editorial-sage-light">서울교통공사 (5호선 환승)</span><span class="text-outline font-label-caps text-label-caps">대중교통</span></div><span class="font-body-sm text-body-sm text-outline">10.28 08:35 · 티머니 후불</span></div></div><div class="flex items-center justify-between md:justify-end gap-space-lg"><span class="font-headline-sm text-headline-sm text-editorial-sage-light font-semibold">- ₩ 1,400</span></div></div><div class="flex flex-col md:flex-row md:items-center justify-between p-space-md rounded-DEFAULT bg-surface-architectural/50 border border-signal-advisory/30 hover:bg-surface-container transition-all gap-space-sm"><div class="flex items-center gap-space-md"><div class="w-10 h-10 rounded-full bg-signal-advisory/10 flex items-center justify-center text-signal-advisory"><span class="material-symbols-outlined text-[20px]">local_cafe</span></div><div class="flex flex-col"><div class="flex items-center gap-2"><span class="font-headline-sm text-headline-sm text-editorial-sage-light">스타벅스 시청광장점</span><span class="px-2 py-0.5 rounded-full bg-signal-advisory/10 text-signal-advisory font-label-caps text-label-caps">누수 주의</span></div><span class="font-body-sm text-body-sm text-outline">10.27 15:10 · 신한카드</span></div></div><div class="flex items-center justify-between md:justify-end gap-space-lg"><span class="font-headline-sm text-headline-sm text-signal-advisory font-semibold">- ₩ 4,500</span></div></div><div class="flex flex-col md:flex-row md:items-center justify-between p-space-md rounded-DEFAULT bg-surface-architectural/50 border border-border-subtle hover:bg-surface-container transition-all gap-space-sm"><div class="flex items-center gap-space-md"><div class="w-10 h-10 rounded-full bg-surface-charcoal flex items-center justify-center text-outline"><span class="material-symbols-outlined text-[20px]">apartment</span></div><div class="flex flex-col"><div class="flex items-center gap-2"><span class="font-headline-sm text-headline-sm text-editorial-sage-light">서초센트럴 입주자대표회의</span><span class="text-outline font-label-caps text-label-caps">주거/공과금</span></div><span class="font-body-sm text-body-sm text-outline">10.25 09:00 · 국민은행 이체</span></div></div><div class="flex items-center justify-between md:justify-end gap-space-lg"><span class="font-headline-sm text-headline-sm text-editorial-sage-light font-semibold">- ₩ 150,000</span></div></div></div><div class="flex flex-col sm:flex-row items-center justify-between pt-space-sm text-outline font-label-caps text-label-caps"><span class="">총 24건 중 최근 4건 표시</span><div class="flex items-center gap-1 cursor-pointer hover:text-primary transition-colors mt-2 sm:mt-0"><span class="">전체 지출 내역 보기</span><span class="material-symbols-outlined text-[16px]">chevron_right</span></div></div></section>
+    </div>
+    </div></main><footer class="w-full bg-surface-charcoal border-t border-border-hairline mt-space-2xl"><div class="max-w-[1440px] mx-auto px-margin-mobile lg:px-margin py-space-2xl"><div class="grid grid-cols-1 md:grid-cols-4 gap-space-xl mb-space-xl"><div class="md:col-span-2 flex flex-col gap-space-sm"><div class="flex items-center gap-space-xs"><span class="material-symbols-outlined text-primary text-[20px]">verified_user</span><span class="font-headline-sm text-headline-sm text-editorial-sage-light">KINETIC CAPITAL LABS</span></div><p class="font-body-sm text-body-sm text-on-surface-variant max-w-lg leading-relaxed">자산 형성, 부채 상환 시나리오 및 현금흐름 궤적을 연산하는 실시간 퀀트 AI 재무 의사결정 인터페이스입니다. 최상위 텔레메트리 연산 엔진을 통해 예측 불확실성을 선제적으로 제거합니다.</p><div class="flex items-center gap-3 font-label-caps text-label-caps text-outline"><span class="inline-flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-signal-positive">lock</span>256-BIT QUANT TELEMETRY</span><span class="">•</span><span class="">NODE: SEOUL-EDGE-01</span></div></div><div class="flex flex-col gap-space-xs"><span class="font-label-caps text-label-caps text-editorial-sage-light tracking-wider uppercase mb-1">재무 모듈</span><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="main-dashboard" href="#">실시간 대시보드</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="debt-analysis" href="#">부채 상환 시나리오</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="financial-simulation" href="#">자산 궤적 시뮬레이터</a><a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" data-path="ai-financial-report" href="#">심층 진단 보고서</a></div><div class="flex flex-col gap-space-xs"><span class="font-label-caps text-label-caps text-editorial-sage-light tracking-wider uppercase mb-1">보안 및 규제 준수</span><span class="font-body-sm text-body-sm text-on-surface-variant">ISO/IEC 27001 인증 준수</span><span class="font-body-sm text-body-sm text-on-surface-variant">금융보안원 클라우드 적격성 평가</span><span class="font-body-sm text-body-sm text-on-surface-variant">개인신용정보 보호 아키텍처</span><div class="mt-2 pt-2 border-t border-border-subtle"><a class="font-label-numeric text-label-numeric text-secondary hover:text-primary transition-colors inline-flex items-center gap-1" data-path="login" href="#">인증 콘솔 재접속 <span class="material-symbols-outlined text-[16px]">arrow_forward</span></a></div></div></div><div class="pt-space-md border-t border-border-subtle flex flex-col sm:flex-row items-center justify-between gap-space-sm font-label-caps text-label-caps text-outline"><p class="">© 2025 KINETIC CAPITAL SYSTEMS INC. ALL QUANT RIGHTS RESERVED.</p><div class="flex items-center gap-space-md"><span class="hover:text-on-surface cursor-pointer">개인정보처리방침</span><span class="hover:text-on-surface cursor-pointer">이용약관</span><span class="hover:text-on-surface cursor-pointer">위험고지서</span></div></div></div></footer>
+    
+    </body></html>
